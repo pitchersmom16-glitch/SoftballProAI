@@ -1,0 +1,33 @@
+import { Sidebar } from "./Sidebar";
+import { useAuth } from "@/hooks/use-auth";
+import { useLocation } from "wouter";
+
+export function Layout({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth();
+  const [location] = useLocation();
+  const isLanding = !isAuthenticated && location === "/";
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  // If on landing page (public), don't show sidebar
+  if (isLanding) {
+    return <main className="min-h-screen bg-white">{children}</main>;
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {isAuthenticated && <Sidebar />}
+      <div className={`lg:pl-72 transition-all duration-300 min-h-screen`}>
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
