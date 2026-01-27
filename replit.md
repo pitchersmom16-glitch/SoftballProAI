@@ -83,6 +83,36 @@ Authentication is handled through `server/replit_integrations/auth/` with Passpo
 ### AI/ML Services
 - **OpenAI API**: Used for video analysis and voice features
 - **Audio Processing**: ffmpeg for audio format conversion (WebM to WAV)
+- **MediaPipe Pose**: Real-time biomechanical pose detection for video analysis
+
+### Biomechanics Engine (MediaPipe Pose)
+The PoseAnalyzer component provides real-time skeleton overlay and biomechanical metrics during video playback.
+
+**Component:** `client/src/components/PoseAnalyzer.tsx`
+
+**Features:**
+- Real-time pose detection using MediaPipe Pose model (loaded from CDN)
+- Canvas overlay with skeleton visualization (neon green connectors, pink landmarks)
+- Auto-detects dominant side (left/right) based on landmark visibility
+- Tracking loss detection with visual indicator
+- Error handling with fallback video player
+
+**Metrics Calculated (every 500ms):**
+- **Arm Slot Angle**: Hip → Shoulder → Elbow angle (degrees)
+- **Knee Flexion**: Hip → Knee → Ankle angle (degrees)
+- **Torque Separation**: Normalized horizontal separation between shoulder/hip midpoints (percentage of shoulder width)
+
+**Integration:**
+- Used in AssessmentDetail page (`/assessments/:id`)
+- Live Biomechanics sidebar displays real-time metrics
+- Metrics update via `onMetricsUpdate` callback
+
+**npm Packages:**
+- `@mediapipe/pose` - Pose detection model
+- `@mediapipe/drawing_utils` - Skeleton drawing utilities
+- `@mediapipe/camera_utils` - Camera utilities
+
+**Note:** Metrics are 2D estimates based on video frame landmarks, not clinical biomechanics measurements.
 
 ### AI Brain System
 The Brain is the core mechanics analysis engine that recommends correction drills based on biomechanical issues. It supports the "whole athlete" model covering Pitching, Hitting, Catching, Throwing, and Mental performance.
