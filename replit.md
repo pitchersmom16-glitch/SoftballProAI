@@ -72,6 +72,28 @@ Authentication is handled through `server/replit_integrations/auth/` with Passpo
 - **OpenAI API**: Used for video analysis and voice features
 - **Audio Processing**: ffmpeg for audio format conversion (WebM to WAV)
 
+### AI Brain System
+The Brain is the core mechanics analysis engine that recommends correction drills based on biomechanical issues.
+
+**Key Components:**
+- `server/brain/analyze_mechanics.ts` - Core analysis logic with issue-to-drill mapping
+- `scripts/seed_drills.ts` - Knowledge Base seed script (30 expert drills)
+
+**Brain API Endpoints:**
+- `POST /api/brain/analyze` - Analyze issues and get top 3 drill recommendations
+- `GET /api/brain/corrective-drills?skillType=pitching&issue=hunched+forward` - Quick lookup
+- `GET /api/brain/drills-by-tag?tag=Internal+Rotation` - Search by mechanic tag
+- `GET /api/brain/drills-by-expert?expert=Amanda+Scarborough` - Search by expert source
+
+**Knowledge Base Structure:**
+Drills include: name, category (Pitching/Hitting), expertSource, mechanicTags[], issueAddressed, videoUrl, difficulty
+
+**Issue Mapping:**
+The Brain maps biomechanical issues to mechanic tags for intelligent drill matching:
+- "hunched forward" → ["Posture", "Spine Angle", "Balance"]
+- "weak leg drive" → ["Leg Drive", "Explosive Power", "Kinetic Chain"]
+- "lunging" → ["Stay Back", "Load", "Balance"]
+
 ### Key npm Dependencies
 - `drizzle-orm` / `drizzle-kit`: Database ORM and migrations
 - `@tanstack/react-query`: Server state management

@@ -159,7 +159,7 @@ export async function analyzeMechanics(request: MechanicsAnalysisRequest): Promi
           matchReasons.push(`Tag match: ${tag}`);
         } else {
           // Partial match check
-          for (const relevantTag of relevantTags) {
+          for (const relevantTag of Array.from(relevantTags)) {
             if (tagLower.includes(relevantTag) || relevantTag.includes(tagLower)) {
               score += WEIGHTS.tagPartialMatch;
               matchReasons.push(`Related to: ${tag}`);
