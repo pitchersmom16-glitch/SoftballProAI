@@ -175,8 +175,8 @@ export async function registerRoutes(
         const response = await openai.chat.completions.create({
           model: "gpt-5.1",
           messages: [
-            { role: "system", content: "You are an expert softball mechanics coach. Analyze the pitching metrics and provide feedback." },
-            { role: "user", content: `Metrics: ${JSON.stringify(mockMetrics)}. Skill: ${assessment.skillType}. Generate 3 key feedback points.` }
+            { role: "system", content: "You are an expert FASTPITCH SOFTBALL mechanics coach specializing in the windmill pitching motion. Your expertise covers: rise ball, drop ball, curve ball, change-up, and screw ball mechanics. You understand proper drag foot technique, hip drive, arm circle speed, wrist snap timing, and stride length optimization specific to fastpitch softball - NOT baseball. All feedback must be age-appropriate and focused on injury prevention and proper fastpitch form." },
+            { role: "user", content: `Fastpitch Softball Metrics: ${JSON.stringify(mockMetrics)}. Skill: ${assessment.skillType}. Generate 3 key feedback points focused on windmill pitching mechanics, drag foot position, and release point.` }
           ],
         });
 

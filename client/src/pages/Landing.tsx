@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { ArrowRight, Activity, Zap, TrendingUp, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Activity, Zap, TrendingUp, CheckCircle2, Video } from "lucide-react";
 
 export default function Landing() {
   return (
