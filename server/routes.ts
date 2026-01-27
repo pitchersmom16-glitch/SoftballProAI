@@ -323,9 +323,10 @@ export async function registerRoutes(
               // Determine health status based on check-in data
               const isArmSore = lastCheckIn.sorenessAreas.includes("arm") || 
                                lastCheckIn.sorenessAreas.includes("shoulder");
-              if (isArmSore && lastCheckIn.sorenessLevel >= 7) {
+              const sorenessLvl = lastCheckIn.sorenessLevel ?? 0;
+              if (isArmSore && sorenessLvl >= 7) {
                 healthStatus = "rest";
-              } else if (isArmSore || lastCheckIn.sorenessLevel >= 5) {
+              } else if (isArmSore || sorenessLvl >= 5) {
                 healthStatus = "caution";
               }
             }
@@ -379,7 +380,7 @@ export async function registerRoutes(
       // Validate team ownership if teamId is provided
       if (data.teamId) {
         const team = await storage.getTeam(data.teamId);
-        if (!team || team.coachId !== coach.id) {
+        if (!team || team.headCoachId !== coach.id) {
           return res.status(403).json({ message: "You don't have access to this team" });
         }
       }
@@ -542,7 +543,7 @@ export async function registerRoutes(
       }
 
       const drills = await getCorrectiveDrills(
-        skillType as "pitching" | "hitting",
+        (skillType as string).toUpperCase() as "PITCHING" | "HITTING" | "CATCHING" | "FIELDING",
         issue as string,
         limit ? Number(limit) : 3
       );
@@ -650,6 +651,272 @@ export async function registerRoutes(
     } catch (err) {
       console.error("Delete mental edge error:", err);
       res.status(500).json({ message: "Failed to delete mental edge content" });
+    }
+  });
+
+  // === HYBRID COACHING SYSTEM ROUTES ===
+
+  // Get player's coaching team
+  app.get("/api/player/coaches", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const coaches = await storage.getPlayerCoaches(userId);
+      res.json(coaches);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Get player settings (subscription mode)
+  app.get("/api/player/settings", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      let settings = await storage.getPlayerSettings(userId);
+      
+      // Create default settings if none exist
+      if (!settings) {
+        settings = await storage.createPlayerSettings({ userId, subscriptionMode: "solo" });
+      }
+      
+      res.json(settings);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Update player settings
+  app.patch("/api/player/settings", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
+      const settingsSchema = z.object({
+        subscriptionMode: z.enum(["solo", "coached"]).optional(),
+        notificationsEnabled: z.boolean().optional(),
+        autoAssignDrills: z.boolean().optional(),
+      });
+      
+      const data = settingsSchema.parse(req.body);
+      
+      // Ensure settings exist first
+      let settings = await storage.getPlayerSettings(userId);
+      if (!settings) {
+        settings = await storage.createPlayerSettings({ userId, subscriptionMode: "solo" });
+      }
+      
+      const updated = await storage.updatePlayerSettings(userId, data);
+      res.json(updated);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  // Send coach invite
+  app.post("/api/player/invite-coach", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
+      const inviteSchema = z.object({
+        coachEmail: z.string().email().optional(),
+        coachUsername: z.string().optional(),
+        skillType: z.enum(["PITCHING", "HITTING", "CATCHING", "FIELDING"]),
+        message: z.string().optional(),
+      });
+      
+      const data = inviteSchema.parse(req.body);
+      
+      if (!data.coachEmail && !data.coachUsername) {
+        return res.status(400).json({ message: "Either coach email or username is required" });
+      }
+      
+      // Generate unique invite token
+      const inviteToken = crypto.randomUUID();
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+      
+      const invite = await storage.createCoachInvite({
+        fromPlayerId: userId,
+        toCoachEmail: data.coachEmail || null,
+        toCoachUsername: data.coachUsername || null,
+        skillType: data.skillType,
+        status: "pending",
+        inviteToken,
+        expiresAt,
+        message: data.message || null,
+      });
+      
+      res.status(201).json(invite);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  // Get player's sent invites
+  app.get("/api/player/invites", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const invites = await storage.getPlayerInvites(userId);
+      res.json(invites);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Get coach's received invites
+  app.get("/api/coach/invites", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const coach = await storage.getCoachByUserId(userId);
+      if (!coach) return res.json([]);
+      
+      const invites = await storage.getCoachInvites(coach.id);
+      res.json(invites);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Accept or decline invite
+  app.patch("/api/coach/invites/:id", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const coach = await storage.getCoachByUserId(userId);
+      if (!coach) return res.status(404).json({ message: "Coach profile not found" });
+      
+      const actionSchema = z.object({
+        status: z.enum(["accepted", "declined"]),
+      });
+      
+      const { status } = actionSchema.parse(req.body);
+      const inviteId = Number(req.params.id);
+      
+      // Update invite status
+      const invite = await storage.updateCoachInvite(inviteId, { 
+        status, 
+        toCoachId: coach.id 
+      });
+      
+      // If accepted, create the player-coach relationship
+      if (status === "accepted") {
+        await storage.createPlayerCoachRelationship({
+          playerId: invite.fromPlayerId,
+          coachId: coach.id,
+          skillType: invite.skillType,
+          status: "active",
+          subscriptionMode: "coached",
+        });
+      }
+      
+      res.json(invite);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  // Get coach's players (students)
+  app.get("/api/coach/players", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const coach = await storage.getCoachByUserId(userId);
+      if (!coach) return res.json([]);
+      
+      const players = await storage.getCoachPlayers(coach.id);
+      res.json(players);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Remove coach from player's team
+  app.delete("/api/player/coaches/:id", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      await storage.deletePlayerCoachRelationship(Number(req.params.id));
+      res.json({ message: "Coach removed from your team" });
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // === COACH REVIEW QUEUE (Pending Assessments) ===
+
+  // Get assessments pending coach review
+  app.get("/api/coach/review-queue", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const coach = await storage.getCoachByUserId(userId);
+      
+      // Get all pending_coach_review assessments for this coach's players
+      const pendingAssessments = await storage.getAssessmentsByStatus("pending_coach_review", coach?.id);
+      res.json(pendingAssessments);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Approve assessment (release drills to player)
+  app.post("/api/coach/assessments/:id/approve", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const assessmentId = Number(req.params.id);
+      
+      await storage.updateAssessment(assessmentId, { status: "coach_approved" });
+      res.json({ message: "Assessment approved, drills released to player" });
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Edit and approve assessment
+  app.post("/api/coach/assessments/:id/edit-approve", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const assessmentId = Number(req.params.id);
+      
+      const editSchema = z.object({
+        notes: z.string().optional(),
+        additionalFeedback: z.string().optional(),
+      });
+      
+      const data = editSchema.parse(req.body);
+      
+      await storage.updateAssessment(assessmentId, { 
+        status: "coach_edited",
+        notes: data.notes
+      });
+      
+      // Add coach's additional feedback if provided
+      if (data.additionalFeedback) {
+        await storage.createFeedback({
+          assessmentId,
+          feedbackText: data.additionalFeedback,
+          priority: "High",
+          issueDetected: "Coach Review"
+        });
+      }
+      
+      res.json({ message: "Assessment edited and approved" });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
     }
   });
 

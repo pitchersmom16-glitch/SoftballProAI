@@ -1,12 +1,13 @@
 import { db } from "./db";
 import { 
   coaches, teams, athletes, drills, assessments, assessmentFeedback, mentalEdge, playerCheckins,
-  practicePlans, coachStudents, homeworkAssignments,
+  practicePlans, coachStudents, homeworkAssignments, playerCoachRelationships, coachInvites, playerSettings,
   type Coach, type Team, type Athlete, type Drill, type Assessment, type Feedback, type MentalEdge, type PlayerCheckin,
-  type PracticePlan, type CoachStudent, type HomeworkAssignment,
+  type PracticePlan, type CoachStudent, type HomeworkAssignment, type PlayerCoachRelationship, type CoachInvite, type PlayerSettings,
   type CreateCoachRequest, type CreateTeamRequest, type CreateAthleteRequest, 
   type CreateDrillRequest, type CreateMentalEdgeRequest, type CreateAssessmentRequest, type CreateFeedbackRequest,
-  type CreatePlayerCheckinRequest, type UpdateAthleteRequest, type UpdateAssessmentRequest
+  type CreatePlayerCheckinRequest, type UpdateAthleteRequest, type UpdateAssessmentRequest,
+  type CreatePlayerCoachRelationshipRequest, type CreateCoachInviteRequest, type CreatePlayerSettingsRequest
 } from "@shared/schema";
 import { users, type UserRole } from "@shared/models/auth";
 import { eq, desc, and } from "drizzle-orm";
@@ -66,6 +67,28 @@ export interface IStorage {
   // Homework Assignments
   getHomeworkAssignments(coachId?: number, athleteId?: number): Promise<HomeworkAssignment[]>;
   createHomeworkAssignment(assignment: Partial<HomeworkAssignment>): Promise<HomeworkAssignment>;
+  
+  // Player-Coach Relationships (Hybrid Coaching)
+  getPlayerCoaches(playerId: string): Promise<(PlayerCoachRelationship & { coach?: Coach })[]>;
+  getCoachPlayers(coachId: number): Promise<(PlayerCoachRelationship & { player?: any })[]>;
+  createPlayerCoachRelationship(rel: CreatePlayerCoachRelationshipRequest): Promise<PlayerCoachRelationship>;
+  updatePlayerCoachRelationship(id: number, update: Partial<PlayerCoachRelationship>): Promise<PlayerCoachRelationship>;
+  deletePlayerCoachRelationship(id: number): Promise<void>;
+  
+  // Coach Invites
+  getPlayerInvites(playerId: string): Promise<CoachInvite[]>;
+  getCoachInvites(coachId: number): Promise<CoachInvite[]>;
+  getInviteByToken(token: string): Promise<CoachInvite | undefined>;
+  createCoachInvite(invite: CreateCoachInviteRequest): Promise<CoachInvite>;
+  updateCoachInvite(id: number, update: Partial<CoachInvite>): Promise<CoachInvite>;
+  
+  // Player Settings
+  getPlayerSettings(userId: string): Promise<PlayerSettings | undefined>;
+  createPlayerSettings(settings: CreatePlayerSettingsRequest): Promise<PlayerSettings>;
+  updatePlayerSettings(userId: string, update: Partial<PlayerSettings>): Promise<PlayerSettings>;
+  
+  // Assessments by status (for coach review queue)
+  getAssessmentsByStatus(status: string, coachId?: number): Promise<Assessment[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -244,6 +267,112 @@ export class DatabaseStorage implements IStorage {
   async createHomeworkAssignment(assignment: Partial<HomeworkAssignment>): Promise<HomeworkAssignment> {
     const [newAssignment] = await db.insert(homeworkAssignments).values(assignment as any).returning();
     return newAssignment;
+  }
+
+  // Player-Coach Relationships (Hybrid Coaching)
+  async getPlayerCoaches(playerId: string): Promise<(PlayerCoachRelationship & { coach?: Coach })[]> {
+    const relationships = await db.select().from(playerCoachRelationships)
+      .where(eq(playerCoachRelationships.playerId, playerId));
+    
+    // Join with coaches
+    const enriched = await Promise.all(
+      relationships.map(async (rel) => {
+        const [coach] = await db.select().from(coaches).where(eq(coaches.id, rel.coachId));
+        return { ...rel, coach };
+      })
+    );
+    
+    return enriched;
+  }
+
+  async getCoachPlayers(coachId: number): Promise<(PlayerCoachRelationship & { player?: any })[]> {
+    const relationships = await db.select().from(playerCoachRelationships)
+      .where(eq(playerCoachRelationships.coachId, coachId));
+    
+    // Join with users (players)
+    const enriched = await Promise.all(
+      relationships.map(async (rel) => {
+        const [player] = await db.select().from(users).where(eq(users.id, rel.playerId));
+        return { ...rel, player };
+      })
+    );
+    
+    return enriched;
+  }
+
+  async createPlayerCoachRelationship(rel: CreatePlayerCoachRelationshipRequest): Promise<PlayerCoachRelationship> {
+    const [newRel] = await db.insert(playerCoachRelationships).values(rel).returning();
+    return newRel;
+  }
+
+  async updatePlayerCoachRelationship(id: number, update: Partial<PlayerCoachRelationship>): Promise<PlayerCoachRelationship> {
+    const [updated] = await db.update(playerCoachRelationships).set(update).where(eq(playerCoachRelationships.id, id)).returning();
+    return updated;
+  }
+
+  async deletePlayerCoachRelationship(id: number): Promise<void> {
+    await db.delete(playerCoachRelationships).where(eq(playerCoachRelationships.id, id));
+  }
+
+  // Coach Invites
+  async getPlayerInvites(playerId: string): Promise<CoachInvite[]> {
+    return db.select().from(coachInvites)
+      .where(eq(coachInvites.fromPlayerId, playerId))
+      .orderBy(desc(coachInvites.createdAt));
+  }
+
+  async getCoachInvites(coachId: number): Promise<CoachInvite[]> {
+    return db.select().from(coachInvites)
+      .where(eq(coachInvites.toCoachId, coachId))
+      .orderBy(desc(coachInvites.createdAt));
+  }
+
+  async getInviteByToken(token: string): Promise<CoachInvite | undefined> {
+    const [invite] = await db.select().from(coachInvites)
+      .where(eq(coachInvites.inviteToken, token));
+    return invite;
+  }
+
+  async createCoachInvite(invite: CreateCoachInviteRequest): Promise<CoachInvite> {
+    const [newInvite] = await db.insert(coachInvites).values(invite).returning();
+    return newInvite;
+  }
+
+  async updateCoachInvite(id: number, update: Partial<CoachInvite>): Promise<CoachInvite> {
+    const [updated] = await db.update(coachInvites).set(update).where(eq(coachInvites.id, id)).returning();
+    return updated;
+  }
+
+  // Player Settings
+  async getPlayerSettings(userId: string): Promise<PlayerSettings | undefined> {
+    const [settings] = await db.select().from(playerSettings)
+      .where(eq(playerSettings.userId, userId));
+    return settings;
+  }
+
+  async createPlayerSettings(settings: CreatePlayerSettingsRequest): Promise<PlayerSettings> {
+    const [newSettings] = await db.insert(playerSettings).values(settings).returning();
+    return newSettings;
+  }
+
+  async updatePlayerSettings(userId: string, update: Partial<PlayerSettings>): Promise<PlayerSettings> {
+    const [updated] = await db.update(playerSettings)
+      .set({ ...update, updatedAt: new Date() })
+      .where(eq(playerSettings.userId, userId))
+      .returning();
+    return updated;
+  }
+
+  // Assessments by status (for coach review queue)
+  async getAssessmentsByStatus(status: string, coachId?: number): Promise<Assessment[]> {
+    if (coachId) {
+      return db.select().from(assessments)
+        .where(and(eq(assessments.status, status), eq(assessments.coachId, coachId)))
+        .orderBy(desc(assessments.createdAt));
+    }
+    return db.select().from(assessments)
+      .where(eq(assessments.status, status))
+      .orderBy(desc(assessments.createdAt));
   }
 }
 
