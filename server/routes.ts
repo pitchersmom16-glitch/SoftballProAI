@@ -347,6 +347,61 @@ export async function registerRoutes(
     }
   });
 
+  // Update team (for head coaches to update their team)
+  app.patch("/api/teams/:id", isAuthenticated, async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
+      const id = Number(req.params.id);
+      const team = await storage.getTeam(id);
+      if (!team) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      
+      // Get the coach for this user
+      const coach = await storage.getCoachByUserId(userId);
+      
+      // Authorization: Must be existing head coach OR team has no head coach (can claim it)
+      const isHeadCoach = coach && team.headCoachId === coach.id;
+      const canClaimTeam = coach && !team.headCoachId;
+      
+      if (!isHeadCoach && !canClaimTeam) {
+        return res.status(403).json({ message: "Only the head coach can update this team" });
+      }
+      
+      const updateSchema = z.object({
+        name: z.string().optional(),
+        ageDivision: z.string().optional(),
+        season: z.string().optional(),
+        logoUrl: z.string().url().optional().nullable(),
+        headCoachId: z.number().optional(),
+        active: z.boolean().optional(),
+      });
+      
+      const input = updateSchema.parse(req.body);
+      
+      // If user is claiming the team (no existing head coach), they can set themselves as head coach
+      if (canClaimTeam && input.headCoachId && input.headCoachId === coach!.id) {
+        // Allow claiming
+      } else if (isHeadCoach) {
+        // Head coach can update anything
+      } else if (input.headCoachId !== undefined) {
+        // Non-head coach trying to set headCoachId
+        return res.status(403).json({ message: "Only existing head coach can change head coach" });
+      }
+      
+      const updated = await storage.updateTeam(id, input);
+      res.json(updated);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      console.error("Error updating team:", err);
+      res.status(500).json({ message: "Failed to update team" });
+    }
+  });
+
   // Delete team
   app.delete("/api/teams/:id", isAuthenticated, async (req, res) => {
     try {
