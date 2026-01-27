@@ -1,5 +1,6 @@
 import { Link } from "wouter";
-import { ArrowRight, Activity, Zap, TrendingUp, Video } from "lucide-react";
+import { Activity, TrendingUp, Video } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.jpg";
 import heroImage from "@/assets/hero.jpg";
 
@@ -25,53 +26,56 @@ export default function Landing() {
 
       {/* Hero Section */}
       <section className="relative w-full min-h-screen flex items-center overflow-hidden bg-brand-black">
-        {/* 1. BACKGROUND LAYER (The Skeleton) */}
-        <div className="absolute inset-0 z-0 flex justify-end items-center">
-          {/* Image is anchored to the RIGHT side */}
+        {/* === LAYER 1: THE SKELETON (Background & Position) === */}
+        <div className="absolute inset-0 z-0 flex items-center justify-end">
           <img
             src={heroImage}
             alt="Biomechanics Background"
-            className="w-full lg:w-[65%] h-full object-contain object-right opacity-60 animate-pulse-slow"
+            className="w-full h-full lg:w-[65%] object-contain object-center lg:object-right opacity-50 animate-pulse-slow"
           />
-          {/* The Gradient Fade (Crucial for reading text) */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/70 to-transparent" />
+          {/* The Gradient Fade: Ensures text is readable on top of the image */}
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-black via-brand-black/80 to-transparent" />
         </div>
 
-        {/* CONTENT LAYER (On top) */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-wider mb-6 badge-glass">
-              <Zap className="h-3 w-3" style={{ color: '#8B5CF6' }} />
-              <span className="text-gray-300">AI-Powered Coaching</span>
+        {/* === LAYER 2: THE TEXT (Content) === */}
+        <div className="relative z-10 container mx-auto px-6 lg:px-12">
+          <div className="max-w-3xl mx-auto lg:mx-0 text-center lg:text-left space-y-8">
+            {/* The AI Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mx-auto lg:mx-0">
+              <span className="w-2 h-2 rounded-full bg-brand-blue animate-pulse"/>
+              <span className="text-sm font-medium text-gray-300 tracking-wide">AI-POWERED COACHING</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold font-display leading-[1.1] mb-6 text-white">
-              The Ultimate <br/>
-              <span className="text-white">Softball Coach</span>
+
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white leading-tight">
+              The Ultimate <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-pink to-brand-blue">
+                Softball Coach
+              </span>
             </h1>
-            <p className="text-lg text-gray-400 mb-8 leading-relaxed max-w-lg">
-              Analyze windmill mechanics instantly with AI video breakdown. Track athlete progress, assign personalized drills, and build championship fastpitch teams.
+
+            <p className="text-xl text-gray-400 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              Analyze windmill mechanics instantly with AI. Track drag foot, arm speed, and separation.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
+
+            {/* Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
               <Link href="/api/login">
-                <button className="h-12 px-8 rounded-full btn-primary-glow text-lg flex items-center justify-center gap-2" data-testid="button-start-coaching">
+                <Button 
+                  className="h-14 px-8 text-lg bg-gradient-to-r from-brand-pink to-purple-600 transition-all shadow-[0_0_20px_rgba(236,72,153,0.3)]"
+                  data-testid="button-start-coaching"
+                >
                   Start Coaching Free
-                  <ArrowRight className="h-5 w-5" />
-                </button>
+                </Button>
               </Link>
               <Link href="#features">
-                <button className="h-12 px-8 rounded-full font-medium text-lg text-white transition-all hover:-translate-y-1" style={{ background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)' }} data-testid="button-view-features">
+                <Button 
+                  variant="outline" 
+                  className="h-14 px-8 text-lg border-white/20 text-white backdrop-blur-md"
+                  data-testid="button-view-features"
+                >
                   View Features
-                </button>
+                </Button>
               </Link>
-            </div>
-            
-            <div className="mt-10 flex items-center gap-4 text-sm text-gray-500 flex-wrap">
-              <div className="flex -space-x-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-8 w-8 rounded-full border-2" style={{ background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(255, 16, 240, 0.3))', borderColor: '#050505' }} />
-                ))}
-              </div>
-              <p className="text-gray-500">Trusted by 500+ coaches</p>
             </div>
           </div>
         </div>

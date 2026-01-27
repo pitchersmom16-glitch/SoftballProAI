@@ -1,0 +1,53 @@
+<section className="relative w-full min-h-screen flex items-center overflow-hidden bg-brand-black">
+  
+  {/* === LAYER 1: THE SKELETON (Background & Position) === */}
+  <div className="absolute inset-0 z-0 flex items-center justify-end">
+    <img
+      src={heroImage}
+      alt="Biomechanics Background"
+      // PHONE RULE: 'object-center' (Center the skeleton behind text)
+      // PC RULE: 'lg:object-right' (Push skeleton to the right side)
+      // PC RULE: 'lg:w-[65%]' (Make it bigger on PC)
+      className="w-full h-full lg:w-[65%] object-contain object-center lg:object-right opacity-50 animate-pulse-slow"
+    />
+    
+    {/* The Gradient Fade: Ensures text is readable on top of the image */}
+    <div className="absolute inset-0 bg-gradient-to-r from-brand-black via-brand-black/80 to-transparent" />
+  </div>
+
+  {/* === LAYER 2: THE TEXT (Content) === */}
+  <div className="relative z-10 container mx-auto px-6 lg:px-12">
+    
+    {/* PHONE RULE: 'text-center' (Center everything) */}
+    {/* PC RULE: 'lg:text-left' (Align left to separate from skeleton) */}
+    <div className="max-w-3xl mx-auto lg:mx-0 text-center lg:text-left space-y-8">
+      
+      {/* The AI Badge */}
+      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mx-auto lg:mx-0">
+        <span className="w-2 h-2 rounded-full bg-brand-blue animate-pulse"/>
+        <span className="text-sm font-medium text-gray-300 tracking-wide">AI-POWERED COACHING</span>
+      </div>
+
+      <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white leading-tight">
+        The Ultimate <br />
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-pink to-brand-blue">
+          Softball Coach
+        </span>
+      </h1>
+
+      <p className="text-xl text-gray-400 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+        Analyze windmill mechanics instantly with AI. Track drag foot, arm speed, and separation.
+      </p>
+
+      {/* Buttons */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+        <Button className="h-14 px-8 text-lg bg-gradient-to-r from-brand-pink to-brand-purple hover:opacity-90 transition-all shadow-[0_0_20px_rgba(236,72,153,0.3)]">
+          Start Coaching Free
+        </Button>
+        <Button variant="outline" className="h-14 px-8 text-lg border-white/20 text-white hover:bg-white/10 backdrop-blur-md">
+          View Features
+        </Button>
+      </div>
+    </div>
+  </div>
+</section>
