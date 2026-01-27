@@ -8,6 +8,15 @@ export * from "./models/chat";
 
 import { users } from "./models/auth";
 
+// === SKILL TYPE ENUM (Source of Truth for Holistic Academy) ===
+// Supports ALL 4 Core Skills as defined in Spec Sheet
+export const SkillTypeEnum = z.enum(["PITCHING", "HITTING", "CATCHING", "THROWING"]);
+export type SkillType = z.infer<typeof SkillTypeEnum>;
+
+// Category enum for drills (includes all positions + conditioning + mental)
+export const DrillCategoryEnum = z.enum(["PITCHING", "HITTING", "CATCHING", "THROWING", "INFIELD", "OUTFIELD", "CONDITIONING", "MENTAL"]);
+export type DrillCategory = z.infer<typeof DrillCategoryEnum>;
+
 // === TABLE DEFINITIONS ===
 
 export const coaches = pgTable("coaches", {
