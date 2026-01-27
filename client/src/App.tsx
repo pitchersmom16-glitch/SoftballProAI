@@ -50,6 +50,7 @@ function Router() {
       <Layout>
         <Switch>
           <Route path="/" component={PlayerDashboard} />
+          <Route path="/analyze" component={Assessments} />
           <Route path="/assessments" component={Assessments} />
           <Route path="/assessments/:id" component={AssessmentDetail} />
           <Route path="/drills" component={Drills} />
@@ -67,6 +68,7 @@ function Router() {
           <Route path="/" component={TeamCoachDashboard} />
           <Route path="/athletes" component={Athletes} />
           <Route path="/teams" component={Teams} />
+          <Route path="/analyze" component={Assessments} />
           <Route path="/assessments" component={Assessments} />
           <Route path="/assessments/:id" component={AssessmentDetail} />
           <Route path="/drills" component={Drills} />
@@ -84,6 +86,7 @@ function Router() {
         <Switch>
           <Route path="/" component={PitchingCoachDashboard} />
           <Route path="/athletes" component={Athletes} />
+          <Route path="/analyze" component={Assessments} />
           <Route path="/assessments" component={Assessments} />
           <Route path="/assessments/:id" component={AssessmentDetail} />
           <Route path="/drills" component={Drills} />
@@ -101,6 +104,7 @@ function Router() {
         <Route path="/" component={Dashboard} />
         <Route path="/athletes" component={Athletes} />
         <Route path="/teams" component={Teams} />
+        <Route path="/analyze" component={Assessments} />
         <Route path="/assessments" component={Assessments} />
         <Route path="/assessments/:id" component={AssessmentDetail} />
         <Route path="/drills" component={Drills} />
