@@ -61,6 +61,7 @@ export const teams = pgTable("teams", {
   ageDivision: text("age_division"), // e.g., "12U", "14U"
   season: text("season"), // e.g., "Spring 2024"
   logoUrl: text("logo_url"),
+  referralCode: text("referral_code").unique(), // Unique code for team invite URLs (e.g., "TEAM_ABC123")
   active: boolean("active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });

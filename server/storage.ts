@@ -121,6 +121,11 @@ export interface IStorage {
   getCoachByReferralCode(code: string): Promise<Coach | undefined>;
   updateCoach(id: number, update: Partial<Coach>): Promise<Coach>;
   
+  // Team referral and update
+  getTeamByReferralCode(code: string): Promise<Team | undefined>;
+  updateTeam(id: number, update: Partial<Team>): Promise<Team>;
+  getTeamsByHeadCoach(coachId: number): Promise<Team[]>;
+  
   // === NOTIFICATIONS ===
   getNotifications(userId: string): Promise<Notification[]>;
   getUnreadNotificationCount(userId: string): Promise<number>;
@@ -511,6 +516,23 @@ export class DatabaseStorage implements IStorage {
   async updateCoach(id: number, update: Partial<Coach>): Promise<Coach> {
     const [updated] = await db.update(coaches).set(update).where(eq(coaches.id, id)).returning();
     return updated;
+  }
+
+  // Team referral and update
+  async getTeamByReferralCode(code: string): Promise<Team | undefined> {
+    const [team] = await db.select().from(teams)
+      .where(eq(teams.referralCode, code));
+    return team;
+  }
+
+  async updateTeam(id: number, update: Partial<Team>): Promise<Team> {
+    const [updated] = await db.update(teams).set(update).where(eq(teams.id, id)).returning();
+    return updated;
+  }
+
+  async getTeamsByHeadCoach(coachId: number): Promise<Team[]> {
+    return db.select().from(teams)
+      .where(eq(teams.headCoachId, coachId));
   }
 
   // === NOTIFICATIONS ===

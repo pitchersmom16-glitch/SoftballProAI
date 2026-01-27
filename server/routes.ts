@@ -161,11 +161,9 @@ export async function registerRoutes(
       
       // If no athlete profile exists, create one
       if (!athlete) {
-        const userName = userClaims.given_name && userClaims.family_name 
-          ? `${userClaims.given_name} ${userClaims.family_name}`
-          : "Solo Player";
         athlete = await storage.createAthlete({
-          name: userName,
+          firstName: userClaims.given_name || "Solo",
+          lastName: userClaims.family_name || "Player",
           userId: userId,
         });
       }
@@ -1189,6 +1187,71 @@ export async function registerRoutes(
     }
   });
 
+  // === HEAD COACH MODE - Team Referrals ===
+
+  // Generate or get team referral code (for head coaches)
+  app.get("/api/team/:teamId/referral-code", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const teamId = Number(req.params.teamId);
+      
+      // Get team and verify ownership
+      let team = await storage.getTeam(teamId);
+      if (!team) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      
+      // Verify user is the head coach
+      const coach = await storage.getCoachByUserId(userId);
+      if (!coach || team.headCoachId !== coach.id) {
+        return res.status(403).json({ message: "Only the head coach can manage team referrals" });
+      }
+      
+      // Generate referral code if none exists
+      if (!team.referralCode) {
+        const code = `TEAM_${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+        team = await storage.updateTeam(team.id, { referralCode: code });
+      }
+      
+      res.json({ 
+        referralCode: team.referralCode,
+        referralUrl: `/register?ref=${team.referralCode}`,
+        teamId: team.id,
+        teamName: team.name
+      });
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Get teams for current head coach
+  app.get("/api/coach/teams", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
+      const coach = await storage.getCoachByUserId(userId);
+      if (!coach) {
+        return res.json({ teams: [] });
+      }
+      
+      const teams = await storage.getTeamsByHeadCoach(coach.id);
+      res.json({ 
+        teams: teams.map(t => ({
+          id: t.id,
+          name: t.name,
+          ageDivision: t.ageDivision,
+          season: t.season,
+          referralCode: t.referralCode,
+          referralUrl: t.referralCode ? `/register?ref=${t.referralCode}` : null
+        }))
+      });
+    } catch (err) {
+      throw err;
+    }
+  });
+
   // === SPECIALIST COACH MODE ===
 
   // Generate or get coach's referral code
@@ -1255,7 +1318,7 @@ export async function registerRoutes(
               id: v.id,
               videoNumber: v.videoNumber,
               videoUrl: v.videoUrl,
-              aiAnalysis: v.aiAnalysis,
+              status: v.status,
             })) : undefined,
           };
         })
@@ -1392,9 +1455,32 @@ export async function registerRoutes(
         });
       }
       
-      // Check for referral code
+      // Check for referral code (can be TEAM_ or COACH_ prefixed)
       if (ref) {
-        const coach = await storage.getCoachByReferralCode(ref as string);
+        const refCode = ref as string;
+        
+        // Check if it's a team referral (TEAM_ prefix)
+        if (refCode.startsWith("TEAM_")) {
+          const team = await storage.getTeamByReferralCode(refCode);
+          if (!team) {
+            return res.status(404).json({ message: "Invalid team referral code" });
+          }
+          
+          // Get head coach info
+          const coach = team.headCoachId ? await storage.getCoach(team.headCoachId) : null;
+          
+          return res.json({
+            type: "team_referral",
+            teamId: team.id,
+            teamName: team.name,
+            coachId: team.headCoachId,
+            coachName: coach?.name || "Head Coach",
+            referralCode: refCode,
+          });
+        }
+        
+        // Otherwise, it's a coach/specialist referral (COACH_ prefix)
+        const coach = await storage.getCoachByReferralCode(refCode);
         if (!coach) {
           return res.status(404).json({ message: "Invalid referral code" });
         }
@@ -1404,7 +1490,7 @@ export async function registerRoutes(
           coachId: coach.id,
           coachName: coach.name,
           skillType: coach.specialty,
-          referralCode: ref,
+          referralCode: refCode,
         });
       }
       
@@ -1420,18 +1506,23 @@ export async function registerRoutes(
       if (!req.user) return res.status(401).json({ message: "Must be logged in to complete registration" });
       
       const userId = (req.user as any).claims.sub;
+      const userClaims = (req.user as any).claims;
       
       const completeSchema = z.object({
         inviteToken: z.string().optional(),
         referralCode: z.string().optional(),
+        firstName: z.string().optional(),
+        lastName: z.string().optional(),
       });
       
       const data = completeSchema.parse(req.body);
       
       let coachId: number | null = null;
+      let teamId: number | null = null;
       let skillType: string = "PITCHING";
+      let isTeamReferral = false;
       
-      // Handle direct invite
+      // Handle direct invite (Private Instructor Mode)
       if (data.inviteToken) {
         const invite = await storage.getStudentInviteByToken(data.inviteToken);
         if (invite && invite.status === "pending") {
@@ -1446,12 +1537,25 @@ export async function registerRoutes(
         }
       }
       
-      // Handle referral code
+      // Handle referral code (can be TEAM_ or COACH_ prefixed)
       if (!coachId && data.referralCode) {
-        const coach = await storage.getCoachByReferralCode(data.referralCode);
-        if (coach) {
-          coachId = coach.id;
-          skillType = coach.specialty || "PITCHING";
+        const refCode = data.referralCode;
+        
+        // Check if it's a team referral (Head Coach Mode)
+        if (refCode.startsWith("TEAM_")) {
+          const team = await storage.getTeamByReferralCode(refCode);
+          if (team && team.headCoachId) {
+            coachId = team.headCoachId;
+            teamId = team.id;
+            isTeamReferral = true;
+          }
+        } else {
+          // Otherwise, it's a coach/specialist referral (Private Instructor Mode)
+          const coach = await storage.getCoachByReferralCode(refCode);
+          if (coach) {
+            coachId = coach.id;
+            skillType = coach.specialty || "PITCHING";
+          }
         }
       }
       
@@ -1459,7 +1563,43 @@ export async function registerRoutes(
         return res.status(400).json({ message: "Invalid invite or referral" });
       }
       
-      // Create player-coach relationship
+      // For team referrals (Head Coach Mode), create an athlete record with teamId
+      if (isTeamReferral && teamId) {
+        const firstName = data.firstName || userClaims.given_name || "Player";
+        const lastName = data.lastName || userClaims.family_name || "Name";
+        
+        // Check if athlete already exists for this user
+        const existingAthlete = await storage.getAthleteByUserId(userId);
+        if (existingAthlete) {
+          // Update existing athlete with team assignment
+          await storage.updateAthlete(existingAthlete.id, { teamId });
+        } else {
+          // Create new athlete linked to the team
+          await storage.createAthlete({
+            userId,
+            firstName,
+            lastName,
+            teamId,
+          });
+        }
+        
+        // Set player settings (no baseline required for team players)
+        let settings = await storage.getPlayerSettings(userId);
+        if (!settings) {
+          await storage.createPlayerSettings({ userId, subscriptionMode: "coached" });
+        } else {
+          await storage.updatePlayerSettings(userId, { subscriptionMode: "coached" });
+        }
+        
+        return res.json({ 
+          message: "Welcome to the team! You're all set.",
+          requiresBaseline: false,
+          coachId,
+          teamId
+        });
+      }
+      
+      // For Private Instructor Mode, create player-coach relationship
       await storage.createPlayerCoachRelationship({
         playerId: userId,
         coachId,
@@ -1773,7 +1913,8 @@ async function seedDatabase() {
     });
     
     await storage.createAthlete({
-      name: "Sarah Jenkins",
+      firstName: "Sarah",
+      lastName: "Jenkins",
       teamId: team.id,
       primaryPosition: "P",
       secondaryPosition: "1B",

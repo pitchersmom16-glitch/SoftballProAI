@@ -158,6 +158,29 @@ The Brain maps biomechanical issues to mechanic tags for intelligent drill match
 - "weak leg drive" → ["Leg Drive", "Explosive Power", "Kinetic Chain"]
 - "lunging" → ["Stay Back", "Load", "Balance"]
 
+### Head Coach Mode - Team Referrals
+Head coaches can invite players directly to their teams using team-specific referral links.
+
+**Key Features:**
+- **Team Referral Links**: Unique URLs per team (`/register?ref=TEAM_ABC123`)
+- **Auto Team Assignment**: Players using team links are automatically added to the team's roster
+- **No Baseline Required**: Team players can access their dashboard immediately (unlike Private Instructor Mode)
+- **Write Permissions**: Head coaches have full edit access to all athletes on their team
+
+**Database Fields:**
+- `teams.referralCode` - Unique referral code for each team (e.g., "TEAM_ABC123")
+
+**API Endpoints:**
+- `GET /api/team/:teamId/referral-code` - Generate/get team's referral code (head coach only)
+- `GET /api/coach/teams` - Get all teams for current head coach with referral info
+
+**Registration Flow:**
+1. Head coach generates team referral link via `/api/team/:teamId/referral-code`
+2. Player opens `/register?ref=TEAM_ABC123`
+3. After OAuth login, player calls `POST /api/register/complete` with referralCode
+4. System creates athlete record with teamId assignment
+5. Player's dashboard is immediately unlocked (no baseline videos required)
+
 ### Private Instructor Mode
 The Private Instructor workflow is distinct from Team Coach mode, designed for 1-on-1 remote training for Pitching, Hitting & Catching.
 
@@ -179,8 +202,8 @@ The Private Instructor workflow is distinct from Team Coach mode, designed for 1
 - `GET /api/specialist/roster` - Get coach's students with status
 - `POST /api/specialist/invite` - Send invite to student/parent
 - `POST /api/specialist/roster/:id/archive` - Archive student
-- `GET /api/register/validate?ref=CODE` - Validate referral/invite
-- `POST /api/register/complete` - Complete registration and link to coach
+- `GET /api/register/validate?ref=CODE` - Validate referral/invite (supports both TEAM_ and COACH_ prefixes)
+- `POST /api/register/complete` - Complete registration and link to coach/team
 - `GET /api/player/onboarding` - Get player's onboarding status
 - `POST /api/player/baseline-video` - Upload baseline video
 - `GET /api/specialist/baseline-queue` - Get students pending review
@@ -188,7 +211,7 @@ The Private Instructor workflow is distinct from Team Coach mode, designed for 1
 
 **Frontend Pages:**
 - `/roster` - Specialist Coach Roster Management
-- `/register?ref=CODE` - Student registration via referral
+- `/register?ref=CODE` - Student registration via referral (works for both TEAM_ and COACH_ codes)
 - `/player/onboarding` - Baseline video upload flow
 
 ### Universal Notification Engine
