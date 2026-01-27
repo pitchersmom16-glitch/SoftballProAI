@@ -10,7 +10,8 @@ import {
   Menu,
   X,
   Brain,
-  Database
+  Database,
+  User
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,9 @@ export function Sidebar() {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
 
-  const navigation = [
+  const isPlayer = user?.role === "player";
+
+  const coachNavigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
     { name: 'Athletes', href: '/athletes', icon: Users },
     { name: 'Assessments', href: '/assessments', icon: Video },
@@ -31,6 +34,15 @@ export function Sidebar() {
     { name: 'Train Brain', href: '/admin/train-brain', icon: Brain },
     { name: 'KB Import', href: '/admin/upload', icon: Database },
   ];
+
+  const playerNavigation = [
+    { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+    { name: 'My Profile', href: '/profile', icon: User },
+    { name: 'Assessments', href: '/assessments', icon: Video },
+    { name: 'Drills', href: '/drills', icon: Dumbbell },
+  ];
+
+  const navigation = isPlayer ? playerNavigation : coachNavigation;
 
   const NavContent = () => (
     <div className="flex flex-col h-full bg-black text-white">
@@ -45,7 +57,7 @@ export function Sidebar() {
             </div>
             <div className="overflow-hidden">
               <p className="text-sm font-medium truncate text-white">{user.firstName} {user.lastName}</p>
-              <p className="text-xs text-gray-400 truncate">Coach</p>
+              <p className="text-xs text-gray-400 truncate">{isPlayer ? 'Player' : 'Coach'}</p>
             </div>
           </div>
         )}

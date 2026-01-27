@@ -910,6 +910,21 @@ export async function registerRoutes(
 
   // === HYBRID COACHING SYSTEM ROUTES ===
 
+  // Get player's athlete profile
+  app.get("/api/player/athlete", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const athlete = await storage.getAthleteByUserId(userId);
+      if (!athlete) {
+        return res.status(404).json({ message: "No athlete profile found for your account" });
+      }
+      res.json(athlete);
+    } catch (err) {
+      throw err;
+    }
+  });
+
   // Get player's coaching team
   app.get("/api/player/coaches", async (req, res) => {
     try {

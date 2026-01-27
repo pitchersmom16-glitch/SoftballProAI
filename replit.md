@@ -51,11 +51,19 @@ The server uses a route registration pattern where all API routes are defined in
 Core entities include:
 - `coaches` - Coach profiles linked to auth users
 - `teams` - Team management with season tracking
-- `athletes` - Athlete profiles with physical stats and positions
+- `athletes` - Athlete profiles with firstName/lastName, physical stats, positions, contact info (playerPhone, parentPhone, parentEmail), and self-service fields (goals, preferredTrainingDays, graduationYear, school)
 - `drills` - Drill library with skill types and difficulty levels (Pitching, Hitting, Catching, Throwing)
 - `mentalEdge` - Mental performance content (visualization, mindset, motivation)
 - `assessments` - Video assessments with AI analysis results
 - `assessmentFeedback` - Coach feedback on assessments
+
+**Athlete Schema Fields:**
+- `firstName`, `lastName` - Separated name fields (NOT NULL)
+- `playerPhone`, `parentPhone`, `parentEmail` - Contact info for text messaging
+- `goals` - Player's personal goals (free text)
+- `preferredTrainingDays` - Array of days available for training
+- `graduationYear` - For recruiting purposes
+- `school` - Current school name
 
 ### Authentication
 - **Provider**: Replit Auth (OpenID Connect)

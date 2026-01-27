@@ -22,6 +22,7 @@ import PitchingCoachDashboard from "@/pages/PitchingCoachDashboard";
 import SpecialistRoster from "@/pages/SpecialistRoster";
 import Register from "@/pages/Register";
 import PlayerOnboarding from "@/pages/PlayerOnboarding";
+import PlayerProfileEdit from "@/pages/PlayerProfileEdit";
 import { OnboardingGate } from "@/components/OnboardingGate";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -91,6 +92,9 @@ function Router() {
           </Route>
           <Route path="/drills">
             <OnboardingGate><Drills /></OnboardingGate>
+          </Route>
+          <Route path="/profile">
+            <OnboardingGate><PlayerProfileEdit /></OnboardingGate>
           </Route>
           {/* Safety Net: Redirect all unknown routes to dashboard */}
           <Route path="*">
