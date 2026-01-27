@@ -24,16 +24,17 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative w-full min-h-screen overflow-hidden flex items-center">
-        {/* BACKGROUND IMAGE LAYER */}
-        <div className="absolute inset-0 z-0">
+      <section className="relative w-full min-h-screen flex items-center overflow-hidden bg-brand-black">
+        {/* 1. BACKGROUND LAYER (The Skeleton) */}
+        <div className="absolute inset-0 z-0 flex justify-end items-center">
+          {/* Image is anchored to the RIGHT side */}
           <img
             src={heroImage}
-            alt="Background"
-            className="w-full h-full object-cover opacity-80"
+            alt="Biomechanics Background"
+            className="w-full lg:w-[65%] h-full object-contain object-right opacity-60 animate-pulse-slow"
           />
-          {/* GRADIENT OVERLAY (To make text readable) */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/40 to-transparent" />
+          {/* The Gradient Fade (Crucial for reading text) */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/70 to-transparent" />
         </div>
 
         {/* CONTENT LAYER (On top) */}
