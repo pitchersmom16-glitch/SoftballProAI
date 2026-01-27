@@ -114,9 +114,10 @@ export default function PlayerDashboard() {
       skillType: string;
       videoUrl: string;
     }) => {
-      return apiRequest("POST", "/api/player/assessment", data);
+      const response = await apiRequest("POST", "/api/player/assessment", data);
+      return response.json();
     },
-    onSuccess: (data: any) => {
+    onSuccess: (assessment: { id: number }) => {
       setShowUploadDialog(false);
       setIsUploading(false);
       toast({
@@ -124,8 +125,8 @@ export default function PlayerDashboard() {
         description: "AI analysis is starting now...",
       });
       // Navigate to the assessment result page
-      if (data?.id) {
-        navigate(`/assessments/${data.id}`);
+      if (assessment?.id) {
+        navigate(`/assessments/${assessment.id}`);
       }
     },
     onError: (err: Error) => {
