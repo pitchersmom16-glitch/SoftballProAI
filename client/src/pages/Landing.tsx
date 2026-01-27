@@ -6,13 +6,13 @@ export default function Landing() {
   return (
     <div className="relative overflow-hidden min-h-screen" style={{ backgroundColor: '#050505' }}>
       {/* Navbar */}
-      <nav className="fixed w-full z-50 glass-panel border-b border-brand-neon/20">
+      <nav className="fixed w-full z-50 border-b" style={{ backgroundColor: 'rgba(5, 5, 5, 0.8)', backdropFilter: 'blur(12px)', borderColor: 'rgba(255, 255, 255, 0.1)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <img src={logo} alt="SoftballProAI" className="h-14 w-auto object-contain" />
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/api/login" className="text-sm font-medium text-gray-400 hover:text-brand-neon transition-colors" data-testid="link-signin">Sign In</Link>
+            <Link href="/api/login" className="text-sm font-medium text-gray-400 hover:text-white transition-colors" data-testid="link-signin">Sign In</Link>
             <Link href="/api/login">
               <button className="px-5 py-2.5 rounded-full btn-primary-glow text-sm" data-testid="button-get-started">
                 Get Started
@@ -26,13 +26,13 @@ export default function Landing() {
       <section className="pt-32 pb-24 lg:pt-48 lg:pb-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6 border" style={{ backgroundColor: 'rgba(40, 0, 255, 0.2)', color: '#8B7FFF', borderColor: 'rgba(40, 0, 255, 0.5)' }}>
-              <Zap className="h-3 w-3" />
-              AI-Powered Coaching
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-wider mb-6 badge-glass">
+              <Zap className="h-3 w-3" style={{ color: '#8B5CF6' }} />
+              <span className="text-gray-300">AI-Powered Coaching</span>
             </div>
             <h1 className="text-5xl lg:text-7xl font-bold font-display leading-[1.1] mb-6 text-white">
               The Ultimate <br/>
-              <span className="gradient-text">Softball Coach</span>
+              <span className="text-white">Softball Coach</span>
             </h1>
             <p className="text-lg text-gray-400 mb-8 leading-relaxed max-w-lg">
               Analyze windmill mechanics instantly with AI video breakdown. Track athlete progress, assign personalized drills, and build championship fastpitch teams.
@@ -45,7 +45,7 @@ export default function Landing() {
                 </button>
               </Link>
               <Link href="#features">
-                <button className="h-12 px-8 rounded-full bg-transparent font-semibold text-lg transition-all hover:-translate-y-1 border" style={{ borderColor: 'rgba(40, 0, 255, 0.6)', color: '#8B7FFF' }} data-testid="button-view-features">
+                <button className="h-12 px-8 rounded-full font-medium text-lg text-white transition-all hover:-translate-y-1" style={{ background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)' }} data-testid="button-view-features">
                   View Features
                 </button>
               </Link>
@@ -54,28 +54,28 @@ export default function Landing() {
             <div className="mt-10 flex items-center gap-4 text-sm text-gray-500 flex-wrap">
               <div className="flex -space-x-2">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-8 w-8 rounded-full border-2" style={{ background: 'linear-gradient(135deg, rgba(57, 255, 20, 0.3), rgba(255, 16, 240, 0.3))', borderColor: '#050505' }} />
+                  <div key={i} className="h-8 w-8 rounded-full border-2" style={{ background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(255, 16, 240, 0.3))', borderColor: '#050505' }} />
                 ))}
               </div>
-              <p>Trusted by 500+ coaches</p>
+              <p className="text-gray-500">Trusted by 500+ coaches</p>
             </div>
           </div>
 
           <div className="relative">
-            <div className="absolute -inset-4 rounded-[2rem] blur-2xl opacity-70 -z-10" style={{ background: 'linear-gradient(135deg, rgba(57, 255, 20, 0.3), rgba(255, 16, 240, 0.2), rgba(250, 255, 0, 0.2))' }} />
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3] border" style={{ backgroundColor: '#050505', borderColor: 'rgba(57, 255, 20, 0.3)' }}>
+            <div className="absolute -inset-4 rounded-[2rem] blur-2xl opacity-40 -z-10" style={{ background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(255, 16, 240, 0.2))' }} />
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3]" style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
               {/* Abstract dashboard representation */}
-              <div className="absolute inset-0 p-8 flex flex-col" style={{ background: 'linear-gradient(135deg, #050505, #0a0a0a)' }}>
+              <div className="absolute inset-0 p-8 flex flex-col" style={{ background: 'linear-gradient(135deg, #0a0a0a, #111)' }}>
                 <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
-                  <div className="h-8 w-32 rounded-lg animate-pulse" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
-                  <div className="h-8 w-8 rounded-full animate-pulse neon-glow" style={{ backgroundColor: '#39FF14' }} />
+                  <div className="h-8 w-32 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }} />
+                  <div className="h-8 w-8 rounded-full" style={{ background: 'linear-gradient(135deg, #FF10F0, #8B5CF6)' }} />
                 </div>
                 <div className="grid grid-cols-2 gap-4 mb-8">
-                  <div className="p-4 rounded-2xl h-32 animate-pulse border" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'rgba(57, 255, 20, 0.3)' }} />
-                  <div className="p-4 rounded-2xl h-32 animate-pulse border" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'rgba(255, 16, 240, 0.3)' }} />
+                  <div className="p-4 rounded-2xl h-32" style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)' }} />
+                  <div className="p-4 rounded-2xl h-32" style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)' }} />
                 </div>
-                <div className="flex-1 rounded-2xl p-4 flex items-center justify-center border" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'rgba(250, 255, 0, 0.3)' }}>
-                  <p className="font-medium" style={{ color: '#39FF14' }}>AI Analysis in progress...</p>
+                <div className="flex-1 rounded-2xl p-4 flex items-center justify-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <p className="font-medium text-gray-400">AI Analysis in progress...</p>
                 </div>
               </div>
             </div>
@@ -84,10 +84,10 @@ export default function Landing() {
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="py-24" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+      <section id="features" className="py-24" style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl font-bold font-display mb-4" style={{ color: '#39FF14' }}>Everything you need to win</h2>
+            <h2 className="text-3xl font-bold font-display text-white mb-4">Everything you need to win</h2>
             <p className="text-gray-400 text-lg">From windmill mechanics to roster management, SoftballProAI gives you the tools to develop elite fastpitch athletes.</p>
           </div>
 
@@ -96,42 +96,33 @@ export default function Landing() {
               {
                 icon: Video,
                 title: "AI Video Analysis",
-                desc: "Upload game footage and get instant biomechanical feedback on windmill pitching and hitting form.",
-                borderColor: "#39FF14",
-                iconBg: "rgba(57, 255, 20, 0.2)",
-                iconColor: "#39FF14"
+                desc: "Upload game footage and get instant biomechanical feedback on windmill pitching and hitting form."
               },
               {
                 icon: Activity,
                 title: "Progress Tracking",
-                desc: "Visualize improvement over time with automated metric tracking for drag foot, arm circle speed, and release point.",
-                borderColor: "#FF10F0",
-                iconBg: "rgba(255, 16, 240, 0.2)",
-                iconColor: "#FF10F0"
+                desc: "Visualize improvement over time with automated metric tracking for drag foot, arm circle speed, and release point."
               },
               {
                 icon: TrendingUp,
                 title: "Smart Drills",
-                desc: "Receive personalized drill recommendations for rise ball, drop ball, and change-up mechanics.",
-                borderColor: "#FAFF00",
-                iconBg: "rgba(250, 255, 0, 0.2)",
-                iconColor: "#FAFF00"
+                desc: "Receive personalized drill recommendations for rise ball, drop ball, and change-up mechanics."
               }
             ].map((feature, i) => (
               <div 
                 key={i} 
-                className="p-8 rounded-3xl transition-all duration-300 group card-hover"
+                className="p-8 rounded-3xl transition-all duration-300 group hover:-translate-y-1"
                 style={{ 
                   backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                  borderColor: `${feature.borderColor}40`
+                  border: '1px solid rgba(255, 255, 255, 0.08)'
                 }}
                 data-testid={`card-feature-${i}`}
               >
                 <div 
-                  className="h-12 w-12 rounded-2xl flex items-center justify-center mb-6 transition-all group-hover:scale-110"
-                  style={{ backgroundColor: feature.iconBg }}
+                  className="h-12 w-12 rounded-2xl flex items-center justify-center mb-6 transition-all"
+                  style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)' }}
                 >
-                  <feature.icon className="h-6 w-6" style={{ color: feature.iconColor }} />
+                  <feature.icon className="h-6 w-6" style={{ color: '#8B5CF6' }} />
                 </div>
                 <h3 className="text-xl font-bold font-display text-white mb-3">{feature.title}</h3>
                 <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
@@ -143,9 +134,9 @@ export default function Landing() {
 
       {/* CTA Section */}
       <section className="py-24 relative">
-        <div className="absolute inset-0 blur-3xl" style={{ background: 'linear-gradient(90deg, rgba(57, 255, 20, 0.1), rgba(255, 16, 240, 0.1), rgba(250, 255, 0, 0.1))' }} />
+        <div className="absolute inset-0 blur-3xl opacity-30" style={{ background: 'linear-gradient(90deg, rgba(139, 92, 246, 0.2), rgba(255, 16, 240, 0.1))' }} />
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <h2 className="text-4xl font-bold font-display mb-6" style={{ color: '#39FF14' }}>Ready to dominate the circle?</h2>
+          <h2 className="text-4xl font-bold font-display text-white mb-6">Ready to dominate the circle?</h2>
           <p className="text-gray-400 text-lg mb-8">Join thousands of fastpitch coaches using AI to develop elite athletes.</p>
           <Link href="/api/login">
             <button className="h-14 px-10 rounded-full btn-primary-glow text-lg" data-testid="button-start-trial">
