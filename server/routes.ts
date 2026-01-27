@@ -86,6 +86,51 @@ export async function registerRoutes(
         blockedActivities,
       });
       
+      // NOTIFICATION TRIGGER: High soreness/injury alert to Team Coach
+      if (data.sorenessLevel >= 7 && data.sorenessAreas.length > 0) {
+        // Find player's team coach (if on a team)
+        const athletes = await storage.getAthletes();
+        const playerAthlete = athletes.find(a => a.userId === userId);
+        
+        if (playerAthlete?.teamId) {
+          const team = await storage.getTeam(playerAthlete.teamId);
+          if (team?.headCoachId) {
+            const coach = await storage.getCoach(team.headCoachId);
+            if (coach?.userId) {
+              const sorenessType = data.sorenessLevel >= 8 ? "injury_alert" : "high_soreness_alert";
+              const alertTitle = data.sorenessLevel >= 8 
+                ? `INJURY ALERT: ${playerAthlete.name}`
+                : `High Soreness: ${playerAthlete.name}`;
+              
+              await storage.createNotification({
+                userId: coach.userId,
+                type: sorenessType,
+                title: alertTitle,
+                message: `${playerAthlete.name} reported ${data.sorenessLevel}/10 soreness in: ${data.sorenessAreas.join(", ")}. ${data.notes || "Check roster status before practice."}`,
+                linkUrl: "/roster",
+                relatedId: playerAthlete.id.toString(),
+              });
+            }
+          }
+        }
+        
+        // Also notify private instructor coaches
+        const playerCoaches = await storage.getPlayerCoaches(userId);
+        for (const rel of playerCoaches.filter(r => r.status === "active")) {
+          const coach = await storage.getCoach(rel.coachId);
+          if (coach?.userId) {
+            await storage.createNotification({
+              userId: coach.userId,
+              type: data.sorenessLevel >= 8 ? "injury_alert" : "high_soreness_alert",
+              title: data.sorenessLevel >= 8 ? `INJURY ALERT` : `High Soreness Alert`,
+              message: `Your student reported ${data.sorenessLevel}/10 soreness in: ${data.sorenessAreas.join(", ")}.`,
+              linkUrl: "/roster",
+              relatedId: userId,
+            });
+          }
+        }
+      }
+      
       res.status(201).json(checkin);
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -1294,8 +1339,35 @@ export async function registerRoutes(
         // Mark baseline as complete but keep dashboard locked until coach approves
         await storage.updatePlayerOnboarding(userId, { baselineComplete: true });
         
-        // TODO: Trigger AI analysis for all 4 videos
-        // For now, just update status to pending_coach_review
+        // NOTIFICATION TRIGGER: Notify instructor that baseline is ready for review
+        if (onboarding.coachId) {
+          const coach = await storage.getCoach(onboarding.coachId);
+          if (coach?.userId) {
+            await storage.createNotification({
+              userId: coach.userId,
+              type: "baseline_ready",
+              title: "Baseline Ready for Review",
+              message: `A new student has completed their 4-video baseline. Click to review and create their training roadmap.`,
+              linkUrl: "/roster",
+              relatedId: userId,
+            });
+          }
+        }
+      } else {
+        // NOTIFICATION TRIGGER: Notify instructor of each video upload
+        if (onboarding.coachId) {
+          const coach = await storage.getCoach(onboarding.coachId);
+          if (coach?.userId) {
+            await storage.createNotification({
+              userId: coach.userId,
+              type: "video_uploaded",
+              title: "New Video Uploaded",
+              message: `Student uploaded baseline video ${data.videoNumber}/4. ${4 - allVideos.length} more to go.`,
+              linkUrl: "/roster",
+              relatedId: userId,
+            });
+          }
+        }
       }
       
       res.status(201).json({
@@ -1376,6 +1448,16 @@ export async function registerRoutes(
         baselineApprovedAt: new Date(),
         // Set next video prompt for 2 weeks later
         nextVideoPromptDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      });
+      
+      // NOTIFICATION TRIGGER: Notify player that roadmap is ready
+      await storage.createNotification({
+        userId: playerId,
+        type: "roadmap_ready",
+        title: "Your Training Roadmap is Ready!",
+        message: `Your coach has reviewed your baseline videos and created a personalized training plan. Your dashboard is now unlocked!`,
+        linkUrl: "/dashboard",
+        relatedId: coach.id.toString(),
       });
       
       res.json({ message: "Baseline approved, dashboard unlocked for student" });
