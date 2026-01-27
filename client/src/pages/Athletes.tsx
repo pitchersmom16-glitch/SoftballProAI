@@ -1,11 +1,13 @@
-import { useAthletes, useCreateAthlete } from "@/hooks/use-athletes";
+import { useAthletes, useCreateAthlete, useDeleteAthlete } from "@/hooks/use-athletes";
 import { useTeams } from "@/hooks/use-teams";
 import { useState } from "react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { 
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter 
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -13,7 +15,8 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertAthleteSchema } from "@shared/routes";
 import { z } from "zod";
-import { Search, Plus, User } from "lucide-react";
+import { Search, Plus, User, Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 // Schema for the form, handling numeric coercions
 const createAthleteFormSchema = insertAthleteSchema.extend({
@@ -28,7 +31,31 @@ export default function Athletes() {
   const { data: athletes, isLoading } = useAthletes();
   const { data: teams } = useTeams();
   const createAthlete = useCreateAthlete();
+  const deleteAthlete = useDeleteAthlete();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [athleteToDelete, setAthleteToDelete] = useState<{ id: number; name: string } | null>(null);
+  const { toast } = useToast();
+
+  const handleDeleteClick = (athlete: { id: number; name: string }) => {
+    setAthleteToDelete(athlete);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (athleteToDelete) {
+      deleteAthlete.mutate(athleteToDelete.id, {
+        onSuccess: () => {
+          toast({ title: "Athlete deleted", description: `${athleteToDelete.name} has been removed.` });
+          setDeleteDialogOpen(false);
+          setAthleteToDelete(null);
+        },
+        onError: () => {
+          toast({ title: "Error", description: "Failed to delete athlete.", variant: "destructive" });
+        }
+      });
+    }
+  };
 
   const form = useForm({
     resolver: zodResolver(createAthleteFormSchema),
@@ -178,7 +205,7 @@ export default function Athletes() {
           {filteredAthletes?.map(athlete => {
             const team = teams?.find(t => t.id === athlete.teamId);
             return (
-              <Card key={athlete.id} className="p-6 hover:shadow-lg transition-all duration-300 border-slate-100 group">
+              <Card key={athlete.id} className="p-6 hover:shadow-lg transition-all duration-300 border-slate-100 group" data-testid={`card-athlete-${athlete.id}`}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-4">
                     <div className="h-14 w-14 rounded-2xl bg-slate-100 flex items-center justify-center text-xl font-bold text-slate-400 group-hover:bg-primary group-hover:text-white transition-colors">
@@ -189,11 +216,22 @@ export default function Athletes() {
                       <p className="text-sm text-slate-500">{athlete.primaryPosition} {athlete.jerseyNumber && `• #${athlete.jerseyNumber}`}</p>
                     </div>
                   </div>
-                  {team && (
-                    <span className="px-2 py-1 rounded-md bg-slate-100 text-xs font-semibold text-slate-600">
-                      {team.name}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {team && (
+                      <span className="px-2 py-1 rounded-md bg-slate-100 text-xs font-semibold text-slate-600">
+                        {team.name}
+                      </span>
+                    )}
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="text-slate-400 hover:text-red-500 hover:bg-red-50"
+                      onClick={() => handleDeleteClick({ id: athlete.id, name: athlete.name })}
+                      data-testid={`button-delete-athlete-${athlete.id}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-2 py-4 border-t border-slate-50">
@@ -211,14 +249,45 @@ export default function Athletes() {
                   </div>
                 </div>
 
-                <Button variant="outline" className="w-full mt-2 group-hover:border-primary group-hover:text-primary transition-colors">
-                  View Profile
-                </Button>
+                <Link href={`/athletes/${athlete.id}`}>
+                  <Button 
+                    variant="outline" 
+                    className="w-full mt-2 group-hover:border-primary group-hover:text-primary transition-colors"
+                    data-testid={`button-view-profile-${athlete.id}`}
+                  >
+                    View Profile
+                  </Button>
+                </Link>
               </Card>
             );
           })}
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Athlete</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete {athleteToDelete?.name}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} data-testid="button-cancel-delete">
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDelete}
+              disabled={deleteAthlete.isPending}
+              data-testid="button-confirm-delete"
+            >
+              {deleteAthlete.isPending ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -32,6 +32,7 @@ export interface IStorage {
   getAthlete(id: number): Promise<Athlete | undefined>;
   createAthlete(athlete: CreateAthleteRequest): Promise<Athlete>;
   updateAthlete(id: number, athlete: UpdateAthleteRequest): Promise<Athlete>;
+  deleteAthlete(id: number): Promise<void>;
 
   // Drills
   getDrills(category?: string): Promise<Drill[]>;
@@ -172,6 +173,10 @@ export class DatabaseStorage implements IStorage {
   async updateAthlete(id: number, update: UpdateAthleteRequest): Promise<Athlete> {
     const [updated] = await db.update(athletes).set(update).where(eq(athletes.id, id)).returning();
     return updated;
+  }
+
+  async deleteAthlete(id: number): Promise<void> {
+    await db.delete(athletes).where(eq(athletes.id, id));
   }
 
   // Drills

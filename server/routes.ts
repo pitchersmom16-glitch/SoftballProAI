@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
-import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
+import { setupAuth, registerAuthRoutes, isAuthenticated } from "./replit_integrations/auth";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 import { openai } from "./replit_integrations/audio"; // Use the audio client for openai instance
 import { analyzeMechanics, getCorrectiveDrills, getDrillsByTag, getDrillsByExpert } from "./brain/analyze_mechanics";
@@ -251,6 +251,22 @@ export async function registerRoutes(
         return res.status(400).json({ message: err.errors[0].message });
       }
       throw err;
+    }
+  });
+
+  // Delete athlete
+  app.delete("/api/athletes/:id", isAuthenticated, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const athlete = await storage.getAthlete(id);
+      if (!athlete) {
+        return res.status(404).json({ message: "Athlete not found" });
+      }
+      await storage.deleteAthlete(id);
+      res.json({ message: "Athlete deleted successfully" });
+    } catch (err) {
+      console.error("Error deleting athlete:", err);
+      res.status(500).json({ message: "Failed to delete athlete" });
     }
   });
 

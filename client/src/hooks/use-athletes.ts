@@ -78,3 +78,21 @@ export function useUpdateAthlete() {
     },
   });
 }
+
+export function useDeleteAthlete() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`/api/athletes/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      
+      if (!res.ok) throw new Error("Failed to delete athlete");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.athletes.list.path] });
+    },
+  });
+}
