@@ -30,10 +30,10 @@ export default function Landing() {
           <img
             src={heroImage}
             alt="Background"
-            className="w-full h-full object-cover opacity-40"
+            className="w-full h-full object-cover opacity-80"
           />
           {/* GRADIENT OVERLAY (To make text readable) */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/40 to-transparent" />
         </div>
 
         {/* CONTENT LAYER (On top) */}
