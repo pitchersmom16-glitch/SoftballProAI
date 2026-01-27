@@ -41,7 +41,8 @@ Core entities include:
 - `coaches` - Coach profiles linked to auth users
 - `teams` - Team management with season tracking
 - `athletes` - Athlete profiles with physical stats and positions
-- `drills` - Drill library with skill types and difficulty levels
+- `drills` - Drill library with skill types and difficulty levels (Pitching, Hitting, Catching, Throwing)
+- `mentalEdge` - Mental performance content (visualization, mindset, motivation)
 - `assessments` - Video assessments with AI analysis results
 - `assessmentFeedback` - Coach feedback on assessments
 
@@ -73,20 +74,34 @@ Authentication is handled through `server/replit_integrations/auth/` with Passpo
 - **Audio Processing**: ffmpeg for audio format conversion (WebM to WAV)
 
 ### AI Brain System
-The Brain is the core mechanics analysis engine that recommends correction drills based on biomechanical issues.
+The Brain is the core mechanics analysis engine that recommends correction drills based on biomechanical issues. It supports the "whole athlete" model covering Pitching, Hitting, Catching, Throwing, and Mental performance.
 
 **Key Components:**
 - `server/brain/analyze_mechanics.ts` - Core analysis logic with issue-to-drill mapping
-- `scripts/seed_drills.ts` - Knowledge Base seed script (30 expert drills)
+- `scripts/seed_drills.ts` - Knowledge Base seed script (30 expert drills + 10 Mental Edge items)
+- `client/src/pages/TrainBrain.tsx` - Admin dashboard for continuous training
 
 **Brain API Endpoints:**
 - `POST /api/brain/analyze` - Analyze issues and get top 3 drill recommendations
+- `POST /api/brain/train/drill` - Add new drill to knowledge base (validated with Zod)
+- `POST /api/brain/train/mental-edge` - Add mental edge content (validated with Zod)
 - `GET /api/brain/corrective-drills?skillType=pitching&issue=hunched+forward` - Quick lookup
 - `GET /api/brain/drills-by-tag?tag=Internal+Rotation` - Search by mechanic tag
 - `GET /api/brain/drills-by-expert?expert=Amanda+Scarborough` - Search by expert source
 
+**Admin Training Dashboard:**
+- Route: `/admin/train-brain`
+- Tabs: Drill Knowledge, Mental Edge
+- Features: Add drills with YouTube URLs, mechanic tags, categories; Add mental content with usage context
+- Accessible via sidebar "Train Brain" link
+
 **Knowledge Base Structure:**
-Drills include: name, category (Pitching/Hitting), expertSource, mechanicTags[], issueAddressed, videoUrl, difficulty
+Drills include: name, category (Pitching/Hitting/Catching/Throwing), expertSource, mechanicTags[], issueAddressed, videoUrl, difficulty
+Mental Edge includes: title, contentType (visualization/mindset/quote/video), category, source, tags, usageContext (pre-game/mid-game/off-day)
+
+**Seeded Content:**
+- 30 expert drills emphasizing biomechanical physics (internal rotation, rotational mechanics)
+- 10 Mental Edge items including 6 Kobe Bryant Mamba Mentality principles
 
 **Issue Mapping:**
 The Brain maps biomechanical issues to mechanic tags for intelligent drill matching:
