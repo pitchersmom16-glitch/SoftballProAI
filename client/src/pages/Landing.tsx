@@ -26,7 +26,7 @@ export default function Landing() {
       <section className="pt-32 pb-24 lg:pt-48 lg:pb-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6 border" style={{ backgroundColor: 'rgba(255, 16, 240, 0.15)', color: '#FF10F0', borderColor: 'rgba(255, 16, 240, 0.4)' }}>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6 border" style={{ backgroundColor: 'rgba(40, 0, 255, 0.2)', color: '#8B7FFF', borderColor: 'rgba(40, 0, 255, 0.5)' }}>
               <Zap className="h-3 w-3" />
               AI-Powered Coaching
             </div>
@@ -45,7 +45,7 @@ export default function Landing() {
                 </button>
               </Link>
               <Link href="#features">
-                <button className="h-12 px-8 rounded-full bg-transparent font-semibold text-lg text-white transition-all hover:-translate-y-1 border" style={{ borderColor: 'rgba(57, 255, 20, 0.4)' }} data-testid="button-view-features">
+                <button className="h-12 px-8 rounded-full bg-transparent font-semibold text-lg transition-all hover:-translate-y-1 border" style={{ borderColor: 'rgba(40, 0, 255, 0.6)', color: '#8B7FFF' }} data-testid="button-view-features">
                   View Features
                 </button>
               </Link>

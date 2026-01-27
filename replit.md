@@ -11,6 +11,7 @@ SoftballProAI is an AI-powered FASTPITCH SOFTBALL coaching platform that enables
   - `brand-neon`: #39FF14 (Primary green - headings, borders, glows)
   - `brand-pink`: #FF10F0 (Hot pink - CTA buttons with glow effect)
   - `brand-yellow`: #FAFF00 (Electric yellow - highlights, accents)
+  - `brand-blue`: #2800FF (Electric indigo - AI badges, secondary buttons)
 - **Typography**: 
   - h1, h2, h3: Neon green (#39FF14) or white with gradient
   - Body text: Light gray on dark backgrounds

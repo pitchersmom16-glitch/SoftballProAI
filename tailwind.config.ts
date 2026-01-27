@@ -91,6 +91,7 @@ export default {
           neon: "#39FF14",
           pink: "#FF10F0",
           yellow: "#FAFF00",
+          blue: "#2800FF",
         },
       },
       fontFamily: {

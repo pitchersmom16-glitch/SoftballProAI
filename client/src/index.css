@@ -148,7 +148,7 @@
 
 .gradient-text {
   @apply bg-clip-text text-transparent;
-  background-image: linear-gradient(to right, #39FF14, #FF10F0, #FAFF00);
+  background-image: linear-gradient(to right, #39FF14, #2800FF, #FF10F0, #FAFF00);
 }
 
 .neon-glow {
@@ -161,6 +161,10 @@
 
 .neon-glow-yellow {
   box-shadow: 0 0 20px rgba(250, 255, 0, 0.6), 0 0 40px rgba(250, 255, 0, 0.3), 0 0 60px rgba(250, 255, 0, 0.1);
+}
+
+.neon-glow-blue {
+  box-shadow: 0 0 20px rgba(40, 0, 255, 0.6), 0 0 40px rgba(40, 0, 255, 0.3), 0 0 60px rgba(40, 0, 255, 0.1);
 }
 
 /* Primary CTA Button with pink glow */
@@ -185,6 +189,9 @@
 }
 .border-brand-pink {
   border-color: #FF10F0;
+}
+.border-brand-blue {
+  border-color: #2800FF;
 }
 
 /* Scrollbar styling */
