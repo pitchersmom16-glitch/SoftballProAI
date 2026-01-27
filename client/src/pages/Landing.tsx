@@ -24,8 +24,20 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-24 lg:pt-48 lg:pb-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col gap-8 md:grid md:grid-cols-2 md:items-center md:gap-12">
+      <section className="relative w-full min-h-screen overflow-hidden flex items-center">
+        {/* BACKGROUND IMAGE LAYER */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src={heroImage}
+            alt="Background"
+            className="w-full h-full object-cover opacity-40"
+          />
+          {/* GRADIENT OVERLAY (To make text readable) */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/80 to-transparent" />
+        </div>
+
+        {/* CONTENT LAYER (On top) */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-wider mb-6 badge-glass">
               <Zap className="h-3 w-3" style={{ color: '#8B5CF6' }} />
@@ -60,14 +72,6 @@ export default function Landing() {
               </div>
               <p className="text-gray-500">Trusted by 500+ coaches</p>
             </div>
-          </div>
-
-          <div className="relative flex justify-center order-2 md:order-none">
-            <img 
-              src={heroImage} 
-              alt="SoftballProAI Hero" 
-              className="w-3/4 max-w-[300px] md:w-full md:max-w-[500px] h-auto object-contain mx-auto drop-shadow-[0_0_25px_rgba(57,255,20,0.4)] animate-pulse-slow"
-            />
           </div>
         </div>
       </section>
