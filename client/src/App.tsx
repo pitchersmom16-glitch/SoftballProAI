@@ -8,6 +8,7 @@ import { Layout } from "@/components/Layout";
 import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
 import Athletes from "@/pages/Athletes";
+import AthleteDetail from "@/pages/AthleteDetail";
 import Teams from "@/pages/Teams";
 import Assessments from "@/pages/Assessments";
 import AssessmentDetail from "@/pages/AssessmentDetail";
@@ -110,6 +111,7 @@ function Router() {
           <Route path="/" component={TeamCoachDashboard} />
           <Route path="/dashboard" component={TeamCoachDashboard} />
           <Route path="/athletes" component={Athletes} />
+          <Route path="/athletes/:id" component={AthleteDetail} />
           <Route path="/teams" component={Teams} />
           <Route path="/assessments" component={Assessments} />
           <Route path="/assessments/:id" component={AssessmentDetail} />
@@ -136,6 +138,7 @@ function Router() {
           <Route path="/dashboard" component={PitchingCoachDashboard} />
           <Route path="/roster" component={SpecialistRoster} />
           <Route path="/athletes" component={Athletes} />
+          <Route path="/athletes/:id" component={AthleteDetail} />
           <Route path="/assessments" component={Assessments} />
           <Route path="/assessments/:id" component={AssessmentDetail} />
           <Route path="/drills" component={Drills} />
@@ -185,6 +188,7 @@ function Router() {
         <Route path="/" component={Dashboard} />
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/athletes" component={Athletes} />
+        <Route path="/athletes/:id" component={AthleteDetail} />
         <Route path="/teams" component={Teams} />
         <Route path="/assessments" component={Assessments} />
         <Route path="/assessments/:id" component={AssessmentDetail} />
