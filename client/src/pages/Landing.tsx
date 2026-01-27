@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { ArrowRight, Activity, Zap, TrendingUp, Video } from "lucide-react";
+import logo from "@/assets/logo.jpg";
 
 export default function Landing() {
   return (
@@ -8,8 +9,7 @@ export default function Landing() {
       <nav className="fixed w-full z-50 glass-panel border-b border-brand-neon/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-2xl neon-glow" style={{ color: '#39FF14' }}>◆</span>
-            <span className="text-xl font-bold font-display text-white">SoftballProAI</span>
+            <img src={logo} alt="SoftballProAI" className="h-14 w-auto object-contain" />
           </div>
           <div className="flex items-center gap-4">
             <Link href="/api/login" className="text-sm font-medium text-gray-400 hover:text-brand-neon transition-colors" data-testid="link-signin">Sign In</Link>
