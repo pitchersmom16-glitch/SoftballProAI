@@ -1,12 +1,10 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/Layout";
-import NotFound from "@/pages/not-found";
 
-// Pages
 import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
 import Athletes from "@/pages/Athletes";
@@ -27,89 +25,122 @@ function Router() {
 
   if (isLoading) return null;
 
-  // Not logged in - show landing page
+  // ============================================
+  // PUBLIC ROUTES (Not Logged In)
+  // ============================================
   if (!user) {
     return (
       <Layout>
         <Switch>
           <Route path="/" component={Landing} />
-          <Route component={NotFound} />
+          <Route path="/auth">
+            {() => {
+              window.location.href = "/api/login";
+              return null;
+            }}
+          </Route>
+          {/* Safety Net: Redirect all unknown routes to home */}
+          <Route path="*">
+            <Redirect to="/" />
+          </Route>
         </Switch>
       </Layout>
     );
   }
 
-  // Logged in but no role selected - show role selection
+  // ============================================
+  // ROLE SELECTION (Logged in but no role)
+  // ============================================
   if (!user.role) {
     return <RoleSelection />;
   }
 
-  // Player mode - show player-specific dashboard
+  // ============================================
+  // PLAYER MODE ROUTES
+  // ============================================
   if (user.role === "player") {
     return (
       <Layout>
         <Switch>
           <Route path="/" component={PlayerDashboard} />
-          <Route path="/analyze" component={Assessments} />
+          <Route path="/dashboard" component={PlayerDashboard} />
           <Route path="/assessments" component={Assessments} />
           <Route path="/assessments/:id" component={AssessmentDetail} />
           <Route path="/drills" component={Drills} />
-          <Route component={NotFound} />
+          {/* Safety Net: Redirect all unknown routes to dashboard */}
+          <Route path="*">
+            <Redirect to="/dashboard" />
+          </Route>
         </Switch>
       </Layout>
     );
   }
 
-  // Team Coach mode - show team-focused dashboard
+  // ============================================
+  // TEAM COACH MODE ROUTES
+  // ============================================
   if (user.role === "team_coach") {
     return (
       <Layout>
         <Switch>
           <Route path="/" component={TeamCoachDashboard} />
+          <Route path="/dashboard" component={TeamCoachDashboard} />
           <Route path="/athletes" component={Athletes} />
           <Route path="/teams" component={Teams} />
-          <Route path="/analyze" component={Assessments} />
           <Route path="/assessments" component={Assessments} />
           <Route path="/assessments/:id" component={AssessmentDetail} />
           <Route path="/drills" component={Drills} />
           <Route path="/admin/train-brain" component={TrainBrain} />
-          <Route component={NotFound} />
+          {/* Safety Net: Redirect all unknown routes to dashboard */}
+          <Route path="*">
+            <Redirect to="/dashboard" />
+          </Route>
         </Switch>
       </Layout>
     );
   }
 
-  // Pitching Coach mode - show pitching-focused dashboard
+  // ============================================
+  // PITCHING COACH MODE ROUTES
+  // ============================================
   if (user.role === "pitching_coach") {
     return (
       <Layout>
         <Switch>
           <Route path="/" component={PitchingCoachDashboard} />
+          <Route path="/dashboard" component={PitchingCoachDashboard} />
           <Route path="/athletes" component={Athletes} />
-          <Route path="/analyze" component={Assessments} />
           <Route path="/assessments" component={Assessments} />
           <Route path="/assessments/:id" component={AssessmentDetail} />
           <Route path="/drills" component={Drills} />
           <Route path="/admin/train-brain" component={TrainBrain} />
-          <Route component={NotFound} />
+          {/* Safety Net: Redirect all unknown routes to dashboard */}
+          <Route path="*">
+            <Redirect to="/dashboard" />
+          </Route>
         </Switch>
       </Layout>
     );
   }
 
-  // Default coach view
+  // ============================================
+  // DEFAULT COACH VIEW ROUTES
+  // ============================================
   return (
     <Layout>
       <Switch>
         <Route path="/" component={Dashboard} />
+        <Route path="/dashboard" component={Dashboard} />
         <Route path="/athletes" component={Athletes} />
         <Route path="/teams" component={Teams} />
-        <Route path="/analyze" component={Assessments} />
         <Route path="/assessments" component={Assessments} />
         <Route path="/assessments/:id" component={AssessmentDetail} />
         <Route path="/drills" component={Drills} />
         <Route path="/admin/train-brain" component={TrainBrain} />
-        <Route component={NotFound} />
+        {/* Safety Net: Redirect all unknown routes to dashboard */}
+        <Route path="*">
+          <Redirect to="/dashboard" />
+        </Route>
       </Switch>
     </Layout>
   );
