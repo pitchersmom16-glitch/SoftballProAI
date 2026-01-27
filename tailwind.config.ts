@@ -86,6 +86,12 @@ export default {
           pink: "hsl(330 100% 60%)",
           yellow: "hsl(54 100% 50%)",
         },
+        brand: {
+          black: "#050505",
+          neon: "#39FF14",
+          pink: "#FF10F0",
+          yellow: "#FAFF00",
+        },
       },
       fontFamily: {
         sans: ["var(--font-sans)"],

@@ -4,10 +4,20 @@
 
 SoftballProAI is an AI-powered FASTPITCH SOFTBALL coaching platform that enables coaches to analyze athlete mechanics through video uploads, track athlete progress, manage teams, and assign personalized drills. The application uses AI video breakdown for performance analysis with a focus on windmill pitching mechanics, drag foot technique, and softball-specific movements (rise ball, drop ball, curve ball, change-up).
 
-## Visual Theme
-- **Dark Mode Only**: Deep black background (#0a0a0a)
-- **Neon Accents**: Neon Green (primary), Hot Pink (accent), Electric Yellow (highlights)
-- **Typography**: White/light gray text for readability on dark backgrounds
+## Visual Theme (Brand Palette)
+- **Dark Mode Only**: Deepest black background (#050505)
+- **Brand Colors**:
+  - `brand-black`: #050505 (Body background)
+  - `brand-neon`: #39FF14 (Primary green - headings, borders, glows)
+  - `brand-pink`: #FF10F0 (Hot pink - CTA buttons with glow effect)
+  - `brand-yellow`: #FAFF00 (Electric yellow - highlights, accents)
+- **Typography**: 
+  - h1, h2, h3: Neon green (#39FF14) or white with gradient
+  - Body text: Light gray on dark backgrounds
+- **Button Styles**:
+  - Primary CTAs use `btn-primary-glow` class (pink with glowing box-shadow)
+  - Secondary buttons use neon green borders
+- **Cards/Containers**: Thin neon green or yellow borders to pop against black
 
 ## User Preferences
 
