@@ -52,8 +52,8 @@ export default function PlayerDashboard() {
     queryKey: ["/api/player/checkin/today"],
   });
 
-  // Fetch random Mamba motivation
-  const { data: mambaContent } = useQuery<MentalEdge | null>({
+  // Fetch random Championship Mindset motivation
+  const { data: championshipContent } = useQuery<MentalEdge | null>({
     queryKey: ["/api/mental-edge/random"],
   });
 
@@ -275,34 +275,34 @@ export default function PlayerDashboard() {
           </Card>
         )}
 
-        {/* Mamba Feed - Daily Motivation */}
+        {/* Championship Mindset Feed - Daily Motivation */}
         <Card className="p-6 bg-gradient-to-br from-neon-yellow/10 to-transparent border-neon-yellow/20">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
               <Flame className="h-5 w-5 text-neon-yellow" />
-              Mamba Mentality
+              Championship Mindset
             </h2>
           </div>
 
-          {mambaContent ? (
+          {championshipContent ? (
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <Quote className="h-8 w-8 text-neon-yellow shrink-0 mt-1" />
                 <div>
                   <p className="text-lg text-white italic leading-relaxed">
-                    "{mambaContent.content}"
+                    "{championshipContent.content}"
                   </p>
                   <p className="text-sm text-neon-yellow mt-2">
-                    — {mambaContent.source}
+                    — {championshipContent.source}
                   </p>
                 </div>
               </div>
 
-              {mambaContent.videoUrl && (
+              {championshipContent.videoUrl && (
                 <Button
                   variant="outline"
                   className="w-full border-neon-yellow/30 text-neon-yellow hover:bg-neon-yellow/10"
-                  onClick={() => window.open(mambaContent.videoUrl!, "_blank")}
+                  onClick={() => window.open(championshipContent.videoUrl!, "_blank")}
                 >
                   <Play className="h-4 w-4 mr-2" />
                   Watch Motivational Video

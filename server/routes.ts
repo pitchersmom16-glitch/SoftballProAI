@@ -966,6 +966,7 @@ export async function registerRoutes(
           const onboarding = rel.player ? await storage.getPlayerOnboarding(rel.playerId) : null;
           const baselineVideos = rel.player ? await storage.getBaselineVideos(rel.playerId) : [];
           
+          const needsReview = !onboarding?.dashboardUnlocked && baselineVideos.length >= 4;
           return {
             id: rel.id,
             playerId: rel.playerId,
@@ -979,7 +980,14 @@ export async function registerRoutes(
             baselineComplete: onboarding?.baselineComplete ?? false,
             baselineVideoCount: baselineVideos.length,
             dashboardUnlocked: onboarding?.dashboardUnlocked ?? false,
-            needsReview: !onboarding?.dashboardUnlocked && baselineVideos.length >= 4,
+            needsReview,
+            // Include baseline videos for students needing review
+            baselineVideos: needsReview ? baselineVideos.map(v => ({
+              id: v.id,
+              videoNumber: v.videoNumber,
+              videoUrl: v.videoUrl,
+              aiAnalysis: v.aiAnalysis,
+            })) : undefined,
           };
         })
       );
@@ -1346,7 +1354,21 @@ export async function registerRoutes(
   app.post("/api/specialist/baseline/:playerId/approve", async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
       const playerId = req.params.playerId;
+      
+      // Verify coach exists
+      const coach = await storage.getCoachByUserId(userId);
+      if (!coach) {
+        return res.status(403).json({ message: "Only instructors can approve baselines" });
+      }
+      
+      // Verify this coach is linked to this player
+      const relationships = await storage.getCoachPlayers(coach.id);
+      const isMyStudent = relationships.some(rel => rel.playerId === playerId && rel.status === "active");
+      if (!isMyStudent) {
+        return res.status(403).json({ message: "You can only approve baselines for your own students" });
+      }
       
       // Unlock dashboard
       await storage.updatePlayerOnboarding(playerId, { 

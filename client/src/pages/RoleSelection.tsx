@@ -17,9 +17,9 @@ const roles = [
     color: "neon-green",
     features: [
       "Daily Vibe check-in with soreness tracking",
-      "Mamba Mentality daily motivation",
+      "Championship Mindset daily motivation",
       "One-click video upload for instant feedback",
-      "Personalized drill recommendations",
+      "Personalized Goal Tracking",
       "Injury prevention alerts"
     ],
     accentClass: "from-neon-green/20 to-neon-green/5 border-neon-green/30 hover:border-neon-green/60"
@@ -42,13 +42,13 @@ const roles = [
   },
   {
     id: "pitching_coach" as UserRole,
-    title: "Pitching Coach Mode",
-    subtitle: "Specialist View",
-    description: "Remote training for your pitching students",
+    title: "Private Instructor Mode",
+    subtitle: "Instructor View",
+    description: "Remote training for Pitching, Hitting & Catching",
     icon: Target,
     color: "neon-yellow",
     features: [
-      "Manage your 'Stable' of students",
+      "My Active Roster (up to 25 students)",
       "Assign homework drills with rep counts",
       "Split-screen Pro Model comparison",
       "Video analysis with detailed feedback",

@@ -112,7 +112,7 @@ Mental Edge includes: title, contentType (visualization/mindset/quote/video), ca
 
 **Seeded Content:**
 - 30 expert drills emphasizing biomechanical physics (internal rotation, rotational mechanics)
-- 10 Mental Edge items including 6 Kobe Bryant Mamba Mentality principles
+- 10 Mental Edge items including Championship Mindset principles
 
 **Issue Mapping:**
 The Brain maps biomechanical issues to mechanic tags for intelligent drill matching:
@@ -120,8 +120,8 @@ The Brain maps biomechanical issues to mechanic tags for intelligent drill match
 - "weak leg drive" → ["Leg Drive", "Explosive Power", "Kinetic Chain"]
 - "lunging" → ["Stay Back", "Load", "Balance"]
 
-### Specialist Coach Mode (Pitching/Catching)
-The Specialist Coach workflow is distinct from Head Coach mode, designed for 1-on-1 remote training.
+### Private Instructor Mode
+The Private Instructor workflow is distinct from Team Coach mode, designed for 1-on-1 remote training for Pitching, Hitting & Catching.
 
 **Key Features:**
 - **Roster Management**: 25-student hard cap per coach, archive/activate students

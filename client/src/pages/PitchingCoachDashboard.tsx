@@ -137,10 +137,10 @@ export default function PitchingCoachDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-neon-yellow">
-              Pitching Coach Studio
+              Private Instructor Studio
             </h1>
             <p className="text-muted-foreground mt-1">
-              Train your stable remotely with video analysis
+              Train your roster remotely with video analysis
             </p>
           </div>
           <div className="flex gap-3">
@@ -199,8 +199,8 @@ export default function PitchingCoachDashboard() {
                   <GraduationCap className="w-6 h-6 text-neon-yellow" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold">The Stable</h2>
-                  <p className="text-sm text-muted-foreground">Your remote pitching students</p>
+                  <h2 className="text-xl font-bold">My Active Roster</h2>
+                  <p className="text-sm text-muted-foreground">Your remote training students</p>
                 </div>
               </div>
             </div>
@@ -255,8 +255,8 @@ export default function PitchingCoachDashboard() {
               ) : (
                 <div className="text-center py-12 text-muted-foreground">
                   <Users className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg">Your stable is empty</p>
-                  <p className="text-sm">Add pitching students to start remote coaching</p>
+                  <p className="text-lg">Your roster is empty</p>
+                  <p className="text-sm">Add students to start remote coaching</p>
                 </div>
               )}
             </div>

@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Users, 
@@ -18,7 +19,9 @@ import {
   Mail,
   Phone,
   Loader2,
-  Eye
+  Eye,
+  Video,
+  MapPin
 } from "lucide-react";
 import {
   Dialog,
@@ -37,6 +40,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+interface BaselineVideo {
+  id: number;
+  videoNumber: number;
+  videoUrl: string;
+  aiAnalysis?: string;
+}
+
 interface Student {
   id: number;
   playerId: string;
@@ -49,6 +59,7 @@ interface Student {
   baselineVideoCount: number;
   dashboardUnlocked: boolean;
   needsReview: boolean;
+  baselineVideos?: BaselineVideo[];
 }
 
 interface RosterData {
@@ -62,10 +73,15 @@ interface ReferralData {
   referralUrl: string;
 }
 
+const VIDEO_LABELS = ["Front View", "Side View", "Back View", "Close-Up Release"];
+
 export default function SpecialistRoster() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showInviteDialog, setShowInviteDialog] = useState(false);
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [roadmapNotes, setRoadmapNotes] = useState("");
   const [inviteData, setInviteData] = useState({
     parentEmail: "",
     studentEmail: "",
@@ -119,6 +135,37 @@ export default function SpecialistRoster() {
       });
     },
   });
+
+  const approveMutation = useMutation({
+    mutationFn: async (playerId: string) => {
+      return apiRequest("POST", `/api/specialist/baseline/${playerId}/approve`, { 
+        notes: roadmapNotes 
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/specialist/roster"] });
+      setShowReviewDialog(false);
+      setSelectedStudent(null);
+      setRoadmapNotes("");
+      toast({
+        title: "Roadmap Created!",
+        description: "Student dashboard has been unlocked. They can now access their training plan.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create roadmap.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const openReviewDialog = (student: Student) => {
+    setSelectedStudent(student);
+    setRoadmapNotes("");
+    setShowReviewDialog(true);
+  };
 
   const copyReferralLink = () => {
     if (referral?.referralUrl) {
@@ -340,6 +387,7 @@ export default function SpecialistRoster() {
                           <Button 
                             size="sm" 
                             className="bg-pink-600"
+                            onClick={() => openReviewDialog(student)}
                             data-testid={`button-review-${student.id}`}
                           >
                             <Eye className="w-4 h-4 mr-1" />
@@ -382,6 +430,89 @@ export default function SpecialistRoster() {
             </p>
           </div>
         )}
+
+        {/* Review Baseline Dialog */}
+        <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
+          <DialogContent className="bg-[#0a0a0a] border-purple-500/30 max-w-4xl max-h-[90vh] overflow-y-auto" data-testid="dialog-review">
+            <DialogHeader>
+              <DialogTitle className="text-white flex items-center gap-2">
+                <Eye className="w-5 h-5 text-pink-500" />
+                Baseline Review: {selectedStudent?.name}
+              </DialogTitle>
+              <DialogDescription className="text-gray-400">
+                Review the student's baseline videos and AI analysis, then create their training roadmap.
+              </DialogDescription>
+            </DialogHeader>
+            
+            {selectedStudent && (
+              <div className="space-y-6 mt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  {VIDEO_LABELS.map((label, idx) => {
+                    const video = selectedStudent.baselineVideos?.find(v => v.videoNumber === idx + 1);
+                    return (
+                      <Card key={idx} className="bg-black/50 border-gray-700 p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Video className="w-4 h-4 text-purple-400" />
+                          <h4 className="font-medium text-white">{label}</h4>
+                        </div>
+                        {video?.videoUrl ? (
+                          <div className="space-y-2">
+                            <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
+                              <video 
+                                src={video.videoUrl} 
+                                controls 
+                                className="w-full h-full rounded-lg"
+                                data-testid={`video-baseline-${idx + 1}`}
+                              />
+                            </div>
+                            {video.aiAnalysis && (
+                              <div className="bg-purple-900/20 border border-purple-500/20 rounded p-2">
+                                <p className="text-xs text-gray-400">AI Analysis:</p>
+                                <p className="text-sm text-gray-300">{video.aiAnalysis}</p>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
+                            <p className="text-gray-500 text-sm">No video uploaded</p>
+                          </div>
+                        )}
+                      </Card>
+                    );
+                  })}
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-sm text-gray-400 flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    Roadmap Notes (What to focus on first)
+                  </label>
+                  <Textarea
+                    placeholder="e.g., Start with K-drills for arm circle, focus on internal rotation..."
+                    value={roadmapNotes}
+                    onChange={(e) => setRoadmapNotes(e.target.value)}
+                    className="bg-black/50 border-gray-700 min-h-[100px]"
+                    data-testid="textarea-roadmap-notes"
+                  />
+                </div>
+
+                <Button
+                  onClick={() => selectedStudent && approveMutation.mutate(selectedStudent.playerId)}
+                  disabled={approveMutation.isPending}
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600"
+                  data-testid="button-create-roadmap"
+                >
+                  {approveMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  ) : (
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                  )}
+                  Create Roadmap & Unlock Dashboard
+                </Button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

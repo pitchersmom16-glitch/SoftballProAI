@@ -501,7 +501,7 @@ export default function TrainBrain() {
                           <FormItem>
                             <FormLabel>Title</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g., Mamba Mentality - Fearless Focus" {...field} data-testid="input-mental-title" />
+                              <Input placeholder="e.g., Championship Mindset - Fearless Focus" {...field} data-testid="input-mental-title" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -614,7 +614,7 @@ export default function TrainBrain() {
                             <FormLabel>Tags</FormLabel>
                             <FormControl>
                               <Input 
-                                placeholder="Mamba Mentality, Work Ethic, Fearless (comma separated)"
+                                placeholder="Championship Mindset, Work Ethic, Fearless (comma separated)"
                                 {...field}
                                 data-testid="input-mental-tags"
                               />
