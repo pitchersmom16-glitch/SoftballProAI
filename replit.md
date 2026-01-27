@@ -153,6 +153,39 @@ The Private Instructor workflow is distinct from Team Coach mode, designed for 1
 - `/register?ref=CODE` - Student registration via referral
 - `/player/onboarding` - Baseline video upload flow
 
+### Universal Notification Engine
+The notification system provides real-time alerts for all user types with bi-directional communication.
+
+**Notification Types:**
+- `training_reminder` - Player: 15 mins before training time
+- `championship_mindset` - Player: Daily motivation quote
+- `video_uploaded` - Instructor: Student uploaded a video
+- `baseline_ready` - Instructor: Student baseline ready for review
+- `high_soreness_alert` - Team Coach: Player reported high soreness (7+/10)
+- `injury_alert` - Team Coach: Player reported injury (8+/10)
+- `roadmap_ready` - Player: Coach created training roadmap
+- `homework_assigned` - Player: New drill assignment
+
+**Database Table:** `notifications`
+- Columns: userId, type, title, message, linkUrl, relatedId, read, emailSent, pushSent, createdAt
+
+**API Endpoints:**
+- `GET /api/notifications` - Get all notifications for current user
+- `GET /api/notifications/unread-count` - Get unread count
+- `PATCH /api/notifications/:id/read` - Mark notification as read
+- `PATCH /api/notifications/read-all` - Mark all notifications as read
+
+**Trigger Points:**
+- Player check-in with soreness 7+ → notifies team coach and private instructors
+- Baseline video upload → notifies instructor with progress
+- All 4 baseline videos complete → notifies instructor "Baseline Ready for Review"
+- Baseline approval → notifies player "Roadmap Ready"
+
+**UI Component:**
+- `NotificationBell` in dashboard header for all authenticated users
+- Shows unread count badge, click to view/dismiss notifications
+- Auto-refreshes every 30 seconds
+
 ### Key npm Dependencies
 - `drizzle-orm` / `drizzle-kit`: Database ORM and migrations
 - `@tanstack/react-query`: Server state management

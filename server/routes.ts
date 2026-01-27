@@ -1496,14 +1496,23 @@ export async function registerRoutes(
     }
   });
 
-  // Mark notification as read
+  // Mark notification as read (with ownership verification)
   app.patch("/api/notifications/:id/read", async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
       
       const notificationId = parseInt(req.params.id);
-      const notification = await storage.markNotificationRead(notificationId);
       
+      // Verify ownership by checking if notification belongs to this user
+      const userNotifications = await storage.getNotifications(userId);
+      const ownsNotification = userNotifications.some(n => n.id === notificationId);
+      
+      if (!ownsNotification) {
+        return res.status(403).json({ message: "You can only mark your own notifications as read" });
+      }
+      
+      const notification = await storage.markNotificationRead(notificationId);
       res.json(notification);
     } catch (err) {
       throw err;
