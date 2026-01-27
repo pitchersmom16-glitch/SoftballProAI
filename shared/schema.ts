@@ -48,6 +48,9 @@ export const coaches = pgTable("coaches", {
   bio: text("bio"),
   experienceYears: integer("experience_years"),
   certificationLevel: text("certification_level"),
+  specialty: text("specialty"), // "PITCHING", "CATCHING", "HITTING", "FIELDING" - for Specialist Coaches
+  referralCode: text("referral_code").unique(), // Unique code for Smart Invite URLs (e.g., "COACH_ABC123")
+  maxStudents: integer("max_students").default(25), // Hard cap on active students
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -194,6 +197,50 @@ export const coachInvites = pgTable("coach_invites", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Smart Invite - Coach invites students/parents via email/phone with unique referral URL
+export const studentInvites = pgTable("student_invites", {
+  id: serial("id").primaryKey(),
+  coachId: integer("coach_id").notNull().references(() => coaches.id),
+  parentEmail: text("parent_email"),
+  studentEmail: text("student_email"),
+  phone: text("phone"),
+  studentName: text("student_name"),
+  skillType: text("skill_type").notNull(), // Coach's specialty that student is signing up for
+  inviteToken: text("invite_token").notNull().unique(), // Unique token for the referral URL
+  status: text("status").default("pending"), // "pending", "registered", "expired"
+  registeredUserId: text("registered_user_id").references(() => users.id), // Set when student registers
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Baseline Videos - Track student onboarding video uploads (4 required to unlock app)
+export const baselineVideos = pgTable("baseline_videos", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id),
+  coachId: integer("coach_id").references(() => coaches.id),
+  skillType: text("skill_type").notNull(), // "PITCHING", "CATCHING", etc.
+  videoNumber: integer("video_number").notNull(), // 1-4 for the baseline protocol
+  videoUrl: text("video_url").notNull(),
+  durationSeconds: integer("duration_seconds"),
+  assessmentId: integer("assessment_id").references(() => assessments.id), // Created when AI analyzes
+  status: text("status").default("uploaded"), // "uploaded", "analyzing", "analyzed"
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Player Onboarding Status - Tracks whether student has completed baseline protocol
+export const playerOnboarding = pgTable("player_onboarding", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id).unique(),
+  coachId: integer("coach_id").references(() => coaches.id), // Linked coach
+  skillType: text("skill_type"), // Specialty they signed up for
+  baselineComplete: boolean("baseline_complete").default(false), // Set to true after 4 videos
+  baselineApprovedAt: timestamp("baseline_approved_at"), // When coach approved
+  dashboardUnlocked: boolean("dashboard_unlocked").default(false),
+  nextVideoPromptDate: date("next_video_prompt_date"), // 2 weeks after completion
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Player Settings - Stores player preferences including subscription mode
 export const playerSettings = pgTable("player_settings", {
   id: serial("id").primaryKey(),
@@ -309,6 +356,9 @@ export const insertCoachStudentSchema = createInsertSchema(coachStudents).omit({
 export const insertPlayerCoachRelationshipSchema = createInsertSchema(playerCoachRelationships).omit({ id: true, createdAt: true });
 export const insertCoachInviteSchema = createInsertSchema(coachInvites).omit({ id: true, createdAt: true });
 export const insertPlayerSettingsSchema = createInsertSchema(playerSettings).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertStudentInviteSchema = createInsertSchema(studentInvites).omit({ id: true, createdAt: true });
+export const insertBaselineVideoSchema = createInsertSchema(baselineVideos).omit({ id: true, createdAt: true });
+export const insertPlayerOnboardingSchema = createInsertSchema(playerOnboarding).omit({ id: true, createdAt: true, updatedAt: true });
 
 // === EXPLICIT API CONTRACT TYPES ===
 
@@ -326,6 +376,9 @@ export type CoachStudent = typeof coachStudents.$inferSelect;
 export type PlayerCoachRelationship = typeof playerCoachRelationships.$inferSelect;
 export type CoachInvite = typeof coachInvites.$inferSelect;
 export type PlayerSettings = typeof playerSettings.$inferSelect;
+export type StudentInvite = typeof studentInvites.$inferSelect;
+export type BaselineVideo = typeof baselineVideos.$inferSelect;
+export type PlayerOnboarding = typeof playerOnboarding.$inferSelect;
 
 export type CreateCoachRequest = z.infer<typeof insertCoachSchema>;
 export type CreateTeamRequest = z.infer<typeof insertTeamSchema>;
@@ -341,6 +394,9 @@ export type CreateCoachStudentRequest = z.infer<typeof insertCoachStudentSchema>
 export type CreatePlayerCoachRelationshipRequest = z.infer<typeof insertPlayerCoachRelationshipSchema>;
 export type CreateCoachInviteRequest = z.infer<typeof insertCoachInviteSchema>;
 export type CreatePlayerSettingsRequest = z.infer<typeof insertPlayerSettingsSchema>;
+export type CreateStudentInviteRequest = z.infer<typeof insertStudentInviteSchema>;
+export type CreateBaselineVideoRequest = z.infer<typeof insertBaselineVideoSchema>;
+export type CreatePlayerOnboardingRequest = z.infer<typeof insertPlayerOnboardingSchema>;
 
 export type UpdateAthleteRequest = Partial<CreateAthleteRequest>;
 export type UpdateAssessmentRequest = Partial<CreateAssessmentRequest> & { status?: string, metrics?: any };

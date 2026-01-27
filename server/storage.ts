@@ -2,12 +2,15 @@ import { db } from "./db";
 import { 
   coaches, teams, athletes, drills, assessments, assessmentFeedback, mentalEdge, playerCheckins,
   practicePlans, coachStudents, homeworkAssignments, playerCoachRelationships, coachInvites, playerSettings,
+  studentInvites, baselineVideos, playerOnboarding,
   type Coach, type Team, type Athlete, type Drill, type Assessment, type Feedback, type MentalEdge, type PlayerCheckin,
   type PracticePlan, type CoachStudent, type HomeworkAssignment, type PlayerCoachRelationship, type CoachInvite, type PlayerSettings,
+  type StudentInvite, type BaselineVideo, type PlayerOnboarding,
   type CreateCoachRequest, type CreateTeamRequest, type CreateAthleteRequest, 
   type CreateDrillRequest, type CreateMentalEdgeRequest, type CreateAssessmentRequest, type CreateFeedbackRequest,
   type CreatePlayerCheckinRequest, type UpdateAthleteRequest, type UpdateAssessmentRequest,
-  type CreatePlayerCoachRelationshipRequest, type CreateCoachInviteRequest, type CreatePlayerSettingsRequest
+  type CreatePlayerCoachRelationshipRequest, type CreateCoachInviteRequest, type CreatePlayerSettingsRequest,
+  type CreateStudentInviteRequest, type CreateBaselineVideoRequest, type CreatePlayerOnboardingRequest
 } from "@shared/schema";
 import { users, type UserRole } from "@shared/models/auth";
 import { eq, desc, and } from "drizzle-orm";
@@ -89,6 +92,29 @@ export interface IStorage {
   
   // Assessments by status (for coach review queue)
   getAssessmentsByStatus(status: string, coachId?: number): Promise<Assessment[]>;
+  
+  // === SPECIALIST COACH MODE ===
+  
+  // Student Invites (Smart Invite System)
+  getStudentInvitesByCoach(coachId: number): Promise<StudentInvite[]>;
+  getStudentInviteByToken(token: string): Promise<StudentInvite | undefined>;
+  createStudentInvite(invite: CreateStudentInviteRequest): Promise<StudentInvite>;
+  updateStudentInvite(id: number, update: Partial<StudentInvite>): Promise<StudentInvite>;
+  getCoachActiveStudentCount(coachId: number): Promise<number>;
+  
+  // Baseline Videos
+  getBaselineVideos(userId: string): Promise<BaselineVideo[]>;
+  createBaselineVideo(video: CreateBaselineVideoRequest): Promise<BaselineVideo>;
+  updateBaselineVideo(id: number, update: Partial<BaselineVideo>): Promise<BaselineVideo>;
+  
+  // Player Onboarding
+  getPlayerOnboarding(userId: string): Promise<PlayerOnboarding | undefined>;
+  createPlayerOnboarding(onboarding: CreatePlayerOnboardingRequest): Promise<PlayerOnboarding>;
+  updatePlayerOnboarding(userId: string, update: Partial<PlayerOnboarding>): Promise<PlayerOnboarding>;
+  
+  // Coach by referral code
+  getCoachByReferralCode(code: string): Promise<Coach | undefined>;
+  updateCoach(id: number, update: Partial<Coach>): Promise<Coach>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -373,6 +399,86 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(assessments)
       .where(eq(assessments.status, status))
       .orderBy(desc(assessments.createdAt));
+  }
+
+  // === SPECIALIST COACH MODE ===
+
+  // Student Invites (Smart Invite System)
+  async getStudentInvitesByCoach(coachId: number): Promise<StudentInvite[]> {
+    return db.select().from(studentInvites)
+      .where(eq(studentInvites.coachId, coachId))
+      .orderBy(desc(studentInvites.createdAt));
+  }
+
+  async getStudentInviteByToken(token: string): Promise<StudentInvite | undefined> {
+    const [invite] = await db.select().from(studentInvites)
+      .where(eq(studentInvites.inviteToken, token));
+    return invite;
+  }
+
+  async createStudentInvite(invite: CreateStudentInviteRequest): Promise<StudentInvite> {
+    const [newInvite] = await db.insert(studentInvites).values(invite).returning();
+    return newInvite;
+  }
+
+  async updateStudentInvite(id: number, update: Partial<StudentInvite>): Promise<StudentInvite> {
+    const [updated] = await db.update(studentInvites).set(update).where(eq(studentInvites.id, id)).returning();
+    return updated;
+  }
+
+  async getCoachActiveStudentCount(coachId: number): Promise<number> {
+    const relationships = await db.select().from(playerCoachRelationships)
+      .where(and(eq(playerCoachRelationships.coachId, coachId), eq(playerCoachRelationships.status, "active")));
+    return relationships.length;
+  }
+
+  // Baseline Videos
+  async getBaselineVideos(userId: string): Promise<BaselineVideo[]> {
+    return db.select().from(baselineVideos)
+      .where(eq(baselineVideos.userId, userId))
+      .orderBy(baselineVideos.videoNumber);
+  }
+
+  async createBaselineVideo(video: CreateBaselineVideoRequest): Promise<BaselineVideo> {
+    const [newVideo] = await db.insert(baselineVideos).values(video).returning();
+    return newVideo;
+  }
+
+  async updateBaselineVideo(id: number, update: Partial<BaselineVideo>): Promise<BaselineVideo> {
+    const [updated] = await db.update(baselineVideos).set(update).where(eq(baselineVideos.id, id)).returning();
+    return updated;
+  }
+
+  // Player Onboarding
+  async getPlayerOnboarding(userId: string): Promise<PlayerOnboarding | undefined> {
+    const [onboarding] = await db.select().from(playerOnboarding)
+      .where(eq(playerOnboarding.userId, userId));
+    return onboarding;
+  }
+
+  async createPlayerOnboarding(onboarding: CreatePlayerOnboardingRequest): Promise<PlayerOnboarding> {
+    const [newOnboarding] = await db.insert(playerOnboarding).values(onboarding).returning();
+    return newOnboarding;
+  }
+
+  async updatePlayerOnboarding(userId: string, update: Partial<PlayerOnboarding>): Promise<PlayerOnboarding> {
+    const [updated] = await db.update(playerOnboarding)
+      .set({ ...update, updatedAt: new Date() })
+      .where(eq(playerOnboarding.userId, userId))
+      .returning();
+    return updated;
+  }
+
+  // Coach by referral code
+  async getCoachByReferralCode(code: string): Promise<Coach | undefined> {
+    const [coach] = await db.select().from(coaches)
+      .where(eq(coaches.referralCode, code));
+    return coach;
+  }
+
+  async updateCoach(id: number, update: Partial<Coach>): Promise<Coach> {
+    const [updated] = await db.update(coaches).set(update).where(eq(coaches.id, id)).returning();
+    return updated;
   }
 }
 
