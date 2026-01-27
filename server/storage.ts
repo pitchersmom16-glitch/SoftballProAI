@@ -26,6 +26,7 @@ export interface IStorage {
   getTeam(id: number): Promise<Team | undefined>;
   getTeams(): Promise<Team[]>;
   createTeam(team: CreateTeamRequest): Promise<Team>;
+  deleteTeam(id: number): Promise<void>;
 
   // Athletes
   getAthletes(teamId?: number): Promise<Athlete[]>;
@@ -153,6 +154,10 @@ export class DatabaseStorage implements IStorage {
   async createTeam(team: CreateTeamRequest): Promise<Team> {
     const [newTeam] = await db.insert(teams).values(team).returning();
     return newTeam;
+  }
+
+  async deleteTeam(id: number): Promise<void> {
+    await db.delete(teams).where(eq(teams.id, id));
   }
 
   // Athletes

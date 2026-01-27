@@ -289,6 +289,22 @@ export async function registerRoutes(
     }
   });
 
+  // Delete team
+  app.delete("/api/teams/:id", isAuthenticated, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const team = await storage.getTeam(id);
+      if (!team) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      await storage.deleteTeam(id);
+      res.json({ message: "Team deleted successfully" });
+    } catch (err) {
+      console.error("Error deleting team:", err);
+      res.status(500).json({ message: "Failed to delete team" });
+    }
+  });
+
   // Drills
   app.get(api.drills.list.path, async (req, res) => {
     const category = req.query.category as string;
