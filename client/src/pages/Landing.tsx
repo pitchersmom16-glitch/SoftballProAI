@@ -28,13 +28,19 @@ export default function Landing() {
       <section className="w-full min-h-screen bg-brand-black flex flex-col lg:flex-row items-center overflow-hidden relative">
         {/* === LAYER 1: THE SKELETON (Background & Position) === */}
         <div className="absolute inset-0 z-0">
-          {/* The Hero Image - Full saturation, no opacity reduction */}
+          {/* MOBILE: Cover the screen, centered */}
           <img
             src={heroImage}
             alt="Biomechanics Background"
-            className="absolute inset-0 w-full h-full object-cover object-center lg:object-right"
+            className="absolute inset-0 w-full h-full object-cover object-center lg:hidden"
           />
-          {/* MOBILE: Lighter gradient, only covers left half for text */}
+          {/* DESKTOP: Positioned on right side, contained to fit properly */}
+          <img
+            src={heroImage}
+            alt="Biomechanics Background"
+            className="absolute top-0 right-0 h-full w-[65%] object-contain object-right hidden lg:block"
+          />
+          {/* MOBILE: Lighter gradient for text readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-brand-black via-brand-black/40 to-transparent lg:hidden" />
           {/* DESKTOP: Lighter gradient on left only, skeleton fully visible on right */}
           <div className="absolute inset-0 bg-gradient-to-r from-brand-black via-brand-black/30 to-transparent hidden lg:block" />
