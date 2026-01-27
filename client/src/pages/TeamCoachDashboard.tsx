@@ -340,10 +340,29 @@ export default function TeamCoachDashboard() {
                   data-testid={`roster-athlete-${item.athlete.id}`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${
-                      item.healthStatus === "healthy" ? "bg-neon-green" :
-                      item.healthStatus === "caution" ? "bg-neon-yellow" : "bg-neon-pink"
-                    }`} />
+                    <div className="relative">
+                      {item.athlete.photoUrl ? (
+                        <img 
+                          src={item.athlete.photoUrl} 
+                          alt={item.athlete.name}
+                          className="w-8 h-8 rounded-full object-cover border border-white/20"
+                          data-testid={`health-img-athlete-${item.athlete.id}`}
+                        />
+                      ) : (
+                        <div 
+                          className="w-8 h-8 rounded-full bg-neon-yellow/20 flex items-center justify-center"
+                          data-testid={`health-avatar-fallback-${item.athlete.id}`}
+                        >
+                          <span className="text-neon-yellow text-xs font-bold">
+                            {item.athlete.name?.charAt(0) || "?"}
+                          </span>
+                        </div>
+                      )}
+                      <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card ${
+                        item.healthStatus === "healthy" ? "bg-neon-green" :
+                        item.healthStatus === "caution" ? "bg-neon-yellow" : "bg-neon-pink"
+                      }`} />
+                    </div>
                     <div>
                       <p className="font-medium text-sm">{item.athlete.name}</p>
                       <p className="text-xs text-muted-foreground">
@@ -405,11 +424,23 @@ export default function TeamCoachDashboard() {
                 data-testid={`athlete-card-${athlete.id}`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-neon-green/20 flex items-center justify-center">
-                    <span className="text-neon-green font-bold">
-                      {athlete.name?.charAt(0) || "?"}
-                    </span>
-                  </div>
+                  {athlete.photoUrl ? (
+                    <img 
+                      src={athlete.photoUrl} 
+                      alt={athlete.name}
+                      className="w-10 h-10 rounded-full object-cover border border-neon-green/30"
+                      data-testid={`img-athlete-${athlete.id}`}
+                    />
+                  ) : (
+                    <div 
+                      className="w-10 h-10 rounded-full bg-neon-green/20 flex items-center justify-center"
+                      data-testid={`avatar-fallback-${athlete.id}`}
+                    >
+                      <span className="text-neon-green font-bold">
+                        {athlete.name?.charAt(0) || "?"}
+                      </span>
+                    </div>
+                  )}
                   <div>
                     <p className="font-medium">{athlete.name}</p>
                     <p className="text-xs text-muted-foreground">

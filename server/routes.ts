@@ -257,15 +257,57 @@ export async function registerRoutes(
   // Update athlete
   app.put(api.athletes.update.path, isAuthenticated, async (req, res) => {
     try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
       const id = Number(req.params.id);
       const athlete = await storage.getAthlete(id);
       if (!athlete) {
         return res.status(404).json({ message: "Athlete not found" });
       }
+      
+      // Authorization check: user must either own the athlete OR be coach of athlete's team
+      let isAuthorized = false;
+      
+      // Check if athlete belongs to this user
+      if (athlete.userId === userId) {
+        isAuthorized = true;
+      }
+      
+      // Check if user is a coach who manages this athlete's team
+      if (!isAuthorized && athlete.teamId) {
+        const coach = await storage.getCoachByUserId(userId);
+        if (coach) {
+          const team = await storage.getTeam(athlete.teamId);
+          if (team && team.headCoachId === coach.id) {
+            isAuthorized = true;
+          }
+        }
+      }
+      
+      // Check if user is a private instructor with this athlete as a student
+      if (!isAuthorized) {
+        const coach = await storage.getCoachByUserId(userId);
+        if (coach) {
+          const relationships = await storage.getCoachPlayers(coach.id);
+          const isMyStudent = relationships.some(rel => rel.playerId === athlete.userId && rel.status === "active");
+          if (isMyStudent) {
+            isAuthorized = true;
+          }
+        }
+      }
+      
+      if (!isAuthorized) {
+        return res.status(403).json({ message: "You are not authorized to update this athlete" });
+      }
+      
       const input = api.athletes.update.input.parse(req.body);
       const updated = await storage.updateAthlete(id, input);
       res.json(updated);
     } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
       console.error("Error updating athlete:", err);
       res.status(500).json({ message: "Failed to update athlete" });
     }
