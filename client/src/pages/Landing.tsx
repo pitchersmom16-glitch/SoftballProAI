@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { ArrowRight, Activity, Zap, TrendingUp, Video } from "lucide-react";
 import logo from "@/assets/logo.jpg";
+import heroImage from "@/assets/hero.jpg";
 
 export default function Landing() {
   return (
@@ -24,13 +25,13 @@ export default function Landing() {
 
       {/* Hero Section */}
       <section className="pt-32 pb-24 lg:pt-48 lg:pb-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-wider mb-6 badge-glass">
               <Zap className="h-3 w-3" style={{ color: '#8B5CF6' }} />
               <span className="text-gray-300">AI-Powered Coaching</span>
             </div>
-            <h1 className="text-5xl lg:text-7xl font-bold font-display leading-[1.1] mb-6 text-white">
+            <h1 className="text-5xl md:text-7xl font-bold font-display leading-[1.1] mb-6 text-white">
               The Ultimate <br/>
               <span className="text-white">Softball Coach</span>
             </h1>
@@ -61,24 +62,12 @@ export default function Landing() {
             </div>
           </div>
 
-          <div className="relative">
-            <div className="absolute -inset-4 rounded-[2rem] blur-2xl opacity-40 -z-10" style={{ background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(255, 16, 240, 0.2))' }} />
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3]" style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
-              {/* Abstract dashboard representation */}
-              <div className="absolute inset-0 p-8 flex flex-col" style={{ background: 'linear-gradient(135deg, #0a0a0a, #111)' }}>
-                <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
-                  <div className="h-8 w-32 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }} />
-                  <div className="h-8 w-8 rounded-full" style={{ background: 'linear-gradient(135deg, #FF10F0, #8B5CF6)' }} />
-                </div>
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                  <div className="p-4 rounded-2xl h-32" style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)' }} />
-                  <div className="p-4 rounded-2xl h-32" style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)' }} />
-                </div>
-                <div className="flex-1 rounded-2xl p-4 flex items-center justify-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                  <p className="font-medium text-gray-400">AI Analysis in progress...</p>
-                </div>
-              </div>
-            </div>
+          <div className="relative flex justify-center">
+            <img 
+              src={heroImage} 
+              alt="SoftballProAI Hero" 
+              className="w-full max-w-[500px] h-auto object-contain mx-auto drop-shadow-[0_0_25px_rgba(57,255,20,0.4)] animate-pulse-slow"
+            />
           </div>
         </div>
       </section>
