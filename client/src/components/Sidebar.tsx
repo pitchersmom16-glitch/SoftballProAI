@@ -35,7 +35,9 @@ export function Sidebar() {
   const NavContent = () => (
     <div className="flex flex-col h-full bg-black text-white">
       <div className="p-6 border-b border-white/10">
-        <img src={logo} alt="SoftballProAI" className="h-14 w-auto object-contain" />
+        <Link href="/">
+          <img src={logo} alt="SoftballProAI" className="h-14 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity" />
+        </Link>
         {user && (
           <div className="mt-4 flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
             <div className="h-10 w-10 rounded-full bg-neon-green/20 text-neon-green flex items-center justify-center font-bold text-lg">
@@ -88,7 +90,9 @@ export function Sidebar() {
     <>
       {/* Mobile Trigger */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-black border-b border-white/10 z-40 flex items-center justify-between px-4">
-        <img src={logo} alt="SoftballProAI" className="h-10 w-auto object-contain" />
+        <Link href="/">
+          <img src={logo} alt="SoftballProAI" className="h-10 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity" />
+        </Link>
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="text-white hover:bg-slate-800">

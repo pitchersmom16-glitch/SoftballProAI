@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAssessment } from "@/hooks/use-assessments";
 import { useAthlete } from "@/hooks/use-athletes";
-import { useRoute } from "wouter";
+import { useRoute, Link } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -143,9 +143,11 @@ export default function AssessmentDetail() {
                     <h4 className="font-bold text-sm mb-1">{item.issueDetected}</h4>
                     <p className="text-sm text-slate-300 leading-relaxed">{item.feedbackText}</p>
                     {item.drillId && (
-                      <Button variant="ghost" className="text-accent p-0 h-auto text-xs mt-2">
-                        View Recommended Drill
-                      </Button>
+                      <Link href={`/drills`}>
+                        <Button variant="ghost" className="text-accent p-0 h-auto text-xs mt-2">
+                          View Recommended Drill
+                        </Button>
+                      </Link>
                     )}
                   </div>
                 </div>

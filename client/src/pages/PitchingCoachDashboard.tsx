@@ -452,11 +452,18 @@ export default function PitchingCoachDashboard() {
           </div>
 
           <div className="mt-4 flex justify-center gap-4">
-            <Button variant="outline" className="border-neon-green/50 text-neon-green">
+            <Button 
+              variant="outline" 
+              className="border-neon-green/50 text-neon-green"
+              onClick={() => toast({ title: "Coming Soon", description: "Pro Model comparison will be available in a future update." })}
+            >
               <Eye className="w-4 h-4 mr-2" />
               Load Pro Model
             </Button>
-            <Button variant="outline">
+            <Button 
+              variant="outline"
+              onClick={() => toast({ title: "Coming Soon", description: "Video annotations will be available in a future update." })}
+            >
               <MessageSquare className="w-4 h-4 mr-2" />
               Add Annotation
             </Button>
