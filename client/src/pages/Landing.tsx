@@ -28,16 +28,16 @@ export default function Landing() {
       <section className="w-full min-h-screen bg-brand-black flex flex-col lg:flex-row items-center overflow-hidden relative">
         {/* === LAYER 1: THE SKELETON (Background & Position) === */}
         <div className="absolute inset-0 z-0">
-          {/* The Hero Image - Higher opacity for visibility */}
+          {/* The Hero Image - Full saturation, no opacity reduction */}
           <img
             src={heroImage}
             alt="Biomechanics Background"
-            className="absolute inset-0 w-full h-full object-cover object-center lg:object-right opacity-70 lg:opacity-80"
+            className="absolute inset-0 w-full h-full object-cover object-center lg:object-right"
           />
-          {/* MOBILE: Gradient from top for text readability, skeleton visible at bottom */}
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-black via-brand-black/60 to-transparent lg:hidden" />
-          {/* DESKTOP: Gradient from left for text readability, skeleton visible on right */}
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-black via-brand-black/50 to-transparent hidden lg:block" />
+          {/* MOBILE: Lighter gradient, only covers left half for text */}
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-black via-brand-black/40 to-transparent lg:hidden" />
+          {/* DESKTOP: Lighter gradient on left only, skeleton fully visible on right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-black via-brand-black/30 to-transparent hidden lg:block" />
         </div>
 
         {/* === LAYER 2: THE TEXT (Content) === */}
