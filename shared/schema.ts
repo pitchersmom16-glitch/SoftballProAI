@@ -289,6 +289,34 @@ export const assessmentFeedback = pgTable("assessment_feedback", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// === NOTIFICATION TYPE ENUM ===
+export const NotificationTypeEnum = z.enum([
+  "training_reminder",      // Player: 15 mins before training time
+  "championship_mindset",   // Player: Daily motivation quote
+  "video_uploaded",         // Instructor: Student uploaded video
+  "baseline_ready",         // Instructor: Student baseline ready for review
+  "high_soreness_alert",    // Team Coach: Player reported high soreness
+  "injury_alert",           // Team Coach: Player reported injury
+  "roadmap_ready",          // Player: Coach created training roadmap
+  "homework_assigned",      // Player: New drill assignment
+]);
+export type NotificationType = z.infer<typeof NotificationTypeEnum>;
+
+// === NOTIFICATIONS TABLE ===
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id),
+  type: text("type").notNull(), // NotificationType values
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  linkUrl: text("link_url"), // Optional action link
+  relatedId: text("related_id"), // Optional reference to related entity (playerId, assessmentId, etc.)
+  read: boolean("read").default(false),
+  emailSent: boolean("email_sent").default(false),
+  pushSent: boolean("push_sent").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // === RELATIONS ===
 
 export const coachesRelations = relations(coaches, ({ one, many }) => ({
@@ -359,6 +387,7 @@ export const insertPlayerSettingsSchema = createInsertSchema(playerSettings).omi
 export const insertStudentInviteSchema = createInsertSchema(studentInvites).omit({ id: true, createdAt: true });
 export const insertBaselineVideoSchema = createInsertSchema(baselineVideos).omit({ id: true, createdAt: true });
 export const insertPlayerOnboardingSchema = createInsertSchema(playerOnboarding).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertNotificationSchema = createInsertSchema(notifications).omit({ id: true, createdAt: true });
 
 // === EXPLICIT API CONTRACT TYPES ===
 
@@ -379,6 +408,7 @@ export type PlayerSettings = typeof playerSettings.$inferSelect;
 export type StudentInvite = typeof studentInvites.$inferSelect;
 export type BaselineVideo = typeof baselineVideos.$inferSelect;
 export type PlayerOnboarding = typeof playerOnboarding.$inferSelect;
+export type Notification = typeof notifications.$inferSelect;
 
 export type CreateCoachRequest = z.infer<typeof insertCoachSchema>;
 export type CreateTeamRequest = z.infer<typeof insertTeamSchema>;
@@ -397,6 +427,7 @@ export type CreatePlayerSettingsRequest = z.infer<typeof insertPlayerSettingsSch
 export type CreateStudentInviteRequest = z.infer<typeof insertStudentInviteSchema>;
 export type CreateBaselineVideoRequest = z.infer<typeof insertBaselineVideoSchema>;
 export type CreatePlayerOnboardingRequest = z.infer<typeof insertPlayerOnboardingSchema>;
+export type CreateNotificationRequest = z.infer<typeof insertNotificationSchema>;
 
 export type UpdateAthleteRequest = Partial<CreateAthleteRequest>;
 export type UpdateAssessmentRequest = Partial<CreateAssessmentRequest> & { status?: string, metrics?: any };
