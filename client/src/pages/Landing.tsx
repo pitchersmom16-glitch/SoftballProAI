@@ -27,14 +27,17 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="w-full min-h-screen bg-brand-black flex flex-col lg:flex-row items-center overflow-hidden relative">
         {/* === LAYER 1: THE SKELETON (Background & Position) === */}
-        <div className="absolute inset-0 z-0 flex items-center justify-end">
+        <div className="absolute inset-0 z-0">
+          {/* The Hero Image - Higher opacity for visibility */}
           <img
             src={heroImage}
             alt="Biomechanics Background"
-            className="w-full h-full lg:w-[65%] object-contain object-center lg:object-right opacity-50 animate-pulse-slow"
+            className="absolute inset-0 w-full h-full object-cover object-center lg:object-right opacity-70 lg:opacity-80"
           />
-          {/* The Gradient Fade: Ensures text is readable on top of the image */}
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-black via-brand-black/80 to-transparent" />
+          {/* MOBILE: Gradient from top for text readability, skeleton visible at bottom */}
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-black via-brand-black/60 to-transparent lg:hidden" />
+          {/* DESKTOP: Gradient from left for text readability, skeleton visible on right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-black via-brand-black/50 to-transparent hidden lg:block" />
         </div>
 
         {/* === LAYER 2: THE TEXT (Content) === */}
