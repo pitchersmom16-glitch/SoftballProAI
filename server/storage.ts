@@ -1,12 +1,13 @@
 import { db } from "./db";
 import { 
-  coaches, teams, athletes, drills, assessments, assessmentFeedback, mentalEdge,
-  type Coach, type Team, type Athlete, type Drill, type Assessment, type Feedback, type MentalEdge,
+  coaches, teams, athletes, drills, assessments, assessmentFeedback, mentalEdge, playerCheckins,
+  type Coach, type Team, type Athlete, type Drill, type Assessment, type Feedback, type MentalEdge, type PlayerCheckin,
   type CreateCoachRequest, type CreateTeamRequest, type CreateAthleteRequest, 
   type CreateDrillRequest, type CreateMentalEdgeRequest, type CreateAssessmentRequest, type CreateFeedbackRequest,
-  type UpdateAthleteRequest, type UpdateAssessmentRequest
+  type CreatePlayerCheckinRequest, type UpdateAthleteRequest, type UpdateAssessmentRequest
 } from "@shared/schema";
-import { eq, desc } from "drizzle-orm";
+import { users, type UserRole } from "@shared/models/auth";
+import { eq, desc, and } from "drizzle-orm";
 
 export interface IStorage {
   // Coaches
@@ -43,6 +44,13 @@ export interface IStorage {
   // Feedback
   getFeedback(assessmentId: number): Promise<Feedback[]>;
   createFeedback(feedback: CreateFeedbackRequest): Promise<Feedback>;
+  
+  // User Role
+  updateUserRole(userId: string, role: UserRole): Promise<void>;
+  
+  // Player Check-ins
+  getPlayerCheckinByDate(userId: string, date: string): Promise<PlayerCheckin | undefined>;
+  createPlayerCheckin(checkin: CreatePlayerCheckinRequest): Promise<PlayerCheckin>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -143,6 +151,23 @@ export class DatabaseStorage implements IStorage {
   async createFeedback(feedback: CreateFeedbackRequest): Promise<Feedback> {
     const [newFeedback] = await db.insert(assessmentFeedback).values(feedback).returning();
     return newFeedback;
+  }
+
+  // User Role
+  async updateUserRole(userId: string, role: UserRole): Promise<void> {
+    await db.update(users).set({ role }).where(eq(users.id, userId));
+  }
+
+  // Player Check-ins
+  async getPlayerCheckinByDate(userId: string, date: string): Promise<PlayerCheckin | undefined> {
+    const [checkin] = await db.select().from(playerCheckins)
+      .where(and(eq(playerCheckins.userId, userId), eq(playerCheckins.date, date)));
+    return checkin;
+  }
+
+  async createPlayerCheckin(checkin: CreatePlayerCheckinRequest): Promise<PlayerCheckin> {
+    const [newCheckin] = await db.insert(playerCheckins).values(checkin).returning();
+    return newCheckin;
   }
 }
 

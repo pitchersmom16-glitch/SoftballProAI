@@ -15,6 +15,8 @@ import Assessments from "@/pages/Assessments";
 import AssessmentDetail from "@/pages/AssessmentDetail";
 import Drills from "@/pages/Drills";
 import TrainBrain from "@/pages/TrainBrain";
+import RoleSelection from "@/pages/RoleSelection";
+import PlayerDashboard from "@/pages/PlayerDashboard";
 
 import { useAuth } from "@/hooks/use-auth";
 
@@ -23,22 +25,49 @@ function Router() {
 
   if (isLoading) return null;
 
+  // Not logged in - show landing page
+  if (!user) {
+    return (
+      <Layout>
+        <Switch>
+          <Route path="/" component={Landing} />
+          <Route component={NotFound} />
+        </Switch>
+      </Layout>
+    );
+  }
+
+  // Logged in but no role selected - show role selection
+  if (!user.role) {
+    return <RoleSelection />;
+  }
+
+  // Player mode - show player-specific dashboard
+  if (user.role === "player") {
+    return (
+      <Layout>
+        <Switch>
+          <Route path="/" component={PlayerDashboard} />
+          <Route path="/assessments" component={Assessments} />
+          <Route path="/assessments/:id" component={AssessmentDetail} />
+          <Route path="/drills" component={Drills} />
+          <Route component={NotFound} />
+        </Switch>
+      </Layout>
+    );
+  }
+
+  // Coach modes (team_coach, pitching_coach) - show full coach dashboard
   return (
     <Layout>
       <Switch>
-        {!user ? (
-          <Route path="/" component={Landing} />
-        ) : (
-          <>
-            <Route path="/" component={Dashboard} />
-            <Route path="/athletes" component={Athletes} />
-            <Route path="/teams" component={Teams} />
-            <Route path="/assessments" component={Assessments} />
-            <Route path="/assessments/:id" component={AssessmentDetail} />
-            <Route path="/drills" component={Drills} />
-            <Route path="/admin/train-brain" component={TrainBrain} />
-          </>
-        )}
+        <Route path="/" component={Dashboard} />
+        <Route path="/athletes" component={Athletes} />
+        <Route path="/teams" component={Teams} />
+        <Route path="/assessments" component={Assessments} />
+        <Route path="/assessments/:id" component={AssessmentDetail} />
+        <Route path="/drills" component={Drills} />
+        <Route path="/admin/train-brain" component={TrainBrain} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

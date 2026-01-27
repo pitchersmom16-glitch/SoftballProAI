@@ -72,6 +72,64 @@ export const drills = pgTable("drills", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Player Daily Check-ins for soreness tracking and injury prevention
+export const playerCheckins = pgTable("player_checkins", {
+  id: serial("id").primaryKey(),
+  athleteId: integer("athlete_id").references(() => athletes.id),
+  userId: text("user_id").references(() => users.id), // Direct link for player mode users
+  date: date("date").notNull(),
+  mood: text("mood"), // "great", "good", "okay", "tired", "struggling"
+  energyLevel: integer("energy_level"), // 1-10 scale
+  sorenessAreas: text("soreness_areas").array(), // ["arm", "shoulder", "legs", "back"]
+  sorenessLevel: integer("soreness_level"), // 1-10 scale, 7+ triggers injury prevention
+  sleepHours: numeric("sleep_hours"),
+  notes: text("notes"),
+  blockedActivities: text("blocked_activities").array(), // Activities blocked due to soreness
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Homework Assignments from Pitching Coach to Players
+export const homeworkAssignments = pgTable("homework_assignments", {
+  id: serial("id").primaryKey(),
+  coachId: integer("coach_id").references(() => coaches.id),
+  athleteId: integer("athlete_id").references(() => athletes.id),
+  drillId: integer("drill_id").references(() => drills.id),
+  title: text("title").notNull(),
+  description: text("description"),
+  reps: integer("reps"), // e.g., "Do 20 K-Drills"
+  dueDate: date("due_date"),
+  status: text("status").default("assigned"), // "assigned", "in_progress", "completed", "overdue"
+  completedAt: timestamp("completed_at"),
+  videoSubmissionUrl: text("video_submission_url"), // Player's video of completed homework
+  coachFeedback: text("coach_feedback"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Practice Plans for Team Coaches
+export const practicePlans = pgTable("practice_plans", {
+  id: serial("id").primaryKey(),
+  coachId: integer("coach_id").references(() => coaches.id),
+  teamId: integer("team_id").references(() => teams.id),
+  name: text("name").notNull(), // e.g., "2-Hour Defensive Focus"
+  duration: integer("duration"), // Duration in minutes
+  focus: text("focus"), // "Defensive", "Offensive", "Pitching", "Full Practice"
+  stations: jsonb("stations"), // Array of station objects with groups and drills
+  scheduledDate: date("scheduled_date"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Pitching Coach "Stable" - Students assigned to a pitching coach
+export const coachStudents = pgTable("coach_students", {
+  id: serial("id").primaryKey(),
+  coachId: integer("coach_id").references(() => coaches.id),
+  athleteId: integer("athlete_id").references(() => athletes.id),
+  status: text("status").default("active"), // "active", "inactive", "graduated"
+  startDate: date("start_date"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Mental Edge table for mindset content, motivation, and psychological training
 export const mentalEdge = pgTable("mental_edge", {
   id: serial("id").primaryKey(),
@@ -167,8 +225,12 @@ export const insertTeamSchema = createInsertSchema(teams).omit({ id: true, creat
 export const insertAthleteSchema = createInsertSchema(athletes).omit({ id: true, createdAt: true });
 export const insertDrillSchema = createInsertSchema(drills).omit({ id: true, createdAt: true });
 export const insertMentalEdgeSchema = createInsertSchema(mentalEdge).omit({ id: true, createdAt: true });
-export const insertAssessmentSchema = createInsertSchema(assessments).omit({ id: true, createdAt: true, status: true, metrics: true }); // Status/metrics usually set by system
+export const insertAssessmentSchema = createInsertSchema(assessments).omit({ id: true, createdAt: true, status: true, metrics: true });
 export const insertFeedbackSchema = createInsertSchema(assessmentFeedback).omit({ id: true, createdAt: true });
+export const insertPlayerCheckinSchema = createInsertSchema(playerCheckins).omit({ id: true, createdAt: true });
+export const insertHomeworkSchema = createInsertSchema(homeworkAssignments).omit({ id: true, createdAt: true, completedAt: true });
+export const insertPracticePlanSchema = createInsertSchema(practicePlans).omit({ id: true, createdAt: true });
+export const insertCoachStudentSchema = createInsertSchema(coachStudents).omit({ id: true, createdAt: true });
 
 // === EXPLICIT API CONTRACT TYPES ===
 
@@ -179,6 +241,10 @@ export type Drill = typeof drills.$inferSelect;
 export type MentalEdge = typeof mentalEdge.$inferSelect;
 export type Assessment = typeof assessments.$inferSelect;
 export type Feedback = typeof assessmentFeedback.$inferSelect;
+export type PlayerCheckin = typeof playerCheckins.$inferSelect;
+export type HomeworkAssignment = typeof homeworkAssignments.$inferSelect;
+export type PracticePlan = typeof practicePlans.$inferSelect;
+export type CoachStudent = typeof coachStudents.$inferSelect;
 
 export type CreateCoachRequest = z.infer<typeof insertCoachSchema>;
 export type CreateTeamRequest = z.infer<typeof insertTeamSchema>;
@@ -187,7 +253,12 @@ export type CreateDrillRequest = z.infer<typeof insertDrillSchema>;
 export type CreateMentalEdgeRequest = z.infer<typeof insertMentalEdgeSchema>;
 export type CreateAssessmentRequest = z.infer<typeof insertAssessmentSchema>;
 export type CreateFeedbackRequest = z.infer<typeof insertFeedbackSchema>;
+export type CreatePlayerCheckinRequest = z.infer<typeof insertPlayerCheckinSchema>;
+export type CreateHomeworkRequest = z.infer<typeof insertHomeworkSchema>;
+export type CreatePracticePlanRequest = z.infer<typeof insertPracticePlanSchema>;
+export type CreateCoachStudentRequest = z.infer<typeof insertCoachStudentSchema>;
 
 export type UpdateAthleteRequest = Partial<CreateAthleteRequest>;
 export type UpdateAssessmentRequest = Partial<CreateAssessmentRequest> & { status?: string, metrics?: any };
+export type UpdateHomeworkRequest = Partial<CreateHomeworkRequest> & { status?: string, completedAt?: Date };
 

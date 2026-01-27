@@ -19,6 +19,96 @@ export async function registerRoutes(
 
   // === API ROUTES ===
 
+  // User Role Management
+  app.put("/api/user/role", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
+      const roleSchema = z.object({
+        role: z.enum(["player", "team_coach", "pitching_coach"])
+      });
+      
+      const { role } = roleSchema.parse(req.body);
+      await storage.updateUserRole(userId, role);
+      
+      res.json({ success: true, role });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  // Player Check-ins
+  app.get("/api/player/checkin/today", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const today = new Date().toISOString().split('T')[0];
+      const checkin = await storage.getPlayerCheckinByDate(userId, today);
+      res.json(checkin || null);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  app.post("/api/player/checkin", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
+      const checkinSchema = z.object({
+        mood: z.string(),
+        sorenessAreas: z.array(z.string()),
+        sorenessLevel: z.number().min(1).max(10),
+        notes: z.string().optional(),
+      });
+      
+      const data = checkinSchema.parse(req.body);
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Determine blocked activities based on soreness
+      const blockedActivities: string[] = [];
+      const isArmSore = data.sorenessAreas.includes("arm") || data.sorenessAreas.includes("shoulder");
+      if (isArmSore && data.sorenessLevel >= 7) {
+        blockedActivities.push("pitching", "throwing");
+      }
+      
+      const checkin = await storage.createPlayerCheckin({
+        userId,
+        date: today,
+        mood: data.mood,
+        sorenessAreas: data.sorenessAreas,
+        sorenessLevel: data.sorenessLevel,
+        notes: data.notes || null,
+        blockedActivities,
+      });
+      
+      res.status(201).json(checkin);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  // Random Mental Edge (Mamba Mentality)
+  app.get("/api/mental-edge/random", async (req, res) => {
+    try {
+      const allContent = await storage.getMentalEdge();
+      if (allContent.length === 0) {
+        return res.json(null);
+      }
+      const randomIndex = Math.floor(Math.random() * allContent.length);
+      res.json(allContent[randomIndex]);
+    } catch (err) {
+      throw err;
+    }
+  });
+
   // Coaches
   app.get(api.coaches.me.path, async (req, res) => {
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
