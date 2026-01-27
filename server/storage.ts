@@ -2,15 +2,16 @@ import { db } from "./db";
 import { 
   coaches, teams, athletes, drills, assessments, assessmentFeedback, mentalEdge, playerCheckins,
   practicePlans, coachStudents, homeworkAssignments, playerCoachRelationships, coachInvites, playerSettings,
-  studentInvites, baselineVideos, playerOnboarding,
+  studentInvites, baselineVideos, playerOnboarding, notifications,
   type Coach, type Team, type Athlete, type Drill, type Assessment, type Feedback, type MentalEdge, type PlayerCheckin,
   type PracticePlan, type CoachStudent, type HomeworkAssignment, type PlayerCoachRelationship, type CoachInvite, type PlayerSettings,
-  type StudentInvite, type BaselineVideo, type PlayerOnboarding,
+  type StudentInvite, type BaselineVideo, type PlayerOnboarding, type Notification,
   type CreateCoachRequest, type CreateTeamRequest, type CreateAthleteRequest, 
   type CreateDrillRequest, type CreateMentalEdgeRequest, type CreateAssessmentRequest, type CreateFeedbackRequest,
   type CreatePlayerCheckinRequest, type UpdateAthleteRequest, type UpdateAssessmentRequest,
   type CreatePlayerCoachRelationshipRequest, type CreateCoachInviteRequest, type CreatePlayerSettingsRequest,
-  type CreateStudentInviteRequest, type CreateBaselineVideoRequest, type CreatePlayerOnboardingRequest
+  type CreateStudentInviteRequest, type CreateBaselineVideoRequest, type CreatePlayerOnboardingRequest,
+  type CreateNotificationRequest
 } from "@shared/schema";
 import { users, type UserRole } from "@shared/models/auth";
 import { eq, desc, and } from "drizzle-orm";
@@ -115,6 +116,13 @@ export interface IStorage {
   // Coach by referral code
   getCoachByReferralCode(code: string): Promise<Coach | undefined>;
   updateCoach(id: number, update: Partial<Coach>): Promise<Coach>;
+  
+  // === NOTIFICATIONS ===
+  getNotifications(userId: string): Promise<Notification[]>;
+  getUnreadNotificationCount(userId: string): Promise<number>;
+  createNotification(notification: CreateNotificationRequest): Promise<Notification>;
+  markNotificationRead(id: number): Promise<Notification>;
+  markAllNotificationsRead(userId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -479,6 +487,38 @@ export class DatabaseStorage implements IStorage {
   async updateCoach(id: number, update: Partial<Coach>): Promise<Coach> {
     const [updated] = await db.update(coaches).set(update).where(eq(coaches.id, id)).returning();
     return updated;
+  }
+
+  // === NOTIFICATIONS ===
+  async getNotifications(userId: string): Promise<Notification[]> {
+    return db.select().from(notifications)
+      .where(eq(notifications.userId, userId))
+      .orderBy(desc(notifications.createdAt));
+  }
+
+  async getUnreadNotificationCount(userId: string): Promise<number> {
+    const unread = await db.select().from(notifications)
+      .where(and(eq(notifications.userId, userId), eq(notifications.read, false)));
+    return unread.length;
+  }
+
+  async createNotification(notification: CreateNotificationRequest): Promise<Notification> {
+    const [newNotification] = await db.insert(notifications).values(notification).returning();
+    return newNotification;
+  }
+
+  async markNotificationRead(id: number): Promise<Notification> {
+    const [updated] = await db.update(notifications)
+      .set({ read: true })
+      .where(eq(notifications.id, id))
+      .returning();
+    return updated;
+  }
+
+  async markAllNotificationsRead(userId: string): Promise<void> {
+    await db.update(notifications)
+      .set({ read: true })
+      .where(eq(notifications.userId, userId));
   }
 }
 
