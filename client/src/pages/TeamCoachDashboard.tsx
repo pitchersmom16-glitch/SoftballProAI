@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Card } from "@/components/ui/card";
@@ -133,14 +134,16 @@ export default function TeamCoachDashboard() {
             </p>
           </div>
           <div className="flex gap-3">
-            <Button 
-              variant="outline" 
-              className="border-neon-pink/50 text-neon-pink hover-elevate"
-              data-testid="button-view-teams"
-            >
-              <Users className="w-4 h-4 mr-2" />
-              Teams ({teams?.length || 0})
-            </Button>
+            <Link href="/teams">
+              <Button 
+                variant="outline" 
+                className="border-neon-pink/50 text-neon-pink hover-elevate"
+                data-testid="button-view-teams"
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Teams ({teams?.length || 0})
+              </Button>
+            </Link>
           </div>
         </div>
 
