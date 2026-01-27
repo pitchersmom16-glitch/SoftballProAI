@@ -4,6 +4,7 @@ export {
   insertTeamSchema, 
   insertAthleteSchema, 
   insertDrillSchema, 
+  insertMentalEdgeSchema,
   insertAssessmentSchema, 
   insertFeedbackSchema
 } from './schema';
@@ -13,9 +14,10 @@ import {
   insertTeamSchema, 
   insertAthleteSchema, 
   insertDrillSchema, 
+  insertMentalEdgeSchema,
   insertAssessmentSchema, 
   insertFeedbackSchema,
-  coaches, teams, athletes, drills, assessments, assessmentFeedback 
+  coaches, teams, athletes, drills, mentalEdge, assessments, assessmentFeedback 
 } from './schema';
 
 // ============================================
@@ -168,6 +170,57 @@ export const api = {
       input: insertDrillSchema,
       responses: {
         201: z.custom<typeof drills.$inferSelect>(),
+        400: errorSchemas.validation,
+      },
+    },
+    delete: {
+      method: 'DELETE' as const,
+      path: '/api/drills/:id',
+      responses: {
+        200: z.object({ message: z.string() }),
+        404: errorSchemas.notFound,
+      },
+    },
+  },
+  mentalEdge: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/mental-edge',
+      responses: {
+        200: z.array(z.custom<typeof mentalEdge.$inferSelect>()),
+      },
+    },
+    create: {
+      method: 'POST' as const,
+      path: '/api/brain/train/mental-edge',
+      input: insertMentalEdgeSchema,
+      responses: {
+        201: z.custom<typeof mentalEdge.$inferSelect>(),
+        400: errorSchemas.validation,
+      },
+    },
+    delete: {
+      method: 'DELETE' as const,
+      path: '/api/mental-edge/:id',
+      responses: {
+        200: z.object({ message: z.string() }),
+        404: errorSchemas.notFound,
+      },
+    },
+  },
+  brain: {
+    trainDrill: {
+      method: 'POST' as const,
+      path: '/api/brain/train/drill',
+      input: insertDrillSchema.extend({
+        equipment: z.array(z.string()).optional().default([]),
+        ageRange: z.string().optional().default("All Ages"),
+      }),
+      responses: {
+        201: z.object({
+          message: z.string(),
+          drill: z.custom<typeof drills.$inferSelect>(),
+        }),
         400: errorSchemas.validation,
       },
     },

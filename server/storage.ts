@@ -1,9 +1,9 @@
 import { db } from "./db";
 import { 
-  coaches, teams, athletes, drills, assessments, assessmentFeedback,
-  type Coach, type Team, type Athlete, type Drill, type Assessment, type Feedback,
+  coaches, teams, athletes, drills, assessments, assessmentFeedback, mentalEdge,
+  type Coach, type Team, type Athlete, type Drill, type Assessment, type Feedback, type MentalEdge,
   type CreateCoachRequest, type CreateTeamRequest, type CreateAthleteRequest, 
-  type CreateDrillRequest, type CreateAssessmentRequest, type CreateFeedbackRequest,
+  type CreateDrillRequest, type CreateMentalEdgeRequest, type CreateAssessmentRequest, type CreateFeedbackRequest,
   type UpdateAthleteRequest, type UpdateAssessmentRequest
 } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
@@ -27,6 +27,12 @@ export interface IStorage {
   // Drills
   getDrills(category?: string): Promise<Drill[]>;
   createDrill(drill: CreateDrillRequest): Promise<Drill>;
+  deleteDrill(id: number): Promise<void>;
+
+  // Mental Edge
+  getMentalEdge(): Promise<MentalEdge[]>;
+  createMentalEdge(content: CreateMentalEdgeRequest): Promise<MentalEdge>;
+  deleteMentalEdge(id: number): Promise<void>;
 
   // Assessments
   getAssessments(athleteId?: number): Promise<Assessment[]>;
@@ -93,6 +99,21 @@ export class DatabaseStorage implements IStorage {
   async createDrill(drill: CreateDrillRequest): Promise<Drill> {
     const [newDrill] = await db.insert(drills).values(drill).returning();
     return newDrill;
+  }
+  async deleteDrill(id: number): Promise<void> {
+    await db.delete(drills).where(eq(drills.id, id));
+  }
+
+  // Mental Edge
+  async getMentalEdge(): Promise<MentalEdge[]> {
+    return db.select().from(mentalEdge);
+  }
+  async createMentalEdge(content: CreateMentalEdgeRequest): Promise<MentalEdge> {
+    const [newContent] = await db.insert(mentalEdge).values(content).returning();
+    return newContent;
+  }
+  async deleteMentalEdge(id: number): Promise<void> {
+    await db.delete(mentalEdge).where(eq(mentalEdge.id, id));
   }
 
   // Assessments

@@ -8,7 +8,8 @@ import {
   LogOut, 
   ShieldCheck,
   Menu,
-  X
+  X,
+  Brain
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ export function Sidebar() {
     { name: 'Assessments', href: '/assessments', icon: Video },
     { name: 'Drills', href: '/drills', icon: Dumbbell },
     { name: 'Teams', href: '/teams', icon: ShieldCheck },
+    { name: 'Train Brain', href: '/admin/train-brain', icon: Brain },
   ];
 
   const NavContent = () => (

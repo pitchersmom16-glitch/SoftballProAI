@@ -14,6 +14,7 @@ import Teams from "@/pages/Teams";
 import Assessments from "@/pages/Assessments";
 import AssessmentDetail from "@/pages/AssessmentDetail";
 import Drills from "@/pages/Drills";
+import TrainBrain from "@/pages/TrainBrain";
 
 import { useAuth } from "@/hooks/use-auth";
 
@@ -35,6 +36,7 @@ function Router() {
             <Route path="/assessments" component={Assessments} />
             <Route path="/assessments/:id" component={AssessmentDetail} />
             <Route path="/drills" component={Drills} />
+            <Route path="/admin/train-brain" component={TrainBrain} />
           </>
         )}
         <Route component={NotFound} />

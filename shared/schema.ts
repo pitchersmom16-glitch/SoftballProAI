@@ -54,11 +54,12 @@ export const skills = pgTable("skills", {
   description: text("description"),
 });
 
+// Skill categories: Pitching, Hitting, Catching, Throwing, Mental
 export const drills = pgTable("drills", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  category: text("category").notNull(), // "Pitching" or "Hitting"
-  skillType: text("skill_type"), // e.g., "pitching", "hitting", "fielding"
+  category: text("category").notNull(), // "Pitching", "Hitting", "Catching", "Throwing"
+  skillType: text("skill_type"), // e.g., "pitching", "hitting", "catching", "throwing"
   difficulty: text("difficulty"), // Beginner, Intermediate, Advanced
   description: text("description").notNull(),
   videoUrl: text("video_url"), // YouTube URL for reference video
@@ -66,8 +67,22 @@ export const drills = pgTable("drills", {
   ageRange: text("age_range"),
   // Knowledge Base fields for AI Brain
   expertSource: text("expert_source"), // e.g., "Amanda Scarborough", "Denny Dunn"
-  mechanicTags: text("mechanic_tags").array(), // e.g., ["Internal Rotation", "Separation", "Drag Foot"]
+  mechanicTags: text("mechanic_tags").array(), // e.g., ["Internal Rotation", "Framing", "Pop Time"]
   issueAddressed: text("issue_addressed"), // Biomechanical issue this drill corrects
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Mental Edge table for mindset content, motivation, and psychological training
+export const mentalEdge = pgTable("mental_edge", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  contentType: text("content_type").notNull(), // "quote", "video", "principle", "visualization"
+  category: text("category").notNull(), // "Pre-Game", "Recovery", "Focus", "Confidence", "Resilience"
+  source: text("source"), // e.g., "Kobe Bryant", "Michael Jordan", "Best of 2021 Motivational"
+  content: text("content").notNull(), // The quote text or description
+  videoUrl: text("video_url"), // YouTube URL for video content
+  tags: text("tags").array(), // e.g., ["Mamba Mentality", "Work Ethic", "Clutch Performance"]
+  usageContext: text("usage_context"), // When to use: "before at-bat", "after strikeout", "team meeting"
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -151,6 +166,7 @@ export const insertCoachSchema = createInsertSchema(coaches).omit({ id: true, cr
 export const insertTeamSchema = createInsertSchema(teams).omit({ id: true, createdAt: true });
 export const insertAthleteSchema = createInsertSchema(athletes).omit({ id: true, createdAt: true });
 export const insertDrillSchema = createInsertSchema(drills).omit({ id: true, createdAt: true });
+export const insertMentalEdgeSchema = createInsertSchema(mentalEdge).omit({ id: true, createdAt: true });
 export const insertAssessmentSchema = createInsertSchema(assessments).omit({ id: true, createdAt: true, status: true, metrics: true }); // Status/metrics usually set by system
 export const insertFeedbackSchema = createInsertSchema(assessmentFeedback).omit({ id: true, createdAt: true });
 
@@ -160,6 +176,7 @@ export type Coach = typeof coaches.$inferSelect;
 export type Team = typeof teams.$inferSelect;
 export type Athlete = typeof athletes.$inferSelect;
 export type Drill = typeof drills.$inferSelect;
+export type MentalEdge = typeof mentalEdge.$inferSelect;
 export type Assessment = typeof assessments.$inferSelect;
 export type Feedback = typeof assessmentFeedback.$inferSelect;
 
@@ -167,6 +184,7 @@ export type CreateCoachRequest = z.infer<typeof insertCoachSchema>;
 export type CreateTeamRequest = z.infer<typeof insertTeamSchema>;
 export type CreateAthleteRequest = z.infer<typeof insertAthleteSchema>;
 export type CreateDrillRequest = z.infer<typeof insertDrillSchema>;
+export type CreateMentalEdgeRequest = z.infer<typeof insertMentalEdgeSchema>;
 export type CreateAssessmentRequest = z.infer<typeof insertAssessmentSchema>;
 export type CreateFeedbackRequest = z.infer<typeof insertFeedbackSchema>;
 

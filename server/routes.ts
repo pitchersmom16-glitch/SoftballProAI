@@ -295,6 +295,71 @@ export async function registerRoutes(
     }
   });
 
+  // === BRAIN TRAINING ROUTES (Admin Dashboard) ===
+
+  // Add new drill to Knowledge Base
+  app.post("/api/brain/train/drill", async (req, res) => {
+    try {
+      const input = api.brain.trainDrill.input.parse(req.body);
+      const drill = await storage.createDrill(input);
+      res.status(201).json({ message: "Drill added to Knowledge Base", drill });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      console.error("Train drill error:", err);
+      res.status(500).json({ message: "Failed to add drill" });
+    }
+  });
+
+  // Add new Mental Edge content
+  app.post("/api/brain/train/mental-edge", async (req, res) => {
+    try {
+      const input = api.mentalEdge.create.input.parse(req.body);
+      const content = await storage.createMentalEdge(input);
+      res.status(201).json({ message: "Mental Edge content added", content });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      console.error("Train mental edge error:", err);
+      res.status(500).json({ message: "Failed to add mental edge content" });
+    }
+  });
+
+  // Get all Mental Edge content
+  app.get("/api/mental-edge", async (req, res) => {
+    try {
+      const content = await storage.getMentalEdge();
+      res.json(content);
+    } catch (err) {
+      console.error("Get mental edge error:", err);
+      res.status(500).json({ message: "Failed to fetch mental edge content" });
+    }
+  });
+
+  // Delete a drill
+  app.delete("/api/drills/:id", async (req, res) => {
+    try {
+      await storage.deleteDrill(Number(req.params.id));
+      res.json({ message: "Drill deleted" });
+    } catch (err) {
+      console.error("Delete drill error:", err);
+      res.status(500).json({ message: "Failed to delete drill" });
+    }
+  });
+
+  // Delete Mental Edge content
+  app.delete("/api/mental-edge/:id", async (req, res) => {
+    try {
+      await storage.deleteMentalEdge(Number(req.params.id));
+      res.json({ message: "Mental edge content deleted" });
+    } catch (err) {
+      console.error("Delete mental edge error:", err);
+      res.status(500).json({ message: "Failed to delete mental edge content" });
+    }
+  });
+
   // Seed Data (if empty)
   seedDatabase();
 
