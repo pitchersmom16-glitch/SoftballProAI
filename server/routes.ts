@@ -296,6 +296,209 @@ export async function registerRoutes(
     res.status(202).json({ message: "Analysis started", status: "analyzing" });
   });
 
+  // === ROSTER HEALTH ===
+  app.get("/api/roster-health", async (req, res) => {
+    try {
+      const teamId = req.query.teamId ? Number(req.query.teamId) : undefined;
+      const athletes = await storage.getAthletes(teamId);
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Get health status for each athlete based on check-ins
+      const rosterHealth = await Promise.all(
+        athletes.map(async (athlete) => {
+          let healthStatus: "healthy" | "caution" | "rest" = "healthy";
+          let lastCheckIn = null;
+          
+          // Try to get check-in if athlete has a userId
+          if (athlete.userId) {
+            const checkin = await storage.getPlayerCheckinByDate(athlete.userId, today);
+            if (checkin) {
+              lastCheckIn = {
+                mood: checkin.mood,
+                sorenessLevel: checkin.sorenessLevel,
+                sorenessAreas: checkin.sorenessAreas || [],
+                blockedActivities: checkin.blockedActivities || [],
+              };
+              
+              // Determine health status based on check-in data
+              const isArmSore = lastCheckIn.sorenessAreas.includes("arm") || 
+                               lastCheckIn.sorenessAreas.includes("shoulder");
+              if (isArmSore && lastCheckIn.sorenessLevel >= 7) {
+                healthStatus = "rest";
+              } else if (isArmSore || lastCheckIn.sorenessLevel >= 5) {
+                healthStatus = "caution";
+              }
+            }
+          }
+          
+          return {
+            athlete,
+            healthStatus,
+            lastCheckIn,
+          };
+        })
+      );
+      
+      res.json(rosterHealth);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // === PRACTICE PLANS ===
+  app.get("/api/practice-plans", async (req, res) => {
+    try {
+      const teamId = req.query.teamId ? Number(req.query.teamId) : undefined;
+      const plans = await storage.getPracticePlans(teamId);
+      res.json(plans);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  app.post("/api/practice-plans", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      
+      const planSchema = z.object({
+        name: z.string().min(1),
+        duration: z.number().optional(),
+        focus: z.string().optional(),
+        scheduledDate: z.string().optional(),
+        notes: z.string().optional(),
+        teamId: z.number().optional(),
+      });
+      
+      const data = planSchema.parse(req.body);
+      
+      // Get coach profile to set coachId
+      const userId = (req.user as any).claims.sub;
+      const coach = await storage.getCoachByUserId(userId);
+      if (!coach) return res.status(404).json({ message: "Coach profile not found. Please complete your profile first." });
+      
+      // Validate team ownership if teamId is provided
+      if (data.teamId) {
+        const team = await storage.getTeam(data.teamId);
+        if (!team || team.coachId !== coach.id) {
+          return res.status(403).json({ message: "You don't have access to this team" });
+        }
+      }
+      
+      const plan = await storage.createPracticePlan({
+        name: data.name,
+        duration: data.duration || null,
+        focus: data.focus || null,
+        scheduledDate: data.scheduledDate || null,
+        notes: data.notes || null,
+        teamId: data.teamId || null,
+        coachId: coach.id,
+      });
+      res.status(201).json(plan);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  // === COACH STUDENTS (Stable) ===
+  app.get("/api/coach/students", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const coach = await storage.getCoachByUserId(userId);
+      if (!coach) return res.json([]);
+      
+      const students = await storage.getCoachStudents(coach.id);
+      res.json(students);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  app.post("/api/coach/students", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const coach = await storage.getCoachByUserId(userId);
+      if (!coach) return res.status(404).json({ message: "Coach profile not found" });
+      
+      const studentSchema = z.object({
+        athleteId: z.number(),
+        status: z.string().optional(),
+        startDate: z.string().optional(),
+        notes: z.string().optional(),
+      });
+      
+      const data = studentSchema.parse(req.body);
+      const student = await storage.createCoachStudent({
+        ...data,
+        coachId: coach.id,
+      });
+      res.status(201).json(student);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  // === HOMEWORK ASSIGNMENTS ===
+  app.get("/api/homework", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const coach = await storage.getCoachByUserId(userId);
+      
+      const athleteId = req.query.athleteId ? Number(req.query.athleteId) : undefined;
+      const assignments = await storage.getHomeworkAssignments(coach?.id, athleteId);
+      res.json(assignments);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  app.post("/api/homework", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const coach = await storage.getCoachByUserId(userId);
+      if (!coach) return res.status(404).json({ message: "Coach profile not found" });
+      
+      const homeworkSchema = z.object({
+        athleteId: z.number(),
+        title: z.string().min(1),
+        description: z.string().optional(),
+        skillFocus: z.string().optional(),
+        referenceVideoUrl: z.string().optional(),
+        drillId: z.number().optional(),
+        reps: z.number().optional(),
+        dueDate: z.string().optional(),
+      });
+      
+      const data = homeworkSchema.parse(req.body);
+      const assignment = await storage.createHomeworkAssignment({
+        athleteId: data.athleteId,
+        title: data.title,
+        description: data.description || null,
+        skillFocus: data.skillFocus || null,
+        referenceVideoUrl: data.referenceVideoUrl || null,
+        drillId: data.drillId || null,
+        reps: data.reps || null,
+        dueDate: data.dueDate || null,
+        coachId: coach.id,
+      });
+      res.status(201).json(assignment);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
   // === BRAIN API ROUTES ===
   
   // Analyze mechanics and get drill recommendations

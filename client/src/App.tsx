@@ -17,6 +17,8 @@ import Drills from "@/pages/Drills";
 import TrainBrain from "@/pages/TrainBrain";
 import RoleSelection from "@/pages/RoleSelection";
 import PlayerDashboard from "@/pages/PlayerDashboard";
+import TeamCoachDashboard from "@/pages/TeamCoachDashboard";
+import PitchingCoachDashboard from "@/pages/PitchingCoachDashboard";
 
 import { useAuth } from "@/hooks/use-auth";
 
@@ -57,7 +59,42 @@ function Router() {
     );
   }
 
-  // Coach modes (team_coach, pitching_coach) - show full coach dashboard
+  // Team Coach mode - show team-focused dashboard
+  if (user.role === "team_coach") {
+    return (
+      <Layout>
+        <Switch>
+          <Route path="/" component={TeamCoachDashboard} />
+          <Route path="/athletes" component={Athletes} />
+          <Route path="/teams" component={Teams} />
+          <Route path="/assessments" component={Assessments} />
+          <Route path="/assessments/:id" component={AssessmentDetail} />
+          <Route path="/drills" component={Drills} />
+          <Route path="/admin/train-brain" component={TrainBrain} />
+          <Route component={NotFound} />
+        </Switch>
+      </Layout>
+    );
+  }
+
+  // Pitching Coach mode - show pitching-focused dashboard
+  if (user.role === "pitching_coach") {
+    return (
+      <Layout>
+        <Switch>
+          <Route path="/" component={PitchingCoachDashboard} />
+          <Route path="/athletes" component={Athletes} />
+          <Route path="/assessments" component={Assessments} />
+          <Route path="/assessments/:id" component={AssessmentDetail} />
+          <Route path="/drills" component={Drills} />
+          <Route path="/admin/train-brain" component={TrainBrain} />
+          <Route component={NotFound} />
+        </Switch>
+      </Layout>
+    );
+  }
+
+  // Default coach view
   return (
     <Layout>
       <Switch>

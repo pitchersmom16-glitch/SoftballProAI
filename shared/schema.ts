@@ -96,6 +96,8 @@ export const homeworkAssignments = pgTable("homework_assignments", {
   drillId: integer("drill_id").references(() => drills.id),
   title: text("title").notNull(),
   description: text("description"),
+  skillFocus: text("skill_focus"), // "rise_ball", "drop_ball", "curve_ball", "change_up", "mechanics", "drag_foot"
+  referenceVideoUrl: text("reference_video_url"), // Pro model or instructional video
   reps: integer("reps"), // e.g., "Do 20 K-Drills"
   dueDate: date("due_date"),
   status: text("status").default("assigned"), // "assigned", "in_progress", "completed", "overdue"

@@ -1,7 +1,9 @@
 import { db } from "./db";
 import { 
   coaches, teams, athletes, drills, assessments, assessmentFeedback, mentalEdge, playerCheckins,
+  practicePlans, coachStudents, homeworkAssignments,
   type Coach, type Team, type Athlete, type Drill, type Assessment, type Feedback, type MentalEdge, type PlayerCheckin,
+  type PracticePlan, type CoachStudent, type HomeworkAssignment,
   type CreateCoachRequest, type CreateTeamRequest, type CreateAthleteRequest, 
   type CreateDrillRequest, type CreateMentalEdgeRequest, type CreateAssessmentRequest, type CreateFeedbackRequest,
   type CreatePlayerCheckinRequest, type UpdateAthleteRequest, type UpdateAssessmentRequest
@@ -16,6 +18,7 @@ export interface IStorage {
   createCoach(coach: CreateCoachRequest): Promise<Coach>;
 
   // Teams
+  getTeam(id: number): Promise<Team | undefined>;
   getTeams(): Promise<Team[]>;
   createTeam(team: CreateTeamRequest): Promise<Team>;
 
@@ -51,6 +54,18 @@ export interface IStorage {
   // Player Check-ins
   getPlayerCheckinByDate(userId: string, date: string): Promise<PlayerCheckin | undefined>;
   createPlayerCheckin(checkin: CreatePlayerCheckinRequest): Promise<PlayerCheckin>;
+  
+  // Practice Plans
+  getPracticePlans(teamId?: number): Promise<PracticePlan[]>;
+  createPracticePlan(plan: Partial<PracticePlan>): Promise<PracticePlan>;
+  
+  // Coach Students (Stable)
+  getCoachStudents(coachId: number): Promise<(CoachStudent & { athlete?: Athlete })[]>;
+  createCoachStudent(student: Partial<CoachStudent>): Promise<CoachStudent>;
+  
+  // Homework Assignments
+  getHomeworkAssignments(coachId?: number, athleteId?: number): Promise<HomeworkAssignment[]>;
+  createHomeworkAssignment(assignment: Partial<HomeworkAssignment>): Promise<HomeworkAssignment>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -69,6 +84,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Teams
+  async getTeam(id: number): Promise<Team | undefined> {
+    const [team] = await db.select().from(teams).where(eq(teams.id, id));
+    return team;
+  }
   async getTeams(): Promise<Team[]> {
     return db.select().from(teams);
   }
@@ -168,6 +187,63 @@ export class DatabaseStorage implements IStorage {
   async createPlayerCheckin(checkin: CreatePlayerCheckinRequest): Promise<PlayerCheckin> {
     const [newCheckin] = await db.insert(playerCheckins).values(checkin).returning();
     return newCheckin;
+  }
+
+  // Practice Plans
+  async getPracticePlans(teamId?: number): Promise<PracticePlan[]> {
+    if (teamId) {
+      return db.select().from(practicePlans).where(eq(practicePlans.teamId, teamId)).orderBy(desc(practicePlans.createdAt));
+    }
+    return db.select().from(practicePlans).orderBy(desc(practicePlans.createdAt));
+  }
+
+  async createPracticePlan(plan: Partial<PracticePlan>): Promise<PracticePlan> {
+    const [newPlan] = await db.insert(practicePlans).values(plan as any).returning();
+    return newPlan;
+  }
+
+  // Coach Students (Stable)
+  async getCoachStudents(coachId: number): Promise<(CoachStudent & { athlete?: Athlete })[]> {
+    const students = await db.select().from(coachStudents).where(eq(coachStudents.coachId, coachId));
+    
+    // Join with athletes
+    const enrichedStudents = await Promise.all(
+      students.map(async (student) => {
+        if (student.athleteId) {
+          const [athlete] = await db.select().from(athletes).where(eq(athletes.id, student.athleteId));
+          return { ...student, athlete };
+        }
+        return student;
+      })
+    );
+    
+    return enrichedStudents;
+  }
+
+  async createCoachStudent(student: Partial<CoachStudent>): Promise<CoachStudent> {
+    const [newStudent] = await db.insert(coachStudents).values(student as any).returning();
+    return newStudent;
+  }
+
+  // Homework Assignments
+  async getHomeworkAssignments(coachId?: number, athleteId?: number): Promise<HomeworkAssignment[]> {
+    if (coachId && athleteId) {
+      return db.select().from(homeworkAssignments)
+        .where(and(eq(homeworkAssignments.coachId, coachId), eq(homeworkAssignments.athleteId, athleteId)))
+        .orderBy(desc(homeworkAssignments.createdAt));
+    }
+    if (coachId) {
+      return db.select().from(homeworkAssignments).where(eq(homeworkAssignments.coachId, coachId)).orderBy(desc(homeworkAssignments.createdAt));
+    }
+    if (athleteId) {
+      return db.select().from(homeworkAssignments).where(eq(homeworkAssignments.athleteId, athleteId)).orderBy(desc(homeworkAssignments.createdAt));
+    }
+    return db.select().from(homeworkAssignments).orderBy(desc(homeworkAssignments.createdAt));
+  }
+
+  async createHomeworkAssignment(assignment: Partial<HomeworkAssignment>): Promise<HomeworkAssignment> {
+    const [newAssignment] = await db.insert(homeworkAssignments).values(assignment as any).returning();
+    return newAssignment;
   }
 }
 
