@@ -140,7 +140,52 @@ export async function registerRoutes(
     }
   });
 
-  // Random Mental Edge (Mamba Mentality)
+  // Player video assessment upload (for Coach Me feature)
+  app.post("/api/player/assessment", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const userClaims = (req.user as any).claims;
+      
+      const assessmentSchema = z.object({
+        skillType: z.enum(["hitting", "pitching", "catching", "fielding"]),
+        videoUrl: z.string().url(),
+      });
+      
+      const data = assessmentSchema.parse(req.body);
+      
+      // Find or create athlete profile for this player
+      const athletes = await storage.getAthletes();
+      let athlete = athletes.find(a => a.userId === userId);
+      
+      // If no athlete profile exists, create one
+      if (!athlete) {
+        const userName = userClaims.given_name && userClaims.family_name 
+          ? `${userClaims.given_name} ${userClaims.family_name}`
+          : "Solo Player";
+        athlete = await storage.createAthlete({
+          name: userName,
+          userId: userId,
+        });
+      }
+      
+      // Create assessment record
+      const assessment = await storage.createAssessment({
+        athleteId: athlete.id,
+        skillType: data.skillType,
+        videoUrl: data.videoUrl,
+      });
+      
+      res.status(201).json(assessment);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  // Random Mental Edge (Championship Mindset)
   app.get("/api/mental-edge/random", async (req, res) => {
     try {
       const allContent = await storage.getMentalEdge();
