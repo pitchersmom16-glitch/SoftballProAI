@@ -25,7 +25,7 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative w-full min-h-screen flex items-center overflow-hidden bg-brand-black">
+      <section className="w-full min-h-screen bg-brand-black flex flex-col lg:flex-row items-center overflow-hidden relative">
         {/* === LAYER 1: THE SKELETON (Background & Position) === */}
         <div className="absolute inset-0 z-0 flex items-center justify-end">
           <img
