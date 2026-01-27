@@ -17,6 +17,28 @@ export type SkillType = z.infer<typeof SkillTypeEnum>;
 export const DrillCategoryEnum = z.enum(["PITCHING", "HITTING", "CATCHING", "FIELDING", "INFIELD", "OUTFIELD", "CONDITIONING", "MENTAL"]);
 export type DrillCategory = z.infer<typeof DrillCategoryEnum>;
 
+// === ASSESSMENT STATUS ENUM ===
+// Supports the AI vs. Coach Review hybrid workflow
+export const AssessmentStatusEnum = z.enum([
+  "pending",              // Just uploaded, not yet analyzed
+  "analyzing",            // AI is processing
+  "ai_complete",          // AI analysis done, ready for auto-assign (Solo mode)
+  "pending_coach_review", // AI done, held for coach review (Coached mode)
+  "coach_approved",       // Coach approved AI suggestions
+  "coach_edited",         // Coach modified AI suggestions
+  "completed",            // Final state, visible to player
+  "reviewed"              // Legacy status for backwards compatibility
+]);
+export type AssessmentStatus = z.infer<typeof AssessmentStatusEnum>;
+
+// === PLAYER SUBSCRIPTION MODE ===
+export const PlayerModeEnum = z.enum(["solo", "coached"]);
+export type PlayerMode = z.infer<typeof PlayerModeEnum>;
+
+// === COACH INVITE STATUS ===
+export const InviteStatusEnum = z.enum(["pending", "accepted", "declined", "expired"]);
+export type InviteStatus = z.infer<typeof InviteStatusEnum>;
+
 // === TABLE DEFINITIONS ===
 
 export const coaches = pgTable("coaches", {
@@ -141,6 +163,48 @@ export const coachStudents = pgTable("coach_students", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// === HYBRID COACHING SYSTEM TABLES ===
+
+// Player-Coach Relationships - Tracks which coach covers which skill for a player
+// Enables the "My Coaching Team" feature where a player can have different coaches for different skills
+export const playerCoachRelationships = pgTable("player_coach_relationships", {
+  id: serial("id").primaryKey(),
+  playerId: text("player_id").notNull().references(() => users.id), // The player (user)
+  coachId: integer("coach_id").notNull().references(() => coaches.id), // The assigned coach
+  skillType: text("skill_type").notNull(), // "PITCHING", "HITTING", "CATCHING", "FIELDING"
+  status: text("status").default("active"), // "active", "inactive", "pending"
+  subscriptionMode: text("subscription_mode").default("coached"), // "solo", "coached"
+  startDate: date("start_date"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Coach Invites - Handles the invite flow when a player adds a coach
+export const coachInvites = pgTable("coach_invites", {
+  id: serial("id").primaryKey(),
+  fromPlayerId: text("from_player_id").notNull().references(() => users.id), // Player sending invite
+  toCoachEmail: text("to_coach_email"), // Email invite (if email provided)
+  toCoachUsername: text("to_coach_username"), // Username invite (if username provided)
+  toCoachId: integer("to_coach_id").references(() => coaches.id), // Resolved coach ID
+  skillType: text("skill_type").notNull(), // Which skill this coach will cover
+  status: text("status").default("pending"), // "pending", "accepted", "declined", "expired"
+  inviteToken: text("invite_token"), // Unique token for email links
+  expiresAt: timestamp("expires_at"),
+  message: text("message"), // Optional message from player
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Player Settings - Stores player preferences including subscription mode
+export const playerSettings = pgTable("player_settings", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id).unique(),
+  subscriptionMode: text("subscription_mode").default("solo"), // "solo" ($9.99) or "coached" (hybrid)
+  notificationsEnabled: boolean("notifications_enabled").default(true),
+  autoAssignDrills: boolean("auto_assign_drills").default(true), // For solo mode
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Mental Edge table for mindset content, motivation, and psychological training
 export const mentalEdge = pgTable("mental_edge", {
   id: serial("id").primaryKey(),
@@ -242,6 +306,9 @@ export const insertPlayerCheckinSchema = createInsertSchema(playerCheckins).omit
 export const insertHomeworkSchema = createInsertSchema(homeworkAssignments).omit({ id: true, createdAt: true, completedAt: true });
 export const insertPracticePlanSchema = createInsertSchema(practicePlans).omit({ id: true, createdAt: true });
 export const insertCoachStudentSchema = createInsertSchema(coachStudents).omit({ id: true, createdAt: true });
+export const insertPlayerCoachRelationshipSchema = createInsertSchema(playerCoachRelationships).omit({ id: true, createdAt: true });
+export const insertCoachInviteSchema = createInsertSchema(coachInvites).omit({ id: true, createdAt: true });
+export const insertPlayerSettingsSchema = createInsertSchema(playerSettings).omit({ id: true, createdAt: true, updatedAt: true });
 
 // === EXPLICIT API CONTRACT TYPES ===
 
@@ -256,6 +323,9 @@ export type PlayerCheckin = typeof playerCheckins.$inferSelect;
 export type HomeworkAssignment = typeof homeworkAssignments.$inferSelect;
 export type PracticePlan = typeof practicePlans.$inferSelect;
 export type CoachStudent = typeof coachStudents.$inferSelect;
+export type PlayerCoachRelationship = typeof playerCoachRelationships.$inferSelect;
+export type CoachInvite = typeof coachInvites.$inferSelect;
+export type PlayerSettings = typeof playerSettings.$inferSelect;
 
 export type CreateCoachRequest = z.infer<typeof insertCoachSchema>;
 export type CreateTeamRequest = z.infer<typeof insertTeamSchema>;
@@ -268,6 +338,9 @@ export type CreatePlayerCheckinRequest = z.infer<typeof insertPlayerCheckinSchem
 export type CreateHomeworkRequest = z.infer<typeof insertHomeworkSchema>;
 export type CreatePracticePlanRequest = z.infer<typeof insertPracticePlanSchema>;
 export type CreateCoachStudentRequest = z.infer<typeof insertCoachStudentSchema>;
+export type CreatePlayerCoachRelationshipRequest = z.infer<typeof insertPlayerCoachRelationshipSchema>;
+export type CreateCoachInviteRequest = z.infer<typeof insertCoachInviteSchema>;
+export type CreatePlayerSettingsRequest = z.infer<typeof insertPlayerSettingsSchema>;
 
 export type UpdateAthleteRequest = Partial<CreateAthleteRequest>;
 export type UpdateAssessmentRequest = Partial<CreateAssessmentRequest> & { status?: string, metrics?: any };
