@@ -185,7 +185,7 @@ export async function registerRoutes(
 
   // Drills
   app.get(api.drills.list.path, async (req, res) => {
-    const category = req.query.skillType as string; // Approximate mapping
+    const category = req.query.category as string;
     const drills = await storage.getDrills(category);
     res.json(drills);
   });

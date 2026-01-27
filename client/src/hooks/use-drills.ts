@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, type Drill, type CreateDrillRequest } from "@shared/routes";
 
-export function useDrills(skillType?: string, difficulty?: string) {
+export function useDrills(category?: string, difficulty?: string) {
   return useQuery({
-    queryKey: [api.drills.list.path, skillType, difficulty],
+    queryKey: [api.drills.list.path, category, difficulty],
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (skillType) params.append("skillType", skillType);
+      if (category) params.append("category", category);
       if (difficulty) params.append("difficulty", difficulty);
       
       const url = `${api.drills.list.path}?${params.toString()}`;
