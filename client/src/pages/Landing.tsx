@@ -39,41 +39,57 @@ export default function Landing() {
 
         {/* === LAYER 2: THE TEXT (Content) === */}
         <div className="relative z-10 container mx-auto px-6 lg:px-12">
-          <div className="max-w-3xl mx-auto lg:mx-0 text-center lg:text-left space-y-8">
+          <div className="max-w-3xl text-left space-y-8">
             {/* The AI Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mx-auto lg:mx-0">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
               <span className="w-2 h-2 rounded-full bg-brand-blue animate-pulse"/>
-              <span className="text-sm font-medium text-gray-300 tracking-wide">AI-POWERED COACHING</span>
+              <span className="text-sm font-medium text-gray-300 tracking-wide">AI-POWERED ACADEMY</span>
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white leading-tight">
-              The Ultimate <br />
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-tight">
+              The World's First <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-pink to-brand-blue">
-                Softball Coach
+                AI-Powered Softball Academy
               </span>
             </h1>
 
-            <p className="text-xl text-gray-400 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              Analyze windmill mechanics instantly with AI. Track drag foot, arm speed, and separation.
+            <p className="text-lg md:text-xl text-gray-400 max-w-2xl leading-relaxed">
+              Master mechanics, mental toughness, and strength with the only AI that sees what the human eye misses. Built specifically for 8U to 16U athletes.
             </p>
 
+            {/* Feature Bullets */}
+            <ul className="space-y-3 text-gray-300">
+              <li className="flex items-center gap-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-pink" />
+                <span>Instant Pitching, Hitting & Catching Biometrics</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-pink" />
+                <span>Daily Championship Mindset & Audio Visualization</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-pink" />
+                <span>AI-Generated Strength & Conditioning Plans</span>
+              </li>
+            </ul>
+
             {/* Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link href="/api/login">
                 <Button 
                   className="h-14 px-8 text-lg bg-gradient-to-r from-brand-pink to-purple-600 transition-all shadow-[0_0_20px_rgba(236,72,153,0.3)]"
-                  data-testid="button-start-coaching"
+                  data-testid="button-analyze-video"
                 >
-                  Start Coaching Free
+                  Analyze My Video
                 </Button>
               </Link>
               <Link href="#features">
                 <Button 
                   variant="outline" 
                   className="h-14 px-8 text-lg border-white/20 text-white backdrop-blur-md"
-                  data-testid="button-view-features"
+                  data-testid="button-for-teams"
                 >
-                  View Features
+                  For Teams & Coaches
                 </Button>
               </Link>
             </div>
