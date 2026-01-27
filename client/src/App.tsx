@@ -17,6 +17,10 @@ import RoleSelection from "@/pages/RoleSelection";
 import PlayerDashboard from "@/pages/PlayerDashboard";
 import TeamCoachDashboard from "@/pages/TeamCoachDashboard";
 import PitchingCoachDashboard from "@/pages/PitchingCoachDashboard";
+import SpecialistRoster from "@/pages/SpecialistRoster";
+import Register from "@/pages/Register";
+import PlayerOnboarding from "@/pages/PlayerOnboarding";
+import { OnboardingGate } from "@/components/OnboardingGate";
 
 import { useAuth } from "@/hooks/use-auth";
 
@@ -33,6 +37,7 @@ function Router() {
       <Layout>
         <Switch>
           <Route path="/" component={Landing} />
+          <Route path="/register" component={Register} />
           <Route path="/auth">
             {() => {
               window.location.href = "/api/login";
@@ -62,11 +67,26 @@ function Router() {
     return (
       <Layout>
         <Switch>
-          <Route path="/" component={PlayerDashboard} />
-          <Route path="/dashboard" component={PlayerDashboard} />
-          <Route path="/assessments" component={Assessments} />
-          <Route path="/assessments/:id" component={AssessmentDetail} />
-          <Route path="/drills" component={Drills} />
+          {/* Onboarding route is NOT gated - it's the gate destination */}
+          <Route path="/player/onboarding" component={PlayerOnboarding} />
+          <Route path="/register" component={Register} />
+          
+          {/* All other player routes require dashboard to be unlocked */}
+          <Route path="/">
+            <OnboardingGate><PlayerDashboard /></OnboardingGate>
+          </Route>
+          <Route path="/dashboard">
+            <OnboardingGate><PlayerDashboard /></OnboardingGate>
+          </Route>
+          <Route path="/assessments">
+            <OnboardingGate><Assessments /></OnboardingGate>
+          </Route>
+          <Route path="/assessments/:id">
+            {(params) => <OnboardingGate><AssessmentDetail /></OnboardingGate>}
+          </Route>
+          <Route path="/drills">
+            <OnboardingGate><Drills /></OnboardingGate>
+          </Route>
           {/* Safety Net: Redirect all unknown routes to dashboard */}
           <Route path="*">
             <Redirect to="/dashboard" />
@@ -101,7 +121,7 @@ function Router() {
   }
 
   // ============================================
-  // PITCHING COACH MODE ROUTES
+  // PITCHING/SPECIALIST COACH MODE ROUTES
   // ============================================
   if (user.role === "pitching_coach") {
     return (
@@ -109,6 +129,7 @@ function Router() {
         <Switch>
           <Route path="/" component={PitchingCoachDashboard} />
           <Route path="/dashboard" component={PitchingCoachDashboard} />
+          <Route path="/roster" component={SpecialistRoster} />
           <Route path="/athletes" component={Athletes} />
           <Route path="/assessments" component={Assessments} />
           <Route path="/assessments/:id" component={AssessmentDetail} />

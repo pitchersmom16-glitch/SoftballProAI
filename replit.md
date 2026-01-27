@@ -120,6 +120,39 @@ The Brain maps biomechanical issues to mechanic tags for intelligent drill match
 - "weak leg drive" → ["Leg Drive", "Explosive Power", "Kinetic Chain"]
 - "lunging" → ["Stay Back", "Load", "Balance"]
 
+### Specialist Coach Mode (Pitching/Catching)
+The Specialist Coach workflow is distinct from Head Coach mode, designed for 1-on-1 remote training.
+
+**Key Features:**
+- **Roster Management**: 25-student hard cap per coach, archive/activate students
+- **Smart Invite System**: Unique referral URLs (`/register?ref=COACH_ABC123`) auto-link students to coaches
+- **Baseline Protocol**: New students must upload 4 videos before dashboard unlocks
+- **Coach Review Queue**: Coach approves baseline before releasing training plan
+
+**Database Tables:**
+- `coaches.referralCode` - Unique referral code for each coach
+- `coaches.specialty` - PITCHING, CATCHING, HITTING, or FIELDING
+- `studentInvites` - Tracks invited students with email/phone
+- `baselineVideos` - 4 required videos per student for onboarding
+- `playerOnboarding` - Tracks baselineComplete and dashboardUnlocked status
+
+**API Endpoints:**
+- `GET /api/specialist/referral-code` - Get/generate coach's referral code
+- `GET /api/specialist/roster` - Get coach's students with status
+- `POST /api/specialist/invite` - Send invite to student/parent
+- `POST /api/specialist/roster/:id/archive` - Archive student
+- `GET /api/register/validate?ref=CODE` - Validate referral/invite
+- `POST /api/register/complete` - Complete registration and link to coach
+- `GET /api/player/onboarding` - Get player's onboarding status
+- `POST /api/player/baseline-video` - Upload baseline video
+- `GET /api/specialist/baseline-queue` - Get students pending review
+- `POST /api/specialist/baseline/:playerId/approve` - Unlock student dashboard
+
+**Frontend Pages:**
+- `/roster` - Specialist Coach Roster Management
+- `/register?ref=CODE` - Student registration via referral
+- `/player/onboarding` - Baseline video upload flow
+
 ### Key npm Dependencies
 - `drizzle-orm` / `drizzle-kit`: Database ORM and migrations
 - `@tanstack/react-query`: Server state management
