@@ -5,74 +5,103 @@
 @tailwind utilities;
 
 :root {
-  /* Softball-inspired Palette: Navy Blue, Electric Yellow/Green, Clean White */
-  --background: 210 20% 98%;
-  --foreground: 222 47% 11%;
+  /* SoftballProAI Neon Dark Theme - Deep Black with Neon Accents */
+  --background: 0 0% 4%;
+  --foreground: 0 0% 95%;
 
-  --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
+  --card: 0 0% 8%;
+  --card-foreground: 0 0% 95%;
+  --card-border: 0 0% 15%;
 
-  --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
+  --popover: 0 0% 8%;
+  --popover-foreground: 0 0% 95%;
+  --popover-border: 0 0% 15%;
 
-  /* Primary: Deep Navy Blue */
-  --primary: 222 47% 20%;
-  --primary-foreground: 210 40% 98%;
+  /* Primary: Neon Green */
+  --primary: 142 100% 50%;
+  --primary-foreground: 0 0% 4%;
 
-  /* Secondary: Soft Gray-Blue */
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222 47% 11.2%;
+  /* Secondary: Dark Gray */
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 90%;
 
-  /* Muted: Subtler grays */
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215 16% 47%;
+  /* Muted: Darker grays */
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 60%;
 
-  /* Accent: Electric Softball Yellow */
-  --accent: 64 90% 55%;
-  --accent-foreground: 222 47% 20%;
+  /* Accent: Hot Pink */
+  --accent: 330 100% 60%;
+  --accent-foreground: 0 0% 100%;
+
+  /* Neon Yellow for highlights */
+  --neon-yellow: 54 100% 50%;
+  --neon-green: 142 100% 50%;
+  --neon-pink: 330 100% 60%;
 
   /* Destructive: Red */
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
 
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 222 47% 20%; /* Same as primary */
+  --border: 0 0% 18%;
+  --input: 0 0% 15%;
+  --ring: 142 100% 50%;
 
   --radius: 0.75rem;
 
   --font-sans: 'Inter', sans-serif;
   --font-display: 'Outfit', sans-serif;
+
+  /* Sidebar */
+  --sidebar: 0 0% 6%;
+  --sidebar-foreground: 0 0% 90%;
+  --sidebar-border: 0 0% 15%;
+  --sidebar-ring: 142 100% 50%;
+  --sidebar-primary: 142 100% 50%;
+  --sidebar-primary-foreground: 0 0% 4%;
+  --sidebar-accent: 0 0% 12%;
+  --sidebar-accent-foreground: 0 0% 95%;
 }
 
 .dark {
-  --background: 222 47% 11%;
-  --foreground: 210 40% 98%;
+  /* Same as root - we're always dark mode now */
+  --background: 0 0% 4%;
+  --foreground: 0 0% 95%;
 
-  --card: 222 47% 13%;
-  --card-foreground: 210 40% 98%;
+  --card: 0 0% 8%;
+  --card-foreground: 0 0% 95%;
+  --card-border: 0 0% 15%;
 
-  --popover: 222 47% 13%;
-  --popover-foreground: 210 40% 98%;
+  --popover: 0 0% 8%;
+  --popover-foreground: 0 0% 95%;
+  --popover-border: 0 0% 15%;
 
-  --primary: 210 40% 98%;
-  --primary-foreground: 222 47% 11.2%;
+  --primary: 142 100% 50%;
+  --primary-foreground: 0 0% 4%;
 
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 90%;
 
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 60%;
 
-  --accent: 64 90% 55%;
-  --accent-foreground: 222 47% 20%;
+  --accent: 330 100% 60%;
+  --accent-foreground: 0 0% 100%;
 
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
 
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 212.7 26.8% 83.9%;
+  --border: 0 0% 18%;
+  --input: 0 0% 15%;
+  --ring: 142 100% 50%;
+
+  --sidebar: 0 0% 6%;
+  --sidebar-foreground: 0 0% 90%;
+  --sidebar-border: 0 0% 15%;
+  --sidebar-ring: 142 100% 50%;
+  --sidebar-primary: 142 100% 50%;
+  --sidebar-primary-foreground: 0 0% 4%;
+  --sidebar-accent: 0 0% 12%;
+  --sidebar-accent-foreground: 0 0% 95%;
 }
 
 @layer base {
@@ -89,17 +118,29 @@
   }
 }
 
-/* Custom Utilities for Polish */
+/* Custom Utilities for Neon Dark Theme */
 .glass-panel {
-  @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl;
+  @apply bg-black/60 backdrop-blur-md border border-white/10 shadow-xl;
 }
 
 .card-hover {
-  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/20;
+  @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-1 hover:border-primary/40;
 }
 
 .gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-[hsl(var(--neon-yellow))];
+}
+
+.neon-glow {
+  box-shadow: 0 0 20px hsl(var(--primary) / 0.5), 0 0 40px hsl(var(--primary) / 0.3);
+}
+
+.neon-glow-pink {
+  box-shadow: 0 0 20px hsl(var(--accent) / 0.5), 0 0 40px hsl(var(--accent) / 0.3);
+}
+
+.neon-glow-yellow {
+  box-shadow: 0 0 20px hsl(var(--neon-yellow) / 0.5), 0 0 40px hsl(var(--neon-yellow) / 0.3);
 }
 
 /* Scrollbar styling */
@@ -107,8 +148,12 @@
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-secondary;
+  background: hsl(0 0% 8%);
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-muted-foreground/30 rounded-full hover:bg-muted-foreground/50 transition-colors;
+  background: hsl(0 0% 25%);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(142 100% 50% / 0.5);
 }

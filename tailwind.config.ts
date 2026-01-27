@@ -81,6 +81,11 @@ export default {
           busy: "rgb(239 68 68)",
           offline: "rgb(156 163 175)",
         },
+        neon: {
+          green: "hsl(142 100% 50%)",
+          pink: "hsl(330 100% 60%)",
+          yellow: "hsl(54 100% 50%)",
+        },
       },
       fontFamily: {
         sans: ["var(--font-sans)"],

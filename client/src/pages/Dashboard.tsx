@@ -52,7 +52,7 @@ export default function Dashboard() {
       <Dialog open={true}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-display">Welcome to SwingAI, Coach!</DialogTitle>
+            <DialogTitle className="text-2xl font-display text-white">Welcome to SoftballProAI, Coach!</DialogTitle>
             <DialogDescription>
               Let's set up your coaching profile to get started.
             </DialogDescription>
@@ -100,8 +100,8 @@ export default function Dashboard() {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold font-display text-slate-900">Coach Dashboard</h1>
-          <p className="text-slate-500 mt-1">Welcome back, {coach?.name}. Here's what's happening.</p>
+          <h1 className="text-3xl font-bold font-display text-white">Coach Dashboard</h1>
+          <p className="text-gray-400 mt-1">Welcome back, {coach?.name}. Here's what's happening.</p>
         </div>
         <Link href="/assessments">
           <Button size="lg" className="shadow-lg shadow-primary/20">
@@ -113,38 +113,38 @@ export default function Dashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-6 border-slate-100 shadow-sm bg-gradient-to-br from-white to-slate-50">
+        <Card className="p-6 border-white/10 bg-card hover:border-neon-green/30 transition-all">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+            <div className="h-12 w-12 rounded-xl bg-neon-green/20 text-neon-green flex items-center justify-center">
               <Users className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-500">Total Athletes</p>
-              <h3 className="text-2xl font-bold text-slate-900">{totalAthletes}</h3>
+              <p className="text-sm font-medium text-gray-400">Total Athletes</p>
+              <h3 className="text-2xl font-bold text-white">{totalAthletes}</h3>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 border-slate-100 shadow-sm bg-gradient-to-br from-white to-slate-50">
+        <Card className="p-6 border-white/10 bg-card hover:border-neon-pink/30 transition-all">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+            <div className="h-12 w-12 rounded-xl bg-neon-pink/20 text-neon-pink flex items-center justify-center">
               <Video className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-500">Assessments This Week</p>
-              <h3 className="text-2xl font-bold text-slate-900">{recentAssessments.length}</h3>
+              <p className="text-sm font-medium text-gray-400">Assessments This Week</p>
+              <h3 className="text-2xl font-bold text-white">{recentAssessments.length}</h3>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 border-slate-100 shadow-sm bg-gradient-to-br from-white to-slate-50">
+        <Card className="p-6 border-white/10 bg-card hover:border-neon-yellow/30 transition-all">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-green-100 text-green-600 flex items-center justify-center">
+            <div className="h-12 w-12 rounded-xl bg-neon-yellow/20 text-neon-yellow flex items-center justify-center">
               <CheckCircle className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-500">Pending Analysis</p>
-              <h3 className="text-2xl font-bold text-slate-900">{pendingCount}</h3>
+              <p className="text-sm font-medium text-gray-400">Pending Analysis</p>
+              <h3 className="text-2xl font-bold text-white">{pendingCount}</h3>
             </div>
           </div>
         </Card>
@@ -154,39 +154,39 @@ export default function Dashboard() {
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold font-display">Recent Assessments</h2>
+            <h2 className="text-xl font-bold font-display text-white">Recent Assessments</h2>
             <Link href="/assessments" className="text-sm font-medium text-primary hover:text-primary/80">View All</Link>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="bg-card rounded-2xl border border-white/10 overflow-hidden">
             {recentAssessments.length === 0 ? (
-              <div className="p-12 text-center text-slate-500">
-                <Video className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+              <div className="p-12 text-center text-gray-400">
+                <Video className="h-12 w-12 mx-auto mb-4 text-gray-600" />
                 <p>No assessments yet. Upload a video to start!</p>
               </div>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-white/10">
                 {recentAssessments.map(assessment => {
                   const athlete = athletes?.find(a => a.id === assessment.athleteId);
                   return (
-                    <div key={assessment.id} className="p-4 hover:bg-slate-50 transition-colors flex items-center justify-between">
+                    <div key={assessment.id} className="p-4 hover:bg-white/5 transition-colors flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center text-lg font-bold text-slate-500">
+                        <div className="h-10 w-10 rounded-lg bg-neon-green/20 flex items-center justify-center text-lg font-bold text-neon-green">
                           {athlete?.name[0] || '?'}
                         </div>
                         <div>
-                          <p className="font-medium text-slate-900">{athlete?.name || 'Unknown Athlete'}</p>
-                          <p className="text-xs text-slate-500 capitalize">{assessment.skillType} • {new Date(assessment.date || '').toLocaleDateString()}</p>
+                          <p className="font-medium text-white">{athlete?.name || 'Unknown Athlete'}</p>
+                          <p className="text-xs text-gray-400 capitalize">{assessment.skillType} • {new Date(assessment.date || '').toLocaleDateString()}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize 
-                          ${assessment.status === 'completed' ? 'bg-green-100 text-green-700' : 
-                            assessment.status === 'analyzing' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700'}`}>
+                          ${assessment.status === 'completed' ? 'bg-neon-green/20 text-neon-green' : 
+                            assessment.status === 'analyzing' ? 'bg-neon-pink/20 text-neon-pink' : 'bg-white/10 text-gray-300'}`}>
                           {assessment.status}
                         </span>
                         <Link href={`/assessments/${assessment.id}`}>
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" className="text-gray-400 hover:text-neon-green">
                             <ArrowRight className="h-4 w-4" />
                           </Button>
                         </Link>
@@ -200,32 +200,32 @@ export default function Dashboard() {
         </div>
 
         <div>
-          <h2 className="text-xl font-bold font-display mb-6">Quick Actions</h2>
+          <h2 className="text-xl font-bold font-display mb-6 text-white">Quick Actions</h2>
           <div className="space-y-4">
             <Link href="/athletes">
-              <Card className="p-4 hover:border-primary/20 hover:shadow-md transition-all cursor-pointer group">
+              <Card className="p-4 border-white/10 hover:border-neon-green/30 transition-all cursor-pointer group bg-card">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                    <div className="h-8 w-8 rounded-lg bg-neon-green/20 text-neon-green flex items-center justify-center">
                       <Users className="h-4 w-4" />
                     </div>
-                    <span className="font-medium">Manage Roster</span>
+                    <span className="font-medium text-white">Manage Roster</span>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-primary transition-colors" />
+                  <ArrowRight className="h-4 w-4 text-gray-500 group-hover:text-neon-green transition-colors" />
                 </div>
               </Card>
             </Link>
             
             <Link href="/drills">
-              <Card className="p-4 hover:border-primary/20 hover:shadow-md transition-all cursor-pointer group">
+              <Card className="p-4 border-white/10 hover:border-neon-pink/30 transition-all cursor-pointer group bg-card">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-accent/20 text-accent-foreground flex items-center justify-center">
+                    <div className="h-8 w-8 rounded-lg bg-neon-pink/20 text-neon-pink flex items-center justify-center">
                       <CheckCircle className="h-4 w-4" />
                     </div>
-                    <span className="font-medium">Browse Drills</span>
+                    <span className="font-medium text-white">Browse Drills</span>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-primary transition-colors" />
+                  <ArrowRight className="h-4 w-4 text-gray-500 group-hover:text-neon-pink transition-colors" />
                 </div>
               </Card>
             </Link>

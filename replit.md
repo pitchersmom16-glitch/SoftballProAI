@@ -1,8 +1,13 @@
-# SwingAI - Softball Coaching Platform
+# SoftballProAI - Fastpitch Softball Coaching Platform
 
 ## Overview
 
-SwingAI is an AI-powered softball coaching platform that enables coaches to analyze athlete mechanics through video uploads, track athlete progress, manage teams, and assign personalized drills. The application uses AI video breakdown for performance analysis and provides a comprehensive dashboard for managing athletes and assessments.
+SoftballProAI is an AI-powered FASTPITCH SOFTBALL coaching platform that enables coaches to analyze athlete mechanics through video uploads, track athlete progress, manage teams, and assign personalized drills. The application uses AI video breakdown for performance analysis with a focus on windmill pitching mechanics, drag foot technique, and softball-specific movements (rise ball, drop ball, curve ball, change-up).
+
+## Visual Theme
+- **Dark Mode Only**: Deep black background (#0a0a0a)
+- **Neon Accents**: Neon Green (primary), Hot Pink (accent), Electric Yellow (highlights)
+- **Typography**: White/light gray text for readability on dark backgrounds
 
 ## User Preferences
 
