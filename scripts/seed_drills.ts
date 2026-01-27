@@ -2,17 +2,29 @@
  * SoftballProAI Expert System Seed Script
  * 
  * Dynamic Knowledge Base for continuous AI learning
- * Categories: Pitching, Hitting, Catching, Throwing
- * Focus: Biomechanical Physics, Internal Rotation, Rotational Mechanics
+ * Categories: PITCHING, CATCHING, INFIELD, OUTFIELD, CONDITIONING, MENTAL
+ * Focus: Full Academy Coverage with Biomechanical Physics
  */
 
 import { db } from "../server/db";
 import { drills, mentalEdge } from "../shared/schema";
 import { sql } from "drizzle-orm";
 
+// Valid categories for the Academy
+export const DRILL_CATEGORIES = [
+  "PITCHING",
+  "CATCHING", 
+  "INFIELD",
+  "OUTFIELD",
+  "CONDITIONING",
+  "MENTAL"
+] as const;
+
+export type DrillCategory = typeof DRILL_CATEGORIES[number];
+
 interface DrillSeed {
   name: string;
-  category: "Pitching" | "Hitting" | "Catching" | "Throwing";
+  category: DrillCategory;
   skillType: string;
   difficulty: "Beginner" | "Intermediate" | "Advanced";
   description: string;
@@ -39,13 +51,12 @@ interface MentalEdgeSeed {
 // PITCHING DRILLS - Internal Rotation & Windmill Biomechanics
 // ============================================================================
 const PITCHING_DRILLS: DrillSeed[] = [
-  // INTERNAL ROTATION - The Core of Windmill Power
   {
     name: "Internal Rotation Isolation Drill",
-    category: "Pitching",
+    category: "PITCHING",
     skillType: "pitching",
     difficulty: "Intermediate",
-    description: "The shoulder's internal rotation is THE source of velocity. Start with arm at 90 degrees, elbow at shoulder height. Rotate forearm forward explosively while keeping elbow stationary. This isolates the internal rotators (subscapularis, pec major, lats) that generate 40-60% of pitch velocity.",
+    description: "The shoulder's internal rotation is THE source of velocity. Start with arm at 90 degrees, elbow at shoulder height. Rotate forearm forward explosively while keeping elbow stationary. This isolates the internal rotators that generate 40-60% of pitch velocity.",
     videoUrl: "https://www.youtube.com/watch?v=internal-rotation-pitching",
     equipment: ["Resistance band", "Mirror"],
     ageRange: "12U-College",
@@ -55,10 +66,10 @@ const PITCHING_DRILLS: DrillSeed[] = [
   },
   {
     name: "Hip-Shoulder Separation Windmill",
-    category: "Pitching",
+    category: "PITCHING",
     skillType: "pitching",
     difficulty: "Advanced",
-    description: "The windmill delivery creates power through hip-shoulder separation. Hips must fire first, creating 40-50 degrees of separation between pelvis and trunk. This stretch-shortening cycle loads the core like a rubber band, transferring ground force through the kinetic chain to the arm.",
+    description: "The windmill delivery creates power through hip-shoulder separation. Hips must fire first, creating 40-50 degrees of separation between pelvis and trunk. This stretch-shortening cycle loads the core like a rubber band.",
     videoUrl: "https://www.youtube.com/watch?v=hip-shoulder-separation",
     equipment: ["Pitching rubber", "Video camera"],
     ageRange: "14U-College",
@@ -68,10 +79,10 @@ const PITCHING_DRILLS: DrillSeed[] = [
   },
   {
     name: "Drag Foot Proprioception Drill",
-    category: "Pitching",
+    category: "PITCHING",
     skillType: "pitching",
     difficulty: "Intermediate",
-    description: "The drag foot isn't passive - it's an active stabilizer. The posterior chain (glute, hamstring) maintains ground contact while the hip drives forward. Feel the drag foot pulling through the dirt, not lifting. This stabilizes the pelvis for maximal hip rotation velocity.",
+    description: "The drag foot isn't passive - it's an active stabilizer. The posterior chain maintains ground contact while the hip drives forward. Feel the drag foot pulling through the dirt, not lifting.",
     videoUrl: "https://www.youtube.com/watch?v=drag-foot-technique",
     equipment: ["Pitching lane", "Tape"],
     ageRange: "10U-College",
@@ -80,38 +91,11 @@ const PITCHING_DRILLS: DrillSeed[] = [
     issueAddressed: "Drag foot lifting, balance loss, hip rotation leak"
   },
   {
-    name: "Scapular Loading Pattern",
-    category: "Pitching",
-    skillType: "pitching",
-    difficulty: "Advanced",
-    description: "Before internal rotation fires, the scapula must retract and depress. This 'loads' the shoulder for explosive acceleration. Practice pulling shoulder blade down and back at top of arm circle, then feel it release as arm accelerates. This is the biomechanical 'trigger' for power.",
-    videoUrl: "https://www.youtube.com/watch?v=scapular-loading",
-    equipment: ["Resistance band", "Wall"],
-    ageRange: "14U-College",
-    expertSource: "ASMI Biomechanics Research",
-    mechanicTags: ["Scapular Retraction", "Shoulder Loading", "Acceleration Phase", "Biomechanical Trigger"],
-    issueAddressed: "Arm circle feels disconnected, shoulder flying open"
-  },
-  {
-    name: "Ground Reaction Force Transfer",
-    category: "Pitching",
-    skillType: "pitching",
-    difficulty: "Advanced",
-    description: "Elite pitchers generate 1.5-2x bodyweight in ground reaction force. This force travels from drive leg through pelvis, core, shoulder, arm, hand, to ball. Practice explosive drive off rubber while feeling force transfer up through body. Every link must be connected.",
-    videoUrl: "https://www.youtube.com/watch?v=ground-force-pitching",
-    equipment: ["Pitching rubber", "Force plate optional"],
-    ageRange: "14U-College",
-    expertSource: "Dr. Glenn Fleisig Biomechanics",
-    mechanicTags: ["Ground Reaction Force", "Leg Drive", "Force Transfer", "Kinetic Chain"],
-    issueAddressed: "Weak pitches despite effort, force leaking, all arm"
-  },
-  // RISE BALL PHYSICS
-  {
     name: "Rise Ball Backspin Mechanics",
-    category: "Pitching",
+    category: "PITCHING",
     skillType: "pitching",
     difficulty: "Advanced",
-    description: "True rise ball requires 1400+ RPM backspin with 12-6 axis. The Magnus effect creates upward force opposing gravity. Focus on aggressive wrist supination through release - palm facing sky at finish. The ball doesn't 'rise' but the late break fools hitters' timing.",
+    description: "True rise ball requires 1400+ RPM backspin with 12-6 axis. The Magnus effect creates upward force opposing gravity. Focus on aggressive wrist supination through release.",
     videoUrl: "https://www.youtube.com/watch?v=rise-ball-physics",
     equipment: ["Rapsodo or spin tracker", "Softballs"],
     ageRange: "14U-College",
@@ -119,196 +103,18 @@ const PITCHING_DRILLS: DrillSeed[] = [
     mechanicTags: ["Rise Ball", "Backspin", "Magnus Effect", "Wrist Supination", "Spin Rate"],
     issueAddressed: "Rise ball flat, no movement, wrong spin axis"
   },
-  // DROP BALL PHYSICS
   {
     name: "Drop Ball Topspin Generation",
-    category: "Pitching",
+    category: "PITCHING",
     skillType: "pitching",
     difficulty: "Advanced",
-    description: "The drop ball uses topspin (12-6 axis pointing forward) creating downward Magnus force. At release, fingers pull DOWN and THROUGH the ball, staying on top. The seams should rotate toward the batter like a forward-rolling wheel. 1200+ RPM creates sharp late break.",
+    description: "The drop ball uses topspin creating downward Magnus force. At release, fingers pull DOWN and THROUGH the ball, staying on top. 1200+ RPM creates sharp late break.",
     videoUrl: "https://www.youtube.com/watch?v=drop-ball-topspin",
     equipment: ["Rapsodo or spin tracker", "Softballs"],
     ageRange: "14U-College",
     expertSource: "Pitch Physics Lab",
     mechanicTags: ["Drop Ball", "Topspin", "Forward Spin", "Late Break", "Fingers On Top"],
     issueAddressed: "Drop ball hanging, no sharp break, spinning sideways"
-  },
-  // CHANGE-UP DECEPTION
-  {
-    name: "Change-Up Arm Speed Deception",
-    category: "Pitching",
-    skillType: "pitching",
-    difficulty: "Intermediate",
-    description: "The change-up is about DECEPTION not slow arm. Arm speed stays identical to fastball - velocity reduction comes from grip and wrist angle only. The circle change grip kills backspin while maintaining arm speed. Hitter's timing is off by 8-10 mph.",
-    videoUrl: "https://www.youtube.com/watch?v=changeup-deception",
-    equipment: ["Softballs", "Video for arm speed comparison"],
-    ageRange: "12U-College",
-    expertSource: "Cat Osterman Pitch Analysis",
-    mechanicTags: ["Change-Up", "Arm Speed", "Deception", "Grip Mechanics", "Timing Disruption"],
-    issueAddressed: "Slowing arm on changeup, hitters recognizing it"
-  },
-  {
-    name: "Curveball Spin Axis Training",
-    category: "Pitching",
-    skillType: "pitching",
-    difficulty: "Advanced",
-    description: "The curveball requires sidespin (3-9 axis). At release, fingers sweep across the ball laterally. The key is maintaining tight spin and consistent axis. Magnus force creates lateral movement - the more spin, the more break.",
-    videoUrl: "https://www.youtube.com/watch?v=curveball-axis",
-    equipment: ["Rapsodo", "Softballs"],
-    ageRange: "14U-College",
-    expertSource: "Pitch Design Lab",
-    mechanicTags: ["Curveball", "Sidespin", "Spin Axis", "Magnus Effect", "Lateral Movement"],
-    issueAddressed: "Curveball spinning wrong, no horizontal break"
-  },
-  {
-    name: "Wrist Pronation/Supination Timing",
-    category: "Pitching",
-    skillType: "pitching",
-    difficulty: "Intermediate",
-    description: "Different pitches require different wrist positions at release. Fastball: neutral. Rise: supination (palm up). Drop: pronation (palm down). Curve: lateral. This must be trained until automatic. The wrist action at release determines pitch type.",
-    videoUrl: "https://www.youtube.com/watch?v=wrist-positions",
-    equipment: ["Softballs", "Slow-motion video"],
-    ageRange: "12U-College",
-    expertSource: "Amanda Scarborough",
-    mechanicTags: ["Wrist Pronation", "Wrist Supination", "Release Point", "Pitch Selection"],
-    issueAddressed: "All pitches look the same, can't vary movement"
-  }
-];
-
-// ============================================================================
-// HITTING DRILLS - Rotational Mechanics & Kinetic Chain
-// ============================================================================
-const HITTING_DRILLS: DrillSeed[] = [
-  // ROTATIONAL POWER - The Physics of Hitting
-  {
-    name: "Hip-Lead Rotation Drill",
-    category: "Hitting",
-    skillType: "hitting",
-    difficulty: "Intermediate",
-    description: "The swing is initiated by the HIPS, not hands. The lead hip opens first, pulling the torso, then shoulders, then hands in sequence. This creates a whip effect through the kinetic chain. Practice rotating hips while keeping hands back - feel the stretch across your core.",
-    videoUrl: "https://www.youtube.com/watch?v=hip-lead-rotation",
-    equipment: ["Bat", "Mirror or video"],
-    ageRange: "10U-College",
-    expertSource: "Rotational Hitting Mechanics",
-    mechanicTags: ["Hip Rotation", "Kinetic Chain", "Whip Effect", "Sequencing"],
-    issueAddressed: "Hands-first swing, no hip involvement, weak power"
-  },
-  {
-    name: "Separation Load Training",
-    category: "Hitting",
-    skillType: "hitting",
-    difficulty: "Advanced",
-    description: "Hip-shoulder separation creates the 'rubber band' effect that generates power. As stride foot lands, hips are 30-45 degrees open while shoulders remain closed. This stores elastic energy in the core. Elite hitters create 40+ degrees of separation.",
-    videoUrl: "https://www.youtube.com/watch?v=separation-loading",
-    equipment: ["Bat", "Video analysis"],
-    ageRange: "12U-College",
-    expertSource: "Biomechanical Hitting Analysis",
-    mechanicTags: ["Separation", "Elastic Energy", "Core Loading", "Hip-Shoulder Differential"],
-    issueAddressed: "No separation, hips and shoulders turning together"
-  },
-  {
-    name: "Barrel Path Optimization",
-    category: "Hitting",
-    skillType: "hitting",
-    difficulty: "Intermediate",
-    description: "The optimal bat path is slightly upward (8-15 degrees) to match pitch plane. A level swing meets a downward pitch at only one point. An upward path stays in the zone longer. Practice getting on plane early and driving through the ball with loft.",
-    videoUrl: "https://www.youtube.com/watch?v=barrel-path-swing",
-    equipment: ["Tee", "Bat", "Video"],
-    ageRange: "12U-College",
-    expertSource: "Launch Angle Science",
-    mechanicTags: ["Barrel Path", "Launch Angle", "Swing Plane", "Zone Time"],
-    issueAddressed: "Groundball tendency, chopping down at ball"
-  },
-  {
-    name: "Connection Ball Training",
-    category: "Hitting",
-    skillType: "hitting",
-    difficulty: "Beginner",
-    description: "Place a small ball or towel between back arm and torso. Keep it pinched during load and early swing. This ensures the back elbow stays connected to the hip rotation, transferring rotational energy to the hands. The hands don't generate power - they receive it.",
-    videoUrl: "https://www.youtube.com/watch?v=connection-drill",
-    equipment: ["Bat", "Small ball or towel", "Tee"],
-    ageRange: "8U-College",
-    expertSource: "Connected Swing Mechanics",
-    mechanicTags: ["Connection", "Back Elbow", "Energy Transfer", "Rotational Link"],
-    issueAddressed: "Disconnected hands, casting, barring lead arm"
-  },
-  {
-    name: "Front Leg Brace Drill",
-    category: "Hitting",
-    skillType: "hitting",
-    difficulty: "Advanced",
-    description: "The front leg must BRACE (straighten) at contact, not bend. This creates an axis for rotation and prevents energy from leaking into forward momentum. Think of it as a pole vault - plant firm and rotate around it. Elite hitters have 170+ degree front knee extension.",
-    videoUrl: "https://www.youtube.com/watch?v=front-leg-brace",
-    equipment: ["Bat", "Tee", "Video"],
-    ageRange: "12U-College",
-    expertSource: "Axis Rotation Science",
-    mechanicTags: ["Front Leg Brace", "Axis Rotation", "Energy Block", "Extension"],
-    issueAddressed: "Collapsing front side, lunging, no firm post"
-  },
-  {
-    name: "Bat Speed Training Protocol",
-    category: "Hitting",
-    skillType: "hitting",
-    difficulty: "Advanced",
-    description: "Bat speed comes from SEQUENCING not strength. Hip velocity peaks first, then shoulder velocity, then bat velocity. Use overload/underload training: heavy bats for strength, light bats for speed. Track improvement with a bat speed sensor.",
-    videoUrl: "https://www.youtube.com/watch?v=bat-speed-training",
-    equipment: ["Multiple weighted bats", "Bat speed sensor"],
-    ageRange: "14U-College",
-    expertSource: "Driveline Baseball Adapted",
-    mechanicTags: ["Bat Speed", "Overload Training", "Underload Training", "Velocity Development"],
-    issueAddressed: "Slow bat speed despite strength, timing issues"
-  },
-  {
-    name: "Vision Training for Pitch Recognition",
-    category: "Hitting",
-    skillType: "hitting",
-    difficulty: "Intermediate",
-    description: "The eyes are the first link in hitting. Track the ball from pitcher's hand through release. Identify spin axis within first 10 feet to recognize pitch type. Use colored balls or numbered balls during soft toss to train visual processing speed.",
-    videoUrl: "https://www.youtube.com/watch?v=vision-hitting",
-    equipment: ["Colored softballs", "Number marked balls"],
-    ageRange: "10U-College",
-    expertSource: "Vision Training for Athletes",
-    mechanicTags: ["Pitch Recognition", "Visual Processing", "Spin Identification", "Eye Training"],
-    issueAddressed: "Can't recognize pitches, late on fastball, fooled by offspeed"
-  },
-  {
-    name: "Contact Point Mapping",
-    category: "Hitting",
-    skillType: "hitting",
-    difficulty: "Intermediate",
-    description: "Every pitch location has an optimal contact point. Inside: out front, pull. Middle: in front of plate, center. Outside: deeper, opposite field. Practice hitting to specific fields based on tee placement. Great hitters adjust contact point, not swing.",
-    videoUrl: "https://www.youtube.com/watch?v=contact-point-drill",
-    equipment: ["Tee", "Bat", "Field markers"],
-    ageRange: "10U-College",
-    expertSource: "Directional Hitting",
-    mechanicTags: ["Contact Point", "Opposite Field", "Pull Side", "Adjustability"],
-    issueAddressed: "Pulling everything, can't use whole field"
-  },
-  {
-    name: "Weight Transfer Timing",
-    category: "Hitting",
-    skillType: "hitting",
-    difficulty: "Beginner",
-    description: "Weight starts 60% back, transfers forward during stride, then BACK into rotation. Common mistake: drifting forward. Weight must get behind rotation for power. Feel like you're sitting on your back hip as you rotate, not falling forward.",
-    videoUrl: "https://www.youtube.com/watch?v=weight-transfer",
-    equipment: ["Bat", "Tee or soft toss"],
-    ageRange: "8U-College",
-    expertSource: "Balance Point Hitting",
-    mechanicTags: ["Weight Transfer", "Load", "Balance", "Stay Back"],
-    issueAddressed: "Lunging, drifting forward, no power"
-  },
-  {
-    name: "Hand Path to the Ball",
-    category: "Hitting",
-    skillType: "hitting",
-    difficulty: "Intermediate",
-    description: "Hands take a short, direct path. Knob of bat leads toward the ball, then barrel accelerates through. Think 'knob to ball, barrel through ball'. Long, loopy swings add distance hands must travel and reduce bat speed.",
-    videoUrl: "https://www.youtube.com/watch?v=hand-path-drill",
-    equipment: ["Bat", "Tee"],
-    ageRange: "10U-College",
-    expertSource: "Efficient Swing Mechanics",
-    mechanicTags: ["Hand Path", "Knob to Ball", "Short Swing", "Direct Path"],
-    issueAddressed: "Casting hands, long swing, slow to contact"
   }
 ];
 
@@ -318,10 +124,10 @@ const HITTING_DRILLS: DrillSeed[] = [
 const CATCHING_DRILLS: DrillSeed[] = [
   {
     name: "Framing with Quiet Hands",
-    category: "Catching",
+    category: "CATCHING",
     skillType: "catching",
     difficulty: "Intermediate",
-    description: "Elite framers receive the ball with soft, quiet hands that absorb impact and subtly guide the ball into the zone. Practice catching with minimal glove movement - stick the pitch where you receive it. Strong wrist, soft elbow. Every pitch should look like a strike.",
+    description: "Elite framers receive the ball with soft, quiet hands that absorb impact and subtly guide the ball into the zone. Practice catching with minimal glove movement - stick the pitch where you receive it.",
     videoUrl: "https://www.youtube.com/watch?v=framing-technique",
     equipment: ["Catcher's mitt", "Softballs", "Net or pitcher"],
     ageRange: "10U-College",
@@ -330,24 +136,11 @@ const CATCHING_DRILLS: DrillSeed[] = [
     issueAddressed: "Stabbing at ball, dropping glove, losing strikes"
   },
   {
-    name: "Low Ball Framing Tilt",
-    category: "Catching",
-    skillType: "catching",
-    difficulty: "Advanced",
-    description: "Low pitches require specific technique: receive with glove tilted UP, fingers pointing down and out. This 'sticks' the low pitch in the zone visually. Practice catching low strikes and holding the glove position for 1-2 seconds.",
-    videoUrl: "https://www.youtube.com/watch?v=low-pitch-framing",
-    equipment: ["Catcher's mitt", "Softballs"],
-    ageRange: "12U-College",
-    expertSource: "Advanced Framing Mechanics",
-    mechanicTags: ["Low Pitch Framing", "Glove Tilt", "Strike Presentation"],
-    issueAddressed: "Pulling glove down on low pitches, losing low strikes"
-  },
-  {
     name: "Blocking Reaction Drill",
-    category: "Catching",
+    category: "CATCHING",
     skillType: "catching",
     difficulty: "Intermediate",
-    description: "Blocking is about getting your body in front of the ball, not catching it. Drop to knees, drive chest forward, tuck chin, create a wall. The ball hits your chest protector and stays in front. Practice random drops - left, right, center.",
+    description: "Blocking is about getting your body in front of the ball, not catching it. Drop to knees, drive chest forward, tuck chin, create a wall. The ball hits your chest protector and stays in front.",
     videoUrl: "https://www.youtube.com/watch?v=blocking-drill",
     equipment: ["Catcher's gear", "Softballs or blocking balls"],
     ageRange: "10U-College",
@@ -357,10 +150,10 @@ const CATCHING_DRILLS: DrillSeed[] = [
   },
   {
     name: "Pop Time Explosiveness Training",
-    category: "Catching",
+    category: "CATCHING",
     skillType: "catching",
     difficulty: "Advanced",
-    description: "Pop time = receive + exchange + throw. Elite catchers are under 1.8 seconds. Focus on catching in throwing position, quick exchange (ball to throwing hand in one motion), and powerful throw from crouch. Practice with stopwatch feedback.",
+    description: "Pop time = receive + exchange + throw. Elite catchers are under 1.8 seconds. Focus on catching in throwing position, quick exchange, and powerful throw from crouch.",
     videoUrl: "https://www.youtube.com/watch?v=pop-time-training",
     equipment: ["Catcher's gear", "Stopwatch", "Target at second base"],
     ageRange: "12U-College",
@@ -369,11 +162,24 @@ const CATCHING_DRILLS: DrillSeed[] = [
     issueAddressed: "Slow pop time, poor exchange, weak arm"
   },
   {
+    name: "Throw-Down Footwork Drill",
+    category: "CATCHING",
+    skillType: "catching",
+    difficulty: "Intermediate",
+    description: "Quick footwork is essential for throw-downs. Practice the jab step with right foot, clearing hips, and driving toward second base. Feet must work before arm.",
+    videoUrl: "https://www.youtube.com/watch?v=throwdown-footwork",
+    equipment: ["Catcher's gear", "Stopwatch"],
+    ageRange: "10U-College",
+    expertSource: "Catching Mechanics Pro",
+    mechanicTags: ["Throw-Down", "Footwork", "Hip Clearance", "Quick Feet"],
+    issueAddressed: "Slow throw-downs, no footwork, arm-only throws"
+  },
+  {
     name: "One-Knee Receiving Stance",
-    category: "Catching",
+    category: "CATCHING",
     skillType: "catching",
     difficulty: "Beginner",
-    description: "The one-knee stance is becoming standard - it improves low pitch framing and reduces strain. Right knee down, left foot forward. Glove presented as relaxed target. Practice receiving in this stance until it feels natural.",
+    description: "The one-knee stance improves low pitch framing and reduces strain. Right knee down, left foot forward. Glove presented as relaxed target.",
     videoUrl: "https://www.youtube.com/watch?v=one-knee-catching",
     equipment: ["Catcher's gear"],
     ageRange: "10U-College",
@@ -384,28 +190,99 @@ const CATCHING_DRILLS: DrillSeed[] = [
 ];
 
 // ============================================================================
-// THROWING DRILLS - Arm Care, Long Toss, Mechanics
+// INFIELD DRILLS - Glove Work, Backhands, Double Plays
 // ============================================================================
-const THROWING_DRILLS: DrillSeed[] = [
+const INFIELD_DRILLS: DrillSeed[] = [
   {
-    name: "Long Toss Progression Protocol",
-    category: "Throwing",
-    skillType: "throwing",
+    name: "Forehand/Backhand Reaction Drill",
+    category: "INFIELD",
+    skillType: "infield",
     difficulty: "Intermediate",
-    description: "Long toss builds arm strength and improves throwing mechanics. Start at 60 feet, work back to 120-150 feet, then compress back. Focus on arc throws going out (strength), line drives coming in (accuracy). 2-3 times per week maximum.",
-    videoUrl: "https://www.youtube.com/watch?v=long-toss-program",
-    equipment: ["Softballs", "Open field"],
+    description: "Quick lateral movement is essential. Practice reading the ball off the bat and taking proper angle. Backhand requires glove-side drop step, forehand requires crossing over. React, don't guess.",
+    videoUrl: "https://www.youtube.com/watch?v=backhand-forehand-drill",
+    equipment: ["Glove", "Softballs", "Fungo bat"],
+    ageRange: "10U-College",
+    expertSource: "Infield Fundamentals Pro",
+    mechanicTags: ["Backhand", "Forehand", "Lateral Movement", "First Step"],
+    issueAddressed: "Slow first step, wrong angle, bobbling backhands"
+  },
+  {
+    name: "Double Play Feed Mechanics",
+    category: "INFIELD",
+    skillType: "infield",
+    difficulty: "Advanced",
+    description: "The feed is more important than the arm strength. Shortstop: underhand or backhand feed chest-high. Second base: flip or sidearm. Practice quick exchange and accurate chest-high tosses.",
+    videoUrl: "https://www.youtube.com/watch?v=double-play-feeds",
+    equipment: ["Glove", "Softballs", "Partner"],
     ageRange: "12U-College",
-    expertSource: "Arm Care Protocol",
-    mechanicTags: ["Long Toss", "Arm Strength", "Arc Throws", "Arm Care"],
-    issueAddressed: "Weak arm, lack of throwing distance"
+    expertSource: "Middle Infield Mastery",
+    mechanicTags: ["Double Play", "Feed", "Quick Exchange", "Underhand Toss"],
+    issueAddressed: "Inaccurate feeds, slow exchange, throwing too hard"
+  },
+  {
+    name: "Short Hop Collection Drill",
+    category: "INFIELD",
+    skillType: "infield",
+    difficulty: "Intermediate",
+    description: "Short hops require soft hands and staying low. Get your glove out front, let the ball come up into the glove. Practice catching short hops at various speeds. Stay down through the ball.",
+    videoUrl: "https://www.youtube.com/watch?v=short-hop-drill",
+    equipment: ["Glove", "Softballs", "Wall or partner"],
+    ageRange: "10U-College",
+    expertSource: "Glove Work Academy",
+    mechanicTags: ["Short Hop", "Soft Hands", "Stay Low", "Ball Collection"],
+    issueAddressed: "Bobbling short hops, coming up too early"
+  },
+  {
+    name: "Slow Roller Charge Drill",
+    category: "INFIELD",
+    skillType: "infield",
+    difficulty: "Intermediate",
+    description: "Slow rollers require aggressive charge with proper footwork. Approach at angle, field outside right foot, crow hop and throw. Barehand only when absolutely necessary.",
+    videoUrl: "https://www.youtube.com/watch?v=slow-roller-charge",
+    equipment: ["Glove", "Softballs", "Fungo bat"],
+    ageRange: "10U-College",
+    expertSource: "Third Base Specialist",
+    mechanicTags: ["Slow Roller", "Charge", "Barehand", "Quick Release"],
+    issueAddressed: "Waiting on slow rollers, rushed throws"
+  },
+  {
+    name: "Ready Position & First Step",
+    category: "INFIELD",
+    skillType: "infield",
+    difficulty: "Beginner",
+    description: "The ready position sets up everything. Feet shoulder-width, weight on balls of feet, glove out front, eyes on pitcher's release. First step is a read step - react to the ball.",
+    videoUrl: "https://www.youtube.com/watch?v=ready-position-infield",
+    equipment: ["Glove", "Softballs"],
+    ageRange: "8U-College",
+    expertSource: "Infield Fundamentals",
+    mechanicTags: ["Ready Position", "First Step", "Athletic Stance", "Ball Read"],
+    issueAddressed: "Flat-footed, slow reaction, caught off guard"
+  }
+];
+
+// ============================================================================
+// OUTFIELD DRILLS - Drop Steps, Crow Hops, Tracking
+// ============================================================================
+const OUTFIELD_DRILLS: DrillSeed[] = [
+  {
+    name: "Drop Step Reaction Drill",
+    category: "OUTFIELD",
+    skillType: "outfield",
+    difficulty: "Intermediate",
+    description: "The drop step is the outfielder's first move on fly balls. Open hips to the ball side, push off opposite foot, run on an angle. Never backpedal - turn and run. Practice reacting to verbal or visual cues.",
+    videoUrl: "https://www.youtube.com/watch?v=drop-step-drill",
+    equipment: ["Glove", "Softballs", "Open field"],
+    ageRange: "10U-College",
+    expertSource: "Outfield Mastery",
+    mechanicTags: ["Drop Step", "First Step", "Hip Turn", "Route Running"],
+    issueAddressed: "Backpedaling, slow first step, bad angles"
   },
   {
     name: "Crow Hop Power Throwing",
-    category: "Throwing",
-    skillType: "throwing",
+    category: "OUTFIELD",
+    skillType: "outfield",
     difficulty: "Intermediate",
-    description: "The crow hop transfers ground force into the throw. Push off back leg explosively, hop and land on back leg, then drive forward into throw. This adds 5-10 mph to outfield throws. Practice the footwork rhythm before adding ball.",
+    description: "The crow hop transfers ground force into the throw. Push off back leg explosively, hop and land on back leg, then drive forward into throw. This adds 5-10 mph to outfield throws.",
     videoUrl: "https://www.youtube.com/watch?v=crow-hop-throw",
     equipment: ["Softballs", "Field space"],
     ageRange: "10U-College",
@@ -414,197 +291,356 @@ const THROWING_DRILLS: DrillSeed[] = [
     issueAddressed: "Flat-footed throws, weak outfield arm"
   },
   {
-    name: "Quick Release Infield Drill",
-    category: "Throwing",
-    skillType: "throwing",
-    difficulty: "Intermediate",
-    description: "Infielders need quick feet-to-release time. Practice fielding and throwing in one fluid motion. Catch, small shuffle, throw - no extra steps. Focus on catching in throwing position and quick transfer. Time yourself from catch to release.",
-    videoUrl: "https://www.youtube.com/watch?v=quick-release-infield",
-    equipment: ["Glove", "Softballs", "Target"],
-    ageRange: "10U-College",
-    expertSource: "Infield Fundamentals",
-    mechanicTags: ["Quick Release", "Transfer", "Footwork", "Infield Throwing"],
-    issueAddressed: "Slow release, extra steps, rushed throws"
-  },
-  {
-    name: "Throwing Arm Path Drill",
-    category: "Throwing",
-    skillType: "throwing",
+    name: "Fly Ball Tracking & Communication",
+    category: "OUTFIELD",
+    skillType: "outfield",
     difficulty: "Beginner",
-    description: "Proper arm path is down-back-up in a circular motion, not straight back. The ball should reach highest point at maximum external rotation. Practice throwing with focus on smooth arm circle, elbow leading, and fingers on top at release.",
-    videoUrl: "https://www.youtube.com/watch?v=throwing-arm-path",
-    equipment: ["Softballs", "Partner or net"],
+    description: "Track the ball from the bat to glove. Call early, call loud, call often. Center fielder has priority. Practice reading ball off bat and taking direct routes, not arcs.",
+    videoUrl: "https://www.youtube.com/watch?v=tracking-fly-balls",
+    equipment: ["Glove", "Softballs", "Fungo bat"],
     ageRange: "8U-College",
-    expertSource: "Throwing Mechanics 101",
-    mechanicTags: ["Arm Path", "Arm Circle", "External Rotation", "Elbow Lead"],
-    issueAddressed: "Short-arming, throwing sidearm, elbow pain"
+    expertSource: "Outfield Fundamentals",
+    mechanicTags: ["Tracking", "Communication", "Route Running", "Priority"],
+    issueAddressed: "Misreading balls, collisions, dropping fly balls"
   },
   {
-    name: "Rotational Throwing Power",
-    category: "Throwing",
-    skillType: "throwing",
+    name: "Gap-to-Gap Range Drill",
+    category: "OUTFIELD",
+    skillType: "outfield",
     difficulty: "Advanced",
-    description: "Throwing velocity comes from hip and trunk rotation, not arm. Focus on driving back hip through the throw while keeping chest closed as long as possible. The arm accelerates AFTER the trunk rotates. Feel your core coil and uncoil.",
-    videoUrl: "https://www.youtube.com/watch?v=rotational-throwing",
-    equipment: ["Softballs", "Video analysis"],
+    description: "Covering the gaps requires reading the ball immediately and taking efficient angles. Practice going gap-to-gap with full extension catches. Work on diving technique safely.",
+    videoUrl: "https://www.youtube.com/watch?v=gap-coverage-drill",
+    equipment: ["Glove", "Softballs", "Open field"],
     ageRange: "12U-College",
-    expertSource: "Rotational Power System",
-    mechanicTags: ["Hip Rotation", "Trunk Rotation", "Delayed Arm Action", "Core Power"],
-    issueAddressed: "All-arm thrower, lack of velocity"
+    expertSource: "Elite Outfield Training",
+    mechanicTags: ["Range", "Diving", "Full Extension", "Gap Coverage"],
+    issueAddressed: "Limited range, afraid to dive, poor angles"
+  },
+  {
+    name: "Fence Awareness Drill",
+    category: "OUTFIELD",
+    skillType: "outfield",
+    difficulty: "Intermediate",
+    description: "Know where the fence is at all times. Practice tracking balls to the warning track, feeling the dirt/grass change, and making catches at the wall safely.",
+    videoUrl: "https://www.youtube.com/watch?v=fence-awareness",
+    equipment: ["Glove", "Softballs", "Outfield fence"],
+    ageRange: "10U-College",
+    expertSource: "Outfield Safety Training",
+    mechanicTags: ["Fence Awareness", "Warning Track", "Safety", "Wall Play"],
+    issueAddressed: "Running into fence, afraid of wall, misjudging depth"
   }
 ];
 
 // ============================================================================
-// MENTAL EDGE - Mamba Mentality & Elite Mindset
+// CONDITIONING DRILLS - CrossFit Style, Explosive, Agility
+// ============================================================================
+const CONDITIONING_DRILLS: DrillSeed[] = [
+  {
+    name: "Box Jump Explosiveness",
+    category: "CONDITIONING",
+    skillType: "conditioning",
+    difficulty: "Intermediate",
+    description: "Explosive lower body power for hitting and throwing. Start with 12-18 inch box, progress higher. Focus on full hip extension and soft landing. 3 sets of 8-10 reps.",
+    videoUrl: "https://www.youtube.com/watch?v=box-jump-training",
+    equipment: ["Plyo box", "Flat surface"],
+    ageRange: "12U-College",
+    expertSource: "CrossFit Softball",
+    mechanicTags: ["Explosiveness", "Lower Body Power", "Hip Extension", "Plyometrics"],
+    issueAddressed: "Slow bat speed, weak leg drive, no explosiveness"
+  },
+  {
+    name: "Agility Ladder Speed Work",
+    category: "CONDITIONING",
+    skillType: "conditioning",
+    difficulty: "Beginner",
+    description: "Quick feet are essential for all positions. Practice in-in-out-out, lateral shuffles, and crossover patterns. Focus on light, quick touches - not speed at first, then build up.",
+    videoUrl: "https://www.youtube.com/watch?v=agility-ladder-softball",
+    equipment: ["Agility ladder", "Flat surface"],
+    ageRange: "8U-College",
+    expertSource: "Speed & Agility Academy",
+    mechanicTags: ["Footwork", "Agility", "Quick Feet", "Coordination"],
+    issueAddressed: "Slow feet, clumsy movements, poor coordination"
+  },
+  {
+    name: "Medicine Ball Rotational Throws",
+    category: "CONDITIONING",
+    skillType: "conditioning",
+    difficulty: "Intermediate",
+    description: "Core rotation power for hitting and throwing. Stand perpendicular to wall, rotate hips explosively, throw med ball into wall. This builds the rotational power chain. 3 sets of 10 each side.",
+    videoUrl: "https://www.youtube.com/watch?v=med-ball-rotation",
+    equipment: ["Medicine ball (4-8 lbs)", "Wall"],
+    ageRange: "10U-College",
+    expertSource: "Rotational Power Training",
+    mechanicTags: ["Core Rotation", "Hip Power", "Medicine Ball", "Power Transfer"],
+    issueAddressed: "Weak rotation, no hip involvement, arm-only swing"
+  },
+  {
+    name: "Burpee Broad Jump Combo",
+    category: "CONDITIONING",
+    skillType: "conditioning",
+    difficulty: "Advanced",
+    description: "Full-body explosive conditioning. Burpee into broad jump for distance. This builds total body power and cardiovascular endurance. Great for game-readiness. 3 sets of 6-8 reps.",
+    videoUrl: "https://www.youtube.com/watch?v=burpee-broad-jump",
+    equipment: ["Open space"],
+    ageRange: "12U-College",
+    expertSource: "CrossFit Athlete Training",
+    mechanicTags: ["Full Body", "Explosiveness", "Conditioning", "Endurance"],
+    issueAddressed: "Poor conditioning, gassing out late in games"
+  },
+  {
+    name: "Lateral Shuffle Cone Drill",
+    category: "CONDITIONING",
+    skillType: "conditioning",
+    difficulty: "Beginner",
+    description: "Lateral movement is critical for infielders and catchers. Set cones 10-15 feet apart. Shuffle, touch cone, shuffle back. Stay low, don't cross feet. Time yourself for improvement.",
+    videoUrl: "https://www.youtube.com/watch?v=lateral-shuffle-drill",
+    equipment: ["Cones", "Flat surface"],
+    ageRange: "8U-College",
+    expertSource: "Agility Training Pro",
+    mechanicTags: ["Lateral Movement", "Shuffle", "Stay Low", "Change of Direction"],
+    issueAddressed: "Slow lateral movement, crossing feet, upright shuffle"
+  }
+];
+
+// ============================================================================
+// MENTAL DRILLS - General & Pitcher-Specific
+// ============================================================================
+const MENTAL_DRILLS: DrillSeed[] = [
+  // GENERAL MENTAL
+  {
+    name: "Pre-Game Visualization Routine",
+    category: "MENTAL",
+    skillType: "mental",
+    difficulty: "Beginner",
+    description: "5-10 minutes before games, close eyes and visualize success. See yourself making great plays, getting hits, striking out batters. Engage all senses - feel the ball, hear the crowd. This primes your nervous system for performance.",
+    videoUrl: "https://www.youtube.com/watch?v=visualization-athletes",
+    equipment: ["Quiet space", "Headphones optional"],
+    ageRange: "10U-College",
+    expertSource: "Sports Psychology Institute",
+    mechanicTags: ["Visualization", "Pre-Game", "Mental Prep", "Focus"],
+    issueAddressed: "Nerves before games, not mentally ready, scattered focus"
+  },
+  {
+    name: "Breath Work Reset Technique",
+    category: "MENTAL",
+    skillType: "mental",
+    difficulty: "Beginner",
+    description: "When stress hits, use 4-7-8 breathing: Inhale 4 seconds, hold 7 seconds, exhale 8 seconds. This activates the parasympathetic nervous system and calms the body. Use between pitches, at-bats, or after errors.",
+    videoUrl: "https://www.youtube.com/watch?v=478-breathing-athletes",
+    equipment: ["None"],
+    ageRange: "8U-College",
+    expertSource: "Performance Psychology",
+    mechanicTags: ["Breath Work", "Stress Reset", "Calm Down", "Focus Recovery"],
+    issueAddressed: "Anxiety, racing heart, can't calm down after mistake"
+  },
+  // PITCHER-SPECIFIC MENTAL
+  {
+    name: "The 0-2 Count Domination Mindset",
+    category: "MENTAL",
+    skillType: "mental",
+    difficulty: "Intermediate",
+    description: "At 0-2, YOU are in control. This is where elite pitchers finish batters. The mental script: 'I earned this. One more strike. Expand the zone.' Visualize the out before you throw. Attack with your best pitch - don't nibble.",
+    videoUrl: "https://www.youtube.com/watch?v=02-count-mindset",
+    equipment: ["None"],
+    ageRange: "12U-College",
+    expertSource: "Pitching Mental Game",
+    mechanicTags: ["Pitcher Mindset", "Count Leverage", "Aggression", "Finish Hitters"],
+    issueAddressed: "Can't finish hitters, nibbling 0-2, giving free passes"
+  },
+  {
+    name: "Flush The Previous Pitch",
+    category: "MENTAL",
+    skillType: "mental",
+    difficulty: "Beginner",
+    description: "The last pitch is GONE. Whether it was a bomb or a strikeout, it doesn't exist anymore. Physical ritual: wipe the rubber with your foot, take a breath, focus on catcher's mitt. Each pitch is independent. Stay present.",
+    videoUrl: "https://www.youtube.com/watch?v=flush-it-pitching",
+    equipment: ["None"],
+    ageRange: "10U-College",
+    expertSource: "Pitching Psychology",
+    mechanicTags: ["Pitcher Mindset", "Present Moment", "Reset", "Emotional Control"],
+    issueAddressed: "Dwelling on mistakes, snowballing after bad pitch, frustration"
+  },
+  {
+    name: "Mamba Mentality Game Focus",
+    category: "MENTAL",
+    skillType: "mental",
+    difficulty: "Advanced",
+    description: "Channel Kobe's obsessive focus. Before the game, decide: 'I will be the hardest worker on this field today. I will out-compete everyone.' Block out everything except the task at hand. No fear, no excuses, only relentless effort.",
+    videoUrl: "https://www.youtube.com/watch?v=mamba-mentality-sports",
+    equipment: ["None"],
+    ageRange: "12U-College",
+    expertSource: "Kobe Bryant Mamba Mentality",
+    mechanicTags: ["Mamba Mentality", "Focus", "Work Ethic", "Competitive Drive"],
+    issueAddressed: "Lacking intensity, going through motions, not competing"
+  }
+];
+
+// ============================================================================
+// MENTAL EDGE CONTENT - Quotes, Principles, Visualization
 // ============================================================================
 const MENTAL_EDGE_CONTENT: MentalEdgeSeed[] = [
-  // KOBE BRYANT - MAMBA MENTALITY PRINCIPLES
+  // Kobe Bryant Mamba Mentality Principles
   {
-    title: "Mamba Mentality - Obsessive Preparation",
-    contentType: "principle",
-    category: "Pre-Game",
-    source: "Kobe Bryant",
-    content: "I have nothing in common with lazy people who blame others for their lack of success. Great things come from hard work and perseverance. No excuses. The moment you start making excuses is the moment you stop winning.",
-    tags: ["Mamba Mentality", "Work Ethic", "No Excuses", "Preparation"],
-    usageContext: "Before practice when you don't feel like working hard"
-  },
-  {
-    title: "Mamba Mentality - Fear of Failure",
+    title: "The Job's Not Finished",
     contentType: "quote",
-    category: "Confidence",
+    category: "Focus",
     source: "Kobe Bryant",
-    content: "I'm not afraid to fail. I'm afraid to not try. The moment you give up is the moment you let someone else win. Everything negative - pressure, challenges - is all an opportunity for me to rise.",
-    tags: ["Mamba Mentality", "Fearless", "Pressure", "Competition"],
-    usageContext: "Before big games, tournament situations"
+    content: "Job's not finished. Job finished? I don't think so.",
+    tags: ["Mamba Mentality", "Persistence", "Championship Mindset"],
+    usageContext: "When team is ahead and might get complacent"
   },
   {
-    title: "Mamba Mentality - Relentless Focus",
+    title: "Rest at the End",
+    contentType: "principle",
+    category: "Resilience",
+    source: "Kobe Bryant",
+    content: "Rest at the end, not in the middle. You give everything you have for the duration of the task. That's Mamba Mentality.",
+    tags: ["Mamba Mentality", "Work Ethic", "No Shortcuts"],
+    usageContext: "During tough practices or when tired"
+  },
+  {
+    title: "Obsession is Natural",
     contentType: "principle",
     category: "Focus",
     source: "Kobe Bryant",
-    content: "I don't focus on what I'm up against. I focus on my goals and try to ignore the rest. The most important thing is to try and inspire people so they can be great in whatever they want to do. Be willing to sacrifice what you are for what you will become.",
-    tags: ["Mamba Mentality", "Focus", "Goals", "Sacrifice"],
-    usageContext: "When distractions are affecting performance"
+    content: "I don't want to be the next Michael Jordan, I only want to be Kobe Bryant. Your obsession with being the best version of YOU is not weird - it's necessary.",
+    tags: ["Mamba Mentality", "Identity", "Self-Improvement"],
+    usageContext: "When comparing yourself to others"
   },
   {
-    title: "Mamba Mentality - Response to Adversity",
-    contentType: "quote",
+    title: "Learn from Everyone",
+    contentType: "principle",
+    category: "Confidence",
+    source: "Kobe Bryant",
+    content: "I studied every great player - not to copy them, but to steal something useful from each one. Magic's vision. Jordan's footwork. Hakeem's post moves. Be a student of the game.",
+    tags: ["Mamba Mentality", "Learning", "Game Study"],
+    usageContext: "During film study or learning new skills"
+  },
+  // Visualization and Focus
+  {
+    title: "See It Before You Do It",
+    contentType: "visualization",
+    category: "Pre-Game",
+    source: "Sports Psychology Research",
+    content: "Elite athletes visualize success 10-15 minutes before competition. Close your eyes. See the pitch coming. Feel your swing. Hear the crack of the bat. Smell the dirt. The brain doesn't fully distinguish between vivid visualization and reality.",
+    tags: ["Visualization", "Mental Rehearsal", "Pre-Game Routine"],
+    usageContext: "Before at-bats or before taking the circle"
+  },
+  {
+    title: "The Next Pitch Mentality",
+    contentType: "principle",
     category: "Resilience",
-    source: "Kobe Bryant",
-    content: "I never tried to prove anything to someone else. I wanted to prove something to myself. Use your success, your failures, your heartache, your joy as fuel. You have to be able to look back at your pain and learn from it.",
-    tags: ["Mamba Mentality", "Resilience", "Self-Motivation", "Growth"],
-    usageContext: "After a tough loss or failure"
+    source: "Elite Softball Coaching",
+    content: "Errors happen. Strikeouts happen. What separates good from great is the ability to flush it. The only pitch that matters is the NEXT one. Physical reset: touch the dirt, take a breath, lock eyes on target. Mental reset: 'That's done. What's next?'",
+    tags: ["Reset", "Present Moment", "Error Recovery"],
+    usageContext: "After making an error or striking out"
   },
+  // Motivational
   {
-    title: "Mamba Mentality - Detail Obsession",
-    contentType: "principle",
-    category: "Pre-Game",
-    source: "Kobe Bryant",
-    content: "I'll do whatever it takes to win games, whether it's sitting on a bench waving a towel, handing a cup of water to a teammate, or hitting the game-winning shot. There's nothing truly to be afraid of, when you think about it, because I've failed before, and I woke up the next morning, and I'm okay.",
-    tags: ["Mamba Mentality", "Team Player", "Winning", "Perspective"],
-    usageContext: "When ego is getting in the way of team success"
-  },
-  {
-    title: "Mamba Mentality - Work When Others Sleep",
+    title: "Hard Work Beats Talent",
     contentType: "quote",
     category: "Confidence",
-    source: "Kobe Bryant",
-    content: "I can't relate to lazy people. We don't speak the same language. I don't understand you. I don't want to understand you. The mindset isn't about seeking a result—it's more about the process of getting to that result.",
-    tags: ["Mamba Mentality", "Work Ethic", "Process", "Excellence"],
-    usageContext: "When you need motivation to put in extra work"
+    source: "Tim Notke / Kevin Durant",
+    content: "Hard work beats talent when talent doesn't work hard. Your opponent might be more talented, but they can't outwork you unless you let them.",
+    tags: ["Work Ethic", "Effort", "Outworking Competition"],
+    usageContext: "Before facing a tough opponent"
   },
-  // BEST OF 2021 MOTIVATIONAL - Pre-Game Content
   {
-    title: "Best of 2021 Motivational Compilation",
-    contentType: "video",
+    title: "Pressure is a Privilege",
+    contentType: "quote",
     category: "Pre-Game",
-    source: "Best of 2021 Motivational Videos",
-    content: "A powerful compilation of the year's most inspiring speeches and moments. Features elite athletes discussing mindset, preparation, and the pursuit of excellence. Perfect for team pre-game viewing to elevate mental state.",
-    videoUrl: "https://www.youtube.com/watch?v=best-2021-motivation",
-    tags: ["Motivational", "Pre-Game", "Elite Mindset", "Team Building"],
-    usageContext: "Team pre-game in locker room, 30 minutes before first pitch"
-  },
-  // ADDITIONAL MENTAL EDGE CONTENT
-  {
-    title: "Visualization: Perfect At-Bat",
-    contentType: "visualization",
-    category: "Pre-Game",
-    source: "Sports Psychology",
-    content: "Close your eyes. See yourself walking to the plate with confidence. Feel the bat in your hands. Watch the pitcher's release point. See the ball, track the spin, time your stride. Feel the solid contact. Hear the crack of the bat. See the ball flying into the gap.",
-    tags: ["Visualization", "At-Bat Prep", "Mental Rehearsal"],
-    usageContext: "Before at-bat, in on-deck circle"
+    source: "Billie Jean King",
+    content: "Pressure is a privilege. It means you're in a position to make an impact. Embrace it. Champions don't shrink from big moments - they grow into them.",
+    tags: ["Pressure", "Big Moments", "Clutch Performance"],
+    usageContext: "Before championship games or high-pressure situations"
   },
   {
-    title: "Reset After Strikeout",
+    title: "Fear as Fuel",
     contentType: "principle",
-    category: "Recovery",
-    source: "Elite Mindset Training",
-    content: "The best hitters fail 7 out of 10 times. One at-bat doesn't define you. Take three deep breaths. Flush it. The next at-bat is a new opportunity. Stay aggressive, stay confident. Trust your training.",
-    tags: ["Recovery", "Resilience", "Next Pitch Mentality"],
-    usageContext: "Immediately after a strikeout or poor at-bat"
+    category: "Resilience",
+    source: "Michael Jordan",
+    content: "Fear is an illusion. The only thing real is this moment. Use your fear as fuel. Feel the butterflies? Good. That means you care. Now go compete.",
+    tags: ["Fear", "Nerves", "Competition"],
+    usageContext: "When feeling nervous or scared"
   },
   {
-    title: "Pitcher's Mound Dominance",
-    contentType: "visualization",
-    category: "Confidence",
-    source: "Pitching Psychology",
-    content: "The circle is YOUR territory. Every batter who steps in is entering YOUR space. You control the tempo. You dictate the at-bat. Breathe. Feel the ball. Trust your mechanics. Attack the zone with confidence. This is your game.",
-    tags: ["Pitcher Mindset", "Dominance", "Confidence", "Control"],
-    usageContext: "Before taking the mound, between innings"
+    title: "Process Over Outcome",
+    contentType: "principle",
+    category: "Focus",
+    source: "Nick Saban Process",
+    content: "Don't think about the scoreboard. Don't think about the championship. Think about THIS pitch. THIS at-bat. THIS play. Win the moment. Stack enough moments and you'll win the game.",
+    tags: ["Process", "Present Moment", "Focus"],
+    usageContext: "During games when overthinking outcome"
   }
 ];
 
-async function seedDatabase() {
-  console.log("🧠 SoftballProAI Expert System Seeding Started...\n");
-  console.log("⚠️  This will REPLACE existing drills and mental edge content\n");
+// ============================================================================
+// SEEDING FUNCTION
+// ============================================================================
+async function seedDrills() {
+  console.log("🧹 Clearing existing drills and mental edge content...");
   
-  // Clear existing data
-  console.log("🗑️  Clearing existing drills...");
-  await db.delete(drills);
-  console.log("🗑️  Clearing existing mental edge content...");
-  await db.delete(mentalEdge);
-  
-  const allDrills = [...PITCHING_DRILLS, ...HITTING_DRILLS, ...CATCHING_DRILLS, ...THROWING_DRILLS];
-  
-  console.log(`\n📚 Seeding ${allDrills.length} expert drills:`);
-  console.log(`   - Pitching: ${PITCHING_DRILLS.length}`);
-  console.log(`   - Hitting: ${HITTING_DRILLS.length}`);
-  console.log(`   - Catching: ${CATCHING_DRILLS.length}`);
-  console.log(`   - Throwing: ${THROWING_DRILLS.length}`);
-  
-  // Insert drills
+  await db.execute(sql`TRUNCATE TABLE drills RESTART IDENTITY CASCADE`);
+  await db.execute(sql`TRUNCATE TABLE mental_edge RESTART IDENTITY CASCADE`);
+
+  console.log("🌱 Seeding drills across all categories...");
+
+  const allDrills = [
+    ...PITCHING_DRILLS,
+    ...CATCHING_DRILLS,
+    ...INFIELD_DRILLS,
+    ...OUTFIELD_DRILLS,
+    ...CONDITIONING_DRILLS,
+    ...MENTAL_DRILLS
+  ];
+
   for (const drill of allDrills) {
-    try {
-      await db.insert(drills).values(drill);
-      console.log(`✅ ${drill.category}: ${drill.name}`);
-    } catch (error) {
-      console.error(`❌ Error inserting ${drill.name}:`, error);
-    }
+    await db.insert(drills).values({
+      name: drill.name,
+      category: drill.category,
+      skillType: drill.skillType,
+      difficulty: drill.difficulty,
+      description: drill.description,
+      videoUrl: drill.videoUrl,
+      equipment: drill.equipment,
+      ageRange: drill.ageRange,
+      expertSource: drill.expertSource,
+      mechanicTags: drill.mechanicTags,
+      issueAddressed: drill.issueAddressed
+    });
   }
-  
-  console.log(`\n🧠 Seeding ${MENTAL_EDGE_CONTENT.length} mental edge items:`);
-  
-  // Insert mental edge content
+
+  console.log(`✅ Seeded ${allDrills.length} drills`);
+  console.log(`   - PITCHING: ${PITCHING_DRILLS.length}`);
+  console.log(`   - CATCHING: ${CATCHING_DRILLS.length}`);
+  console.log(`   - INFIELD: ${INFIELD_DRILLS.length}`);
+  console.log(`   - OUTFIELD: ${OUTFIELD_DRILLS.length}`);
+  console.log(`   - CONDITIONING: ${CONDITIONING_DRILLS.length}`);
+  console.log(`   - MENTAL: ${MENTAL_DRILLS.length}`);
+
+  console.log("\n🧠 Seeding Mental Edge content...");
+
   for (const content of MENTAL_EDGE_CONTENT) {
-    try {
-      await db.insert(mentalEdge).values(content);
-      console.log(`✅ ${content.category}: ${content.title}`);
-    } catch (error) {
-      console.error(`❌ Error inserting ${content.title}:`, error);
-    }
+    await db.insert(mentalEdge).values({
+      title: content.title,
+      contentType: content.contentType,
+      category: content.category,
+      source: content.source,
+      content: content.content,
+      videoUrl: content.videoUrl || null,
+      tags: content.tags,
+      usageContext: content.usageContext
+    });
   }
-  
-  console.log("\n" + "=".repeat(60));
-  console.log("🎉 Expert System Seeding Complete!");
-  console.log(`   📊 Drills: ${allDrills.length}`);
-  console.log(`   🧠 Mental Edge: ${MENTAL_EDGE_CONTENT.length}`);
-  console.log(`   📁 Categories: Pitching, Hitting, Catching, Throwing, Mental`);
-  console.log("=".repeat(60));
-  
-  process.exit(0);
+
+  console.log(`✅ Seeded ${MENTAL_EDGE_CONTENT.length} Mental Edge items`);
+  console.log("\n🎉 Seeding complete!");
 }
 
-seedDatabase().catch((err) => {
-  console.error("Fatal error during seeding:", err);
-  process.exit(1);
-});
+// Run if executed directly
+seedDrills()
+  .then(() => process.exit(0))
+  .catch((err) => {
+    console.error("Seeding failed:", err);
+    process.exit(1);
+  });
