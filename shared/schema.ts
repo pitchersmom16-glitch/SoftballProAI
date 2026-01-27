@@ -68,7 +68,8 @@ export const teams = pgTable("teams", {
 export const athletes = pgTable("athletes", {
   id: serial("id").primaryKey(),
   userId: text("user_id").references(() => users.id), // Optional: if athlete manages their own account
-  name: text("name").notNull(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
   dob: date("dob"),
   heightInches: integer("height_inches"),
   weightLbs: integer("weight_lbs"),
@@ -79,6 +80,15 @@ export const athletes = pgTable("athletes", {
   jerseyNumber: integer("jersey_number"),
   teamId: integer("team_id").references(() => teams.id),
   photoUrl: text("photo_url"),
+  // Contact information for text messaging
+  playerPhone: text("player_phone"), // Player's phone number
+  parentPhone: text("parent_phone"), // Parent/guardian phone number
+  parentEmail: text("parent_email"), // Parent/guardian email
+  // Player self-service fields
+  goals: text("goals"), // Player's personal goals
+  preferredTrainingDays: text("preferred_training_days").array(), // ["Monday", "Wednesday", "Friday"]
+  graduationYear: integer("graduation_year"), // For recruiting purposes
+  school: text("school"), // Current school
   createdAt: timestamp("created_at").defaultNow(),
 });
 

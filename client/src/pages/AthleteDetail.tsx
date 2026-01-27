@@ -31,7 +31,7 @@ export default function AthleteDetail() {
     if (athlete) {
       deleteAthlete.mutate(athlete.id, {
         onSuccess: () => {
-          toast({ title: "Athlete deleted", description: `${athlete.name} has been removed.` });
+          toast({ title: "Athlete deleted", description: `${athlete.firstName} ${athlete.lastName} has been removed.` });
           navigate("/athletes");
         },
         onError: () => {
@@ -76,7 +76,7 @@ export default function AthleteDetail() {
               {athlete.photoUrl ? (
                 <img 
                   src={athlete.photoUrl} 
-                  alt={athlete.name}
+                  alt={`${athlete.firstName} ${athlete.lastName}`}
                   className="h-24 w-24 rounded-2xl object-cover border-2 border-neon-green/30"
                   data-testid="img-athlete-photo"
                 />
@@ -85,7 +85,7 @@ export default function AthleteDetail() {
                   className="h-24 w-24 rounded-2xl bg-gradient-to-br from-neon-pink/20 to-neon-purple/20 border-2 border-neon-green/30 flex items-center justify-center text-4xl font-bold text-neon-green"
                   data-testid="avatar-athlete-fallback"
                 >
-                  {athlete.name[0]}
+                  {athlete.firstName[0]}
                 </div>
               )}
               <ObjectUploader
@@ -145,7 +145,7 @@ export default function AthleteDetail() {
               </ObjectUploader>
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white" data-testid="text-athlete-name">{athlete.name}</h1>
+              <h1 className="text-3xl font-bold text-white" data-testid="text-athlete-name">{athlete.firstName} {athlete.lastName}</h1>
               <p className="text-lg text-muted-foreground">
                 {athlete.primaryPosition} {athlete.jerseyNumber && `• #${athlete.jerseyNumber}`}
               </p>
@@ -199,7 +199,7 @@ export default function AthleteDetail() {
           <DialogHeader>
             <DialogTitle>Delete Athlete</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete {athlete.name}? This action cannot be undone.
+              Are you sure you want to delete {athlete.firstName} {athlete.lastName}? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">

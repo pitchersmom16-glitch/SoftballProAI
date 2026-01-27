@@ -98,15 +98,16 @@ export async function registerRoutes(
             const coach = await storage.getCoach(team.headCoachId);
             if (coach?.userId) {
               const sorenessType = data.sorenessLevel >= 8 ? "injury_alert" : "high_soreness_alert";
+              const athleteName = `${playerAthlete.firstName} ${playerAthlete.lastName}`;
               const alertTitle = data.sorenessLevel >= 8 
-                ? `INJURY ALERT: ${playerAthlete.name}`
-                : `High Soreness: ${playerAthlete.name}`;
+                ? `INJURY ALERT: ${athleteName}`
+                : `High Soreness: ${athleteName}`;
               
               await storage.createNotification({
                 userId: coach.userId,
                 type: sorenessType,
                 title: alertTitle,
-                message: `${playerAthlete.name} reported ${data.sorenessLevel}/10 soreness in: ${data.sorenessAreas.join(", ")}. ${data.notes || "Check roster status before practice."}`,
+                message: `${athleteName} reported ${data.sorenessLevel}/10 soreness in: ${data.sorenessAreas.join(", ")}. ${data.notes || "Check roster status before practice."}`,
                 linkUrl: "/roster",
                 relatedId: playerAthlete.id.toString(),
               });

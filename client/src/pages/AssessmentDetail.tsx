@@ -36,7 +36,7 @@ export default function AssessmentDetail() {
       <div className="flex flex-col md:flex-row justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold font-display text-slate-900">{athlete?.name}'s Analysis</h1>
+            <h1 className="text-3xl font-bold font-display text-slate-900">{athlete ? `${athlete.firstName} ${athlete.lastName}` : ''}'s Analysis</h1>
             <Badge variant="outline" className="text-sm capitalize">{assessment.skillType}</Badge>
           </div>
           <p className="text-slate-500">{new Date(assessment.date || '').toLocaleDateString()} • {assessment.status}</p>

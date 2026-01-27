@@ -344,7 +344,7 @@ export default function TeamCoachDashboard() {
                       {item.athlete.photoUrl ? (
                         <img 
                           src={item.athlete.photoUrl} 
-                          alt={item.athlete.name}
+                          alt={`${item.athlete.firstName} ${item.athlete.lastName}`}
                           className="w-8 h-8 rounded-full object-cover border border-white/20"
                           data-testid={`health-img-athlete-${item.athlete.id}`}
                         />
@@ -354,7 +354,7 @@ export default function TeamCoachDashboard() {
                           data-testid={`health-avatar-fallback-${item.athlete.id}`}
                         >
                           <span className="text-neon-yellow text-xs font-bold">
-                            {item.athlete.name?.charAt(0) || "?"}
+                            {item.athlete.firstName?.charAt(0) || "?"}
                           </span>
                         </div>
                       )}
@@ -364,7 +364,7 @@ export default function TeamCoachDashboard() {
                       }`} />
                     </div>
                     <div>
-                      <p className="font-medium text-sm">{item.athlete.name}</p>
+                      <p className="font-medium text-sm">{item.athlete.firstName} {item.athlete.lastName}</p>
                       <p className="text-xs text-muted-foreground">
                         {item.athlete.primaryPosition || "Player"}
                       </p>
@@ -427,7 +427,7 @@ export default function TeamCoachDashboard() {
                   {athlete.photoUrl ? (
                     <img 
                       src={athlete.photoUrl} 
-                      alt={athlete.name}
+                      alt={`${athlete.firstName} ${athlete.lastName}`}
                       className="w-10 h-10 rounded-full object-cover border border-neon-green/30"
                       data-testid={`img-athlete-${athlete.id}`}
                     />
@@ -437,12 +437,12 @@ export default function TeamCoachDashboard() {
                       data-testid={`avatar-fallback-${athlete.id}`}
                     >
                       <span className="text-neon-green font-bold">
-                        {athlete.name?.charAt(0) || "?"}
+                        {athlete.firstName?.charAt(0) || "?"}
                       </span>
                     </div>
                   )}
                   <div>
-                    <p className="font-medium">{athlete.name}</p>
+                    <p className="font-medium">{athlete.firstName} {athlete.lastName}</p>
                     <p className="text-xs text-muted-foreground">
                       #{athlete.jerseyNumber || "--"} | {athlete.primaryPosition || "Player"}
                     </p>

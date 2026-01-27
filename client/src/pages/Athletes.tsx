@@ -16,7 +16,6 @@ import { insertAthleteSchema } from "@shared/routes";
 import { z } from "zod";
 import { Search, Plus } from "lucide-react";
 
-// Schema for the form, handling numeric coercions
 const createAthleteFormSchema = insertAthleteSchema.extend({
   heightInches: z.coerce.number().optional(),
   weightLbs: z.coerce.number().optional(),
@@ -34,11 +33,15 @@ export default function Athletes() {
   const form = useForm({
     resolver: zodResolver(createAthleteFormSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       bats: "R",
       throws: "R",
       primaryPosition: "",
-      jerseyNumber: undefined,
+      jerseyNumber: undefined as number | undefined,
+      playerPhone: "",
+      parentPhone: "",
+      teamId: undefined as number | undefined,
     }
   });
 
@@ -51,8 +54,11 @@ export default function Athletes() {
     });
   };
 
+  const getFullName = (athlete: { firstName: string; lastName: string }) => 
+    `${athlete.firstName} ${athlete.lastName}`;
+
   const filteredAthletes = athletes?.filter(a => 
-    a.name.toLowerCase().includes(search.toLowerCase())
+    getFullName(a).toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -65,7 +71,7 @@ export default function Athletes() {
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="lg" className="shadow-lg shadow-primary/20">
+            <Button size="lg" className="shadow-lg shadow-primary/20" data-testid="button-add-athlete">
               <Plus className="mr-2 h-4 w-4" /> Add Athlete
             </Button>
           </DialogTrigger>
@@ -74,10 +80,28 @@ export default function Athletes() {
               <DialogTitle>Add New Athlete</DialogTitle>
             </DialogHeader>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4">
-              <div className="space-y-2">
-                <Label>Full Name</Label>
-                <Input {...form.register("name")} placeholder="Jane Doe" className="h-11" />
-                {form.formState.errors.name && <p className="text-red-500 text-xs">{form.formState.errors.name.message}</p>}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>First Name</Label>
+                  <Input {...form.register("firstName")} placeholder="Jane" className="h-11" data-testid="input-first-name" />
+                  {form.formState.errors.firstName && <p className="text-red-500 text-xs">{form.formState.errors.firstName.message}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label>Last Name</Label>
+                  <Input {...form.register("lastName")} placeholder="Doe" className="h-11" data-testid="input-last-name" />
+                  {form.formState.errors.lastName && <p className="text-red-500 text-xs">{form.formState.errors.lastName.message}</p>}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Player Phone</Label>
+                  <Input {...form.register("playerPhone")} placeholder="(555) 123-4567" className="h-11" data-testid="input-player-phone" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Parent Phone</Label>
+                  <Input {...form.register("parentPhone")} placeholder="(555) 987-6543" className="h-11" data-testid="input-parent-phone" />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -88,7 +112,7 @@ export default function Athletes() {
                     name="teamId"
                     render={({ field }) => (
                       <Select onValueChange={field.onChange} value={field.value?.toString()}>
-                        <SelectTrigger className="h-11">
+                        <SelectTrigger className="h-11" data-testid="select-team">
                           <SelectValue placeholder="Select Team" />
                         </SelectTrigger>
                         <SelectContent>
@@ -102,14 +126,14 @@ export default function Athletes() {
                 </div>
                 <div className="space-y-2">
                   <Label>Jersey Number</Label>
-                  <Input type="number" {...form.register("jerseyNumber")} className="h-11" />
+                  <Input type="number" {...form.register("jerseyNumber")} className="h-11" data-testid="input-jersey" />
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label>Position</Label>
-                  <Input {...form.register("primaryPosition")} placeholder="P, SS, C" className="h-11" />
+                  <Input {...form.register("primaryPosition")} placeholder="P, SS, C" className="h-11" data-testid="input-position" />
                 </div>
                 <div className="space-y-2">
                   <Label>Bats</Label>
@@ -118,7 +142,7 @@ export default function Athletes() {
                     name="bats"
                     render={({ field }) => (
                       <Select onValueChange={field.onChange} value={field.value || "R"}>
-                        <SelectTrigger className="h-11">
+                        <SelectTrigger className="h-11" data-testid="select-bats">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -137,7 +161,7 @@ export default function Athletes() {
                     name="throws"
                     render={({ field }) => (
                       <Select onValueChange={field.onChange} value={field.value || "R"}>
-                        <SelectTrigger className="h-11">
+                        <SelectTrigger className="h-11" data-testid="select-throws">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -151,7 +175,7 @@ export default function Athletes() {
               </div>
 
               <DialogFooter>
-                <Button type="submit" disabled={createAthlete.isPending} className="w-full sm:w-auto">
+                <Button type="submit" disabled={createAthlete.isPending} className="w-full sm:w-auto" data-testid="button-submit-athlete">
                   {createAthlete.isPending ? "Adding..." : "Add Athlete"}
                 </Button>
               </DialogFooter>
@@ -167,6 +191,7 @@ export default function Athletes() {
           className="pl-10 h-12 bg-white shadow-sm border-slate-200"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          data-testid="input-search-athletes"
         />
       </div>
 
@@ -178,15 +203,28 @@ export default function Athletes() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredAthletes?.map(athlete => {
             const team = teams?.find(t => t.id === athlete.teamId);
+            const fullName = getFullName(athlete);
             return (
               <Card key={athlete.id} className="p-6 hover:shadow-lg transition-all duration-300 border-slate-100 group" data-testid={`card-athlete-${athlete.id}`}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-4">
-                    <div className="h-14 w-14 rounded-2xl bg-slate-100 flex items-center justify-center text-xl font-bold text-slate-400 group-hover:bg-primary group-hover:text-white transition-colors">
-                      {athlete.name[0]}
-                    </div>
+                    {athlete.photoUrl ? (
+                      <img 
+                        src={athlete.photoUrl} 
+                        alt={fullName}
+                        className="h-14 w-14 rounded-2xl object-cover"
+                        data-testid={`img-athlete-${athlete.id}`}
+                      />
+                    ) : (
+                      <div 
+                        className="h-14 w-14 rounded-2xl bg-slate-100 flex items-center justify-center text-xl font-bold text-slate-400 group-hover:bg-primary group-hover:text-white transition-colors"
+                        data-testid={`avatar-athlete-${athlete.id}`}
+                      >
+                        {athlete.firstName[0]}
+                      </div>
+                    )}
                     <div>
-                      <h3 className="font-bold text-lg text-slate-900">{athlete.name}</h3>
+                      <h3 className="font-bold text-lg text-slate-900">{fullName}</h3>
                       <p className="text-sm text-slate-500">{athlete.primaryPosition} {athlete.jerseyNumber && `• #${athlete.jerseyNumber}`}</p>
                     </div>
                   </div>
