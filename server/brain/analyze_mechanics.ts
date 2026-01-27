@@ -13,8 +13,6 @@
 import { db } from "../db";
 import { drills, mentalEdge } from "@shared/schema";
 import { ilike, or, eq, sql, and } from "drizzle-orm";
-import type { SkillType } from "@shared/schema";
-
 // Known biomechanical issues and their associated mechanic tags
 const ISSUE_TAG_MAPPING: Record<string, string[]> = {
   // === PITCHING ISSUES ===
@@ -96,8 +94,10 @@ const SKILL_TO_CATEGORY: Record<string, string[]> = {
   "PITCHING": ["PITCHING", "Pitching"],
   "HITTING": ["HITTING", "Hitting"],
   "CATCHING": ["CATCHING", "Catching"],
-  "THROWING": ["THROWING", "Throwing", "INFIELD", "OUTFIELD", "Infield", "Outfield"]
+  "FIELDING": ["FIELDING", "Fielding", "THROWING", "INFIELD", "OUTFIELD", "Infield", "Outfield"]
 };
+
+type SkillType = "PITCHING" | "HITTING" | "CATCHING" | "FIELDING";
 
 export interface MechanicsAnalysisRequest {
   skillType: SkillType;
@@ -152,11 +152,11 @@ export async function analyzeCatching(request: Omit<MechanicsAnalysisRequest, 's
 }
 
 /**
- * THROWING/FIELDING ANALYSIS
+ * FIELDING ANALYSIS
  * Analyzes arm slot, footwork, exchange, accuracy, and fielding mechanics
  */
-export async function analyzeThrowing(request: Omit<MechanicsAnalysisRequest, 'skillType'>): Promise<MechanicsAnalysisResult> {
-  return analyzeMechanics({ ...request, skillType: "THROWING" });
+export async function analyzeFielding(request: Omit<MechanicsAnalysisRequest, 'skillType'>): Promise<MechanicsAnalysisResult> {
+  return analyzeMechanics({ ...request, skillType: "FIELDING" });
 }
 
 /**
