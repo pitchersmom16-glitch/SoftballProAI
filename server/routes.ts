@@ -920,6 +920,448 @@ export async function registerRoutes(
     }
   });
 
+  // === SPECIALIST COACH MODE ===
+
+  // Generate or get coach's referral code
+  app.get("/api/specialist/referral-code", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      let coach = await storage.getCoachByUserId(userId);
+      
+      if (!coach) {
+        return res.status(404).json({ message: "Coach profile not found" });
+      }
+      
+      // Generate referral code if none exists
+      if (!coach.referralCode) {
+        const code = `COACH_${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+        coach = await storage.updateCoach(coach.id, { referralCode: code });
+      }
+      
+      res.json({ 
+        referralCode: coach.referralCode,
+        referralUrl: `/register?ref=${coach.referralCode}`
+      });
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Get coach's roster (My Students)
+  app.get("/api/specialist/roster", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const coach = await storage.getCoachByUserId(userId);
+      
+      if (!coach) return res.json({ students: [], count: 0, maxStudents: 25 });
+      
+      // Get all active student relationships
+      const relationships = await storage.getCoachPlayers(coach.id);
+      
+      // Enrich with onboarding status and last activity
+      const students = await Promise.all(
+        relationships.map(async (rel) => {
+          const onboarding = rel.player ? await storage.getPlayerOnboarding(rel.playerId) : null;
+          const baselineVideos = rel.player ? await storage.getBaselineVideos(rel.playerId) : [];
+          
+          return {
+            id: rel.id,
+            playerId: rel.playerId,
+            name: rel.player?.firstName && rel.player?.lastName 
+              ? `${rel.player.firstName} ${rel.player.lastName}` 
+              : rel.player?.email || "Unknown",
+            email: rel.player?.email,
+            skillType: rel.skillType,
+            status: rel.status,
+            startDate: rel.startDate,
+            baselineComplete: onboarding?.baselineComplete ?? false,
+            baselineVideoCount: baselineVideos.length,
+            dashboardUnlocked: onboarding?.dashboardUnlocked ?? false,
+            needsReview: !onboarding?.dashboardUnlocked && baselineVideos.length >= 4,
+          };
+        })
+      );
+      
+      res.json({ 
+        students: students.filter(s => s.status === "active"),
+        count: students.filter(s => s.status === "active").length,
+        maxStudents: coach.maxStudents || 25
+      });
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Smart Invite - Send invite to student/parent
+  app.post("/api/specialist/invite", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const coach = await storage.getCoachByUserId(userId);
+      
+      if (!coach) return res.status(404).json({ message: "Coach profile not found" });
+      
+      // Check student cap
+      const activeCount = await storage.getCoachActiveStudentCount(coach.id);
+      const maxStudents = coach.maxStudents || 25;
+      
+      if (activeCount >= maxStudents) {
+        return res.status(400).json({ 
+          message: `You have reached your maximum of ${maxStudents} active students. Archive inactive students to add more.` 
+        });
+      }
+      
+      const inviteSchema = z.object({
+        parentEmail: z.string().email().optional(),
+        studentEmail: z.string().email().optional(),
+        phone: z.string().optional(),
+        studentName: z.string().optional(),
+      });
+      
+      const data = inviteSchema.parse(req.body);
+      
+      if (!data.parentEmail && !data.studentEmail && !data.phone) {
+        return res.status(400).json({ message: "At least one contact method is required (parent email, student email, or phone)" });
+      }
+      
+      // Generate unique invite token
+      const inviteToken = crypto.randomUUID();
+      const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+      
+      const invite = await storage.createStudentInvite({
+        coachId: coach.id,
+        parentEmail: data.parentEmail || null,
+        studentEmail: data.studentEmail || null,
+        phone: data.phone || null,
+        studentName: data.studentName || null,
+        skillType: coach.specialty || "PITCHING",
+        inviteToken,
+        status: "pending",
+        expiresAt,
+      });
+      
+      res.status(201).json({
+        invite,
+        inviteUrl: `/register?invite=${inviteToken}`,
+        message: "Invite created successfully"
+      });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  // Get coach's sent invites
+  app.get("/api/specialist/invites", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const coach = await storage.getCoachByUserId(userId);
+      
+      if (!coach) return res.json([]);
+      
+      const invites = await storage.getStudentInvitesByCoach(coach.id);
+      res.json(invites);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Archive student (remove from active roster)
+  app.post("/api/specialist/roster/:id/archive", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const relationshipId = Number(req.params.id);
+      
+      await storage.updatePlayerCoachRelationship(relationshipId, { status: "inactive" });
+      res.json({ message: "Student archived successfully" });
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // === REFERRAL REGISTRATION (Public Route) ===
+
+  // Validate invite token and get coach info
+  app.get("/api/register/validate", async (req, res) => {
+    try {
+      const { invite, ref } = req.query;
+      
+      // Check for direct invite token
+      if (invite) {
+        const studentInvite = await storage.getStudentInviteByToken(invite as string);
+        if (!studentInvite) {
+          return res.status(404).json({ message: "Invalid or expired invite" });
+        }
+        if (studentInvite.status !== "pending") {
+          return res.status(400).json({ message: "This invite has already been used" });
+        }
+        if (studentInvite.expiresAt && new Date(studentInvite.expiresAt) < new Date()) {
+          return res.status(400).json({ message: "This invite has expired" });
+        }
+        
+        const coach = await storage.getCoach(studentInvite.coachId);
+        return res.json({
+          type: "invite",
+          coachId: studentInvite.coachId,
+          coachName: coach?.name,
+          skillType: studentInvite.skillType,
+          studentName: studentInvite.studentName,
+          inviteToken: invite,
+        });
+      }
+      
+      // Check for referral code
+      if (ref) {
+        const coach = await storage.getCoachByReferralCode(ref as string);
+        if (!coach) {
+          return res.status(404).json({ message: "Invalid referral code" });
+        }
+        
+        return res.json({
+          type: "referral",
+          coachId: coach.id,
+          coachName: coach.name,
+          skillType: coach.specialty,
+          referralCode: ref,
+        });
+      }
+      
+      return res.status(400).json({ message: "Invite token or referral code required" });
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Complete registration with referral/invite (called after OAuth)
+  app.post("/api/register/complete", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Must be logged in to complete registration" });
+      
+      const userId = (req.user as any).claims.sub;
+      
+      const completeSchema = z.object({
+        inviteToken: z.string().optional(),
+        referralCode: z.string().optional(),
+      });
+      
+      const data = completeSchema.parse(req.body);
+      
+      let coachId: number | null = null;
+      let skillType: string = "PITCHING";
+      
+      // Handle direct invite
+      if (data.inviteToken) {
+        const invite = await storage.getStudentInviteByToken(data.inviteToken);
+        if (invite && invite.status === "pending") {
+          coachId = invite.coachId;
+          skillType = invite.skillType;
+          
+          // Mark invite as used
+          await storage.updateStudentInvite(invite.id, { 
+            status: "registered",
+            registeredUserId: userId
+          });
+        }
+      }
+      
+      // Handle referral code
+      if (!coachId && data.referralCode) {
+        const coach = await storage.getCoachByReferralCode(data.referralCode);
+        if (coach) {
+          coachId = coach.id;
+          skillType = coach.specialty || "PITCHING";
+        }
+      }
+      
+      if (!coachId) {
+        return res.status(400).json({ message: "Invalid invite or referral" });
+      }
+      
+      // Create player-coach relationship
+      await storage.createPlayerCoachRelationship({
+        playerId: userId,
+        coachId,
+        skillType,
+        status: "active",
+        subscriptionMode: "coached",
+      });
+      
+      // Create onboarding record (dashboard locked until baseline complete)
+      await storage.createPlayerOnboarding({
+        userId,
+        coachId,
+        skillType,
+        baselineComplete: false,
+        dashboardUnlocked: false,
+      });
+      
+      // Set player settings to coached mode
+      let settings = await storage.getPlayerSettings(userId);
+      if (!settings) {
+        await storage.createPlayerSettings({ userId, subscriptionMode: "coached" });
+      } else {
+        await storage.updatePlayerSettings(userId, { subscriptionMode: "coached" });
+      }
+      
+      res.json({ 
+        message: "Registration complete! Please upload your baseline videos.",
+        requiresBaseline: true,
+        coachId,
+        skillType
+      });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  // === BASELINE PROTOCOL ===
+
+  // Get onboarding status (including baseline progress)
+  app.get("/api/player/onboarding", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
+      const onboarding = await storage.getPlayerOnboarding(userId);
+      if (!onboarding) {
+        // No onboarding = solo player, dashboard unlocked by default
+        return res.json({ dashboardUnlocked: true, baselineComplete: true });
+      }
+      
+      const baselineVideos = await storage.getBaselineVideos(userId);
+      
+      res.json({
+        ...onboarding,
+        baselineVideoCount: baselineVideos.length,
+        baselineVideosRequired: 4,
+        baselineVideos,
+      });
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Upload baseline video
+  app.post("/api/player/baseline-video", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
+      const videoSchema = z.object({
+        videoUrl: z.string().url(),
+        videoNumber: z.number().min(1).max(4),
+        durationSeconds: z.number().optional(),
+      });
+      
+      const data = videoSchema.parse(req.body);
+      
+      // Get onboarding to find coach
+      const onboarding = await storage.getPlayerOnboarding(userId);
+      if (!onboarding) {
+        return res.status(400).json({ message: "No onboarding record found" });
+      }
+      
+      // Create baseline video record
+      const video = await storage.createBaselineVideo({
+        userId,
+        coachId: onboarding.coachId,
+        skillType: onboarding.skillType || "PITCHING",
+        videoNumber: data.videoNumber,
+        videoUrl: data.videoUrl,
+        durationSeconds: data.durationSeconds,
+        status: "uploaded",
+      });
+      
+      // Check if all 4 videos are uploaded
+      const allVideos = await storage.getBaselineVideos(userId);
+      if (allVideos.length >= 4) {
+        // Mark baseline as complete but keep dashboard locked until coach approves
+        await storage.updatePlayerOnboarding(userId, { baselineComplete: true });
+        
+        // TODO: Trigger AI analysis for all 4 videos
+        // For now, just update status to pending_coach_review
+      }
+      
+      res.status(201).json({
+        video,
+        totalUploaded: allVideos.length,
+        remaining: Math.max(0, 4 - allVideos.length),
+        baselineComplete: allVideos.length >= 4,
+      });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  // Coach: Get students needing baseline review
+  app.get("/api/specialist/baseline-queue", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const coach = await storage.getCoachByUserId(userId);
+      
+      if (!coach) return res.json([]);
+      
+      // Get all students with complete baseline but unlocked dashboard
+      const relationships = await storage.getCoachPlayers(coach.id);
+      
+      const needsReview = await Promise.all(
+        relationships.map(async (rel) => {
+          const onboarding = await storage.getPlayerOnboarding(rel.playerId);
+          const videos = await storage.getBaselineVideos(rel.playerId);
+          
+          if (onboarding?.baselineComplete && !onboarding?.dashboardUnlocked) {
+            return {
+              playerId: rel.playerId,
+              playerName: rel.player?.firstName && rel.player?.lastName 
+                ? `${rel.player.firstName} ${rel.player.lastName}` 
+                : rel.player?.email,
+              skillType: rel.skillType,
+              videos,
+              submittedAt: videos[videos.length - 1]?.createdAt,
+            };
+          }
+          return null;
+        })
+      );
+      
+      res.json(needsReview.filter(Boolean));
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Coach: Approve baseline and unlock dashboard
+  app.post("/api/specialist/baseline/:playerId/approve", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const playerId = req.params.playerId;
+      
+      // Unlock dashboard
+      await storage.updatePlayerOnboarding(playerId, { 
+        dashboardUnlocked: true,
+        baselineApprovedAt: new Date(),
+        // Set next video prompt for 2 weeks later
+        nextVideoPromptDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      });
+      
+      res.json({ message: "Baseline approved, dashboard unlocked for student" });
+    } catch (err) {
+      throw err;
+    }
+  });
+
   // Seed Data (if empty)
   seedDatabase();
 
