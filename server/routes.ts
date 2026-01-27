@@ -1384,6 +1384,63 @@ export async function registerRoutes(
     }
   });
 
+  // === UNIVERSAL NOTIFICATION ENGINE ===
+
+  // Get all notifications for current user
+  app.get("/api/notifications", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
+      const notifications = await storage.getNotifications(userId);
+      const unreadCount = await storage.getUnreadNotificationCount(userId);
+      
+      res.json({ notifications, unreadCount });
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Get unread notification count
+  app.get("/api/notifications/unread-count", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
+      const count = await storage.getUnreadNotificationCount(userId);
+      res.json({ count });
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Mark notification as read
+  app.patch("/api/notifications/:id/read", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      
+      const notificationId = parseInt(req.params.id);
+      const notification = await storage.markNotificationRead(notificationId);
+      
+      res.json(notification);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Mark all notifications as read
+  app.patch("/api/notifications/read-all", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
+      await storage.markAllNotificationsRead(userId);
+      res.json({ message: "All notifications marked as read" });
+    } catch (err) {
+      throw err;
+    }
+  });
+
   // Seed Data (if empty)
   seedDatabase();
 
