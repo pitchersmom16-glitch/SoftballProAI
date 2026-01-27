@@ -57,13 +57,17 @@ export const skills = pgTable("skills", {
 export const drills = pgTable("drills", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  category: text("category").notNull(), // e.g., "Mechanics", "Strength", "Mental"
-  skillType: text("skill_type"), // e.g., "pitching", "hitting"
+  category: text("category").notNull(), // "Pitching" or "Hitting"
+  skillType: text("skill_type"), // e.g., "pitching", "hitting", "fielding"
   difficulty: text("difficulty"), // Beginner, Intermediate, Advanced
   description: text("description").notNull(),
-  videoUrl: text("video_url"),
+  videoUrl: text("video_url"), // YouTube URL for reference video
   equipment: text("equipment").array(),
   ageRange: text("age_range"),
+  // Knowledge Base fields for AI Brain
+  expertSource: text("expert_source"), // e.g., "Amanda Scarborough", "Denny Dunn"
+  mechanicTags: text("mechanic_tags").array(), // e.g., ["Internal Rotation", "Separation", "Drag Foot"]
+  issueAddressed: text("issue_addressed"), // Biomechanical issue this drill corrects
   createdAt: timestamp("created_at").defaultNow(),
 });
 

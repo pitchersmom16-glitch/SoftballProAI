@@ -6,6 +6,7 @@ import { z } from "zod";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 import { openai } from "./replit_integrations/audio"; // Use the audio client for openai instance
+import { analyzeMechanics, getCorrectiveDrills, getDrillsByTag, getDrillsByExpert } from "./brain/analyze_mechanics";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -203,6 +204,95 @@ export async function registerRoutes(
     })();
 
     res.status(202).json({ message: "Analysis started", status: "analyzing" });
+  });
+
+  // === BRAIN API ROUTES ===
+  
+  // Analyze mechanics and get drill recommendations
+  app.post("/api/brain/analyze", async (req, res) => {
+    try {
+      const { skillType, detectedIssues, athleteLevel, limit } = req.body;
+      
+      if (!skillType || !["pitching", "hitting"].includes(skillType)) {
+        return res.status(400).json({ 
+          message: "Invalid skillType. Must be 'pitching' or 'hitting'" 
+        });
+      }
+
+      const result = await analyzeMechanics({
+        skillType,
+        detectedIssues: detectedIssues || [],
+        athleteLevel: athleteLevel || "Intermediate",
+        limit: limit || 3
+      });
+
+      res.json(result);
+    } catch (err) {
+      console.error("Brain analysis error:", err);
+      res.status(500).json({ message: "Analysis failed" });
+    }
+  });
+
+  // Quick corrective drill lookup
+  app.get("/api/brain/corrective-drills", async (req, res) => {
+    try {
+      const { skillType, issue, limit } = req.query;
+      
+      if (!skillType || !["pitching", "hitting"].includes(skillType as string)) {
+        return res.status(400).json({ 
+          message: "Invalid skillType. Must be 'pitching' or 'hitting'" 
+        });
+      }
+      
+      if (!issue) {
+        return res.status(400).json({ message: "Issue parameter required" });
+      }
+
+      const drills = await getCorrectiveDrills(
+        skillType as "pitching" | "hitting",
+        issue as string,
+        limit ? Number(limit) : 3
+      );
+
+      res.json({ issue, recommendations: drills });
+    } catch (err) {
+      console.error("Corrective drills error:", err);
+      res.status(500).json({ message: "Lookup failed" });
+    }
+  });
+
+  // Search drills by mechanic tag
+  app.get("/api/brain/drills-by-tag", async (req, res) => {
+    try {
+      const { tag, limit } = req.query;
+      
+      if (!tag) {
+        return res.status(400).json({ message: "Tag parameter required" });
+      }
+
+      const drills = await getDrillsByTag(tag as string, limit ? Number(limit) : 10);
+      res.json({ tag, drills });
+    } catch (err) {
+      console.error("Drills by tag error:", err);
+      res.status(500).json({ message: "Lookup failed" });
+    }
+  });
+
+  // Search drills by expert source
+  app.get("/api/brain/drills-by-expert", async (req, res) => {
+    try {
+      const { expert } = req.query;
+      
+      if (!expert) {
+        return res.status(400).json({ message: "Expert parameter required" });
+      }
+
+      const drills = await getDrillsByExpert(expert as string);
+      res.json({ expert, drills });
+    } catch (err) {
+      console.error("Drills by expert error:", err);
+      res.status(500).json({ message: "Lookup failed" });
+    }
   });
 
   // Seed Data (if empty)
