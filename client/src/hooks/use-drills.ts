@@ -1,13 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, type Drill, type CreateDrillRequest } from "@shared/routes";
+import { api } from "@shared/routes";
+import type { Drill, CreateDrillRequest } from "@shared/schema";
 
-export function useDrills(category?: string, difficulty?: string) {
+export function useDrills(category?: string) {
   return useQuery({
-    queryKey: [api.drills.list.path, category, difficulty],
+    queryKey: [api.drills.list.path, category],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (category) params.append("category", category);
-      if (difficulty) params.append("difficulty", difficulty);
       
       const url = `${api.drills.list.path}?${params.toString()}`;
       const res = await fetch(url, { credentials: "include" });

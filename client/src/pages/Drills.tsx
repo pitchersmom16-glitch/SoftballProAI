@@ -28,8 +28,7 @@ export default function Drills() {
   const [diffFilter, setDiffFilter] = useState<string>("all");
   
   const { data: drills, isLoading } = useDrills(
-    categoryFilter === "all" ? undefined : categoryFilter,
-    diffFilter === "all" ? undefined : diffFilter
+    categoryFilter === "all" ? undefined : categoryFilter
   );
 
   const filteredDrills = drills?.filter(drill => {
@@ -42,7 +41,7 @@ export default function Drills() {
       <div className="flex flex-col gap-6">
         <div>
           <h1 className="text-3xl font-bold text-white" data-testid="text-drills-title">Drill Library</h1>
-          <p className="text-gray-400 mt-1">Academy drills across all skill categories</p>
+          <p className="text-gray-400 mt-1" data-testid="text-drills-subtitle">Academy drills across all skill categories</p>
         </div>
         
         <div className="flex flex-wrap gap-2" data-testid="filter-category-buttons">
@@ -56,10 +55,8 @@ export default function Drills() {
                 size="sm"
                 onClick={() => setCategoryFilter(cat.value)}
                 className={cn(
-                  "gap-2 transition-all",
-                  isActive 
-                    ? "bg-gradient-to-r from-purple-600 to-pink-600 border-0 text-white" 
-                    : "border-gray-700 text-gray-300 hover:border-purple-500 hover:text-white"
+                  "gap-2",
+                  isActive && "bg-gradient-to-r from-purple-600 to-pink-600 border-0"
                 )}
                 data-testid={`button-filter-${cat.value.toLowerCase()}`}
               >
@@ -76,15 +73,9 @@ export default function Drills() {
             return (
               <Button
                 key={diff.value}
-                variant={isActive ? "default" : "ghost"}
+                variant={isActive ? "secondary" : "ghost"}
                 size="sm"
                 onClick={() => setDiffFilter(diff.value)}
-                className={cn(
-                  "transition-all",
-                  isActive 
-                    ? "bg-white/10 text-white" 
-                    : "text-gray-400 hover:text-white"
-                )}
                 data-testid={`button-difficulty-${diff.value.toLowerCase()}`}
               >
                 {diff.label}
@@ -94,7 +85,7 @@ export default function Drills() {
         </div>
       </div>
 
-      <div className="text-sm text-gray-500">
+      <div className="text-sm text-gray-500" data-testid="text-drill-count">
         Showing {filteredDrills?.length || 0} drills
         {categoryFilter !== "all" && ` in ${categoryFilter}`}
         {diffFilter !== "all" && ` (${diffFilter})`}
@@ -103,19 +94,19 @@ export default function Drills() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="drills-grid">
         {isLoading ? (
           [1,2,3,4,5,6].map(i => (
-            <div key={i} className="h-64 bg-white/5 rounded-xl animate-pulse border border-white/10" />
+            <div key={i} className="h-64 bg-white/5 rounded-xl animate-pulse border border-white/10" data-testid={`skeleton-drill-${i}`} />
           ))
         ) : (
           filteredDrills?.map(drill => (
             <Card 
               key={drill.id} 
-              className="overflow-hidden bg-white/5 border-white/10 hover:border-purple-500/50 transition-all duration-300 group cursor-pointer h-full flex flex-col"
+              className="overflow-hidden bg-white/5 border-white/10 hover-elevate transition-all duration-300 group cursor-pointer h-full flex flex-col"
               data-testid={`card-drill-${drill.id}`}
             >
               <div className="relative h-40 bg-gradient-to-br from-purple-900/50 to-pink-900/50">
                 {drill.videoUrl ? (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="h-14 w-14 rounded-full bg-white/10 backdrop-blur flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                    <div className="h-14 w-14 rounded-full bg-white/10 backdrop-blur flex items-center justify-center">
                       <Play className="h-6 w-6 text-white ml-1" />
                     </div>
                   </div>
@@ -139,6 +130,7 @@ export default function Drills() {
                         drill.difficulty === "Intermediate" && "bg-yellow-500/20 text-yellow-300",
                         drill.difficulty === "Advanced" && "bg-red-500/20 text-red-300"
                       )}
+                      data-testid={`badge-difficulty-${drill.id}`}
                     >
                       {drill.difficulty}
                     </Badge>
@@ -150,23 +142,23 @@ export default function Drills() {
                 <div className="mb-3">
                   <h3 className="text-lg font-semibold text-white mb-1" data-testid={`text-drill-name-${drill.id}`}>{drill.name}</h3>
                   {drill.expertSource && (
-                    <p className="text-xs text-purple-400">{drill.expertSource}</p>
+                    <p className="text-xs text-purple-400" data-testid={`text-drill-expert-${drill.id}`}>{drill.expertSource}</p>
                   )}
                 </div>
                 
-                <p className="text-gray-400 text-sm line-clamp-3 mb-4 flex-1">
+                <p className="text-gray-400 text-sm line-clamp-3 mb-4 flex-1" data-testid={`text-drill-description-${drill.id}`}>
                   {drill.description}
                 </p>
 
                 {drill.mechanicTags && drill.mechanicTags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-4">
+                  <div className="flex flex-wrap gap-1 mb-4" data-testid={`tags-drill-${drill.id}`}>
                     {drill.mechanicTags.slice(0, 3).map((tag, i) => (
-                      <Badge key={i} variant="outline" className="text-xs border-gray-700 text-gray-400">
+                      <Badge key={i} variant="outline" className="text-xs border-gray-700 text-gray-400" data-testid={`tag-${drill.id}-${i}`}>
                         {tag}
                       </Badge>
                     ))}
                     {drill.mechanicTags.length > 3 && (
-                      <Badge variant="outline" className="text-xs border-gray-700 text-gray-400">
+                      <Badge variant="outline" className="text-xs border-gray-700 text-gray-400" data-testid={`tag-${drill.id}-more`}>
                         +{drill.mechanicTags.length - 3}
                       </Badge>
                     )}
@@ -175,7 +167,7 @@ export default function Drills() {
 
                 <Button 
                   variant="outline" 
-                  className="w-full mt-auto border-gray-700 text-gray-300 hover:border-purple-500 hover:text-white hover:bg-purple-500/10 transition-all"
+                  className="w-full mt-auto"
                   data-testid={`button-view-drill-${drill.id}`}
                 >
                   View Details
@@ -187,9 +179,9 @@ export default function Drills() {
       </div>
 
       {filteredDrills?.length === 0 && !isLoading && (
-        <div className="text-center py-16 text-gray-500">
-          <Dumbbell className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>No drills found for this category.</p>
+        <div className="text-center py-16 text-gray-500" data-testid="empty-state-drills">
+          <Dumbbell className="h-12 w-12 mx-auto mb-4 opacity-50" data-testid="icon-empty-state" />
+          <p data-testid="text-empty-state">No drills found for this category.</p>
         </div>
       )}
     </div>
