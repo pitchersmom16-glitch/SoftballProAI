@@ -228,6 +228,20 @@ export const api = {
 };
 
 // ============================================
+// TYPE EXPORTS
+// ============================================
+export type Coach = typeof coaches.$inferSelect;
+export type Team = typeof teams.$inferSelect;
+export type Athlete = typeof athletes.$inferSelect;
+export type Drill = typeof drills.$inferSelect;
+export type MentalEdge = typeof mentalEdge.$inferSelect;
+export type Assessment = typeof assessments.$inferSelect;
+export type AssessmentFeedback = typeof assessmentFeedback.$inferSelect;
+
+export type CreateAthleteRequest = z.infer<typeof api.athletes.create.input>;
+export type UpdateAthleteRequest = z.infer<typeof api.athletes.update.input>;
+
+// ============================================
 // HELPER FUNCTIONS
 // ============================================
 export function buildUrl(path: string, params?: Record<string, string | number>): string {

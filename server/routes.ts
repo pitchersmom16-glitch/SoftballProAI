@@ -254,6 +254,23 @@ export async function registerRoutes(
     }
   });
 
+  // Update athlete
+  app.put(api.athletes.update.path, isAuthenticated, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const athlete = await storage.getAthlete(id);
+      if (!athlete) {
+        return res.status(404).json({ message: "Athlete not found" });
+      }
+      const input = api.athletes.update.input.parse(req.body);
+      const updated = await storage.updateAthlete(id, input);
+      res.json(updated);
+    } catch (err) {
+      console.error("Error updating athlete:", err);
+      res.status(500).json({ message: "Failed to update athlete" });
+    }
+  });
+
   // Delete athlete
   app.delete("/api/athletes/:id", isAuthenticated, async (req, res) => {
     try {
