@@ -61,6 +61,9 @@ function Router() {
     return <RoleSelection />;
   }
 
+  // Helper: Check if user is any type of coach
+  const isCoach = user.role === "team_coach" || user.role === "pitching_coach" || user.role?.includes("coach");
+
   // ============================================
   // PLAYER MODE ROUTES
   // ============================================
@@ -148,7 +151,33 @@ function Router() {
   }
 
   // ============================================
-  // DEFAULT COACH VIEW ROUTES
+  // COACH VIEW ROUTES (Any coach role gets admin access)
+  // ============================================
+  if (isCoach) {
+    return (
+      <Layout>
+        <Switch>
+          <Route path="/" component={TeamCoachDashboard} />
+          <Route path="/dashboard" component={TeamCoachDashboard} />
+          <Route path="/athletes" component={Athletes} />
+          <Route path="/teams" component={Teams} />
+          <Route path="/roster" component={SpecialistRoster} />
+          <Route path="/assessments" component={Assessments} />
+          <Route path="/assessments/:id" component={AssessmentDetail} />
+          <Route path="/drills" component={Drills} />
+          <Route path="/admin/train-brain" component={TrainBrain} />
+          <Route path="/admin/upload" component={AdminUpload} />
+          {/* Safety Net: Redirect all unknown routes to dashboard */}
+          <Route path="*">
+            <Redirect to="/dashboard" />
+          </Route>
+        </Switch>
+      </Layout>
+    );
+  }
+
+  // ============================================
+  // DEFAULT VIEW ROUTES (Fallback)
   // ============================================
   return (
     <Layout>
