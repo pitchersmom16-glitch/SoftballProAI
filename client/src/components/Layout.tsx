@@ -1,9 +1,10 @@
 import { Sidebar } from "./Sidebar";
+import { NotificationBell } from "./NotificationBell";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const [location] = useLocation();
   const isLanding = !isAuthenticated && location === "/";
 
@@ -24,6 +25,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-slate-50">
       {isAuthenticated && <Sidebar />}
       <div className={`lg:pl-72 transition-all duration-300 min-h-screen`}>
+        {isAuthenticated && user?.role && (
+          <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-sm border-b border-slate-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-end gap-2">
+              <NotificationBell />
+            </div>
+          </header>
+        )}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {children}
         </main>
