@@ -722,6 +722,78 @@ export async function registerRoutes(
     }
   });
 
+  // Bulk import drills from JSON (Knowledge Base Importer)
+  app.post("/api/admin/import-drills", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      
+      const userId = (req.user as any).claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user || (user.role !== "team_coach" && user.role !== "pitching_coach")) {
+        return res.status(403).json({ message: "Only coaches can import drills" });
+      }
+      
+      const importSchema = z.object({
+        category: z.enum(["Pitching", "Hitting", "Catching", "Throwing", "Biomechanics", "Crossfit"]),
+        drills: z.array(z.object({
+          name: z.string().min(1, "Drill name is required"),
+          description: z.string().min(1, "Description is required"),
+          skillType: z.string().optional(),
+          difficulty: z.string().optional(),
+          videoUrl: z.string().optional(),
+          equipment: z.array(z.string()).optional(),
+          ageRange: z.string().optional(),
+          expertSource: z.string().optional(),
+          mechanicTags: z.array(z.string()).optional(),
+          issueAddressed: z.string().optional(),
+        }))
+      });
+
+      const { category, drills } = importSchema.parse(req.body);
+      
+      let imported = 0;
+      let errors: string[] = [];
+      
+      for (const drill of drills) {
+        try {
+          await storage.createDrill({
+            name: drill.name,
+            category,
+            description: drill.description,
+            skillType: drill.skillType || category.toLowerCase(),
+            difficulty: drill.difficulty,
+            videoUrl: drill.videoUrl,
+            equipment: drill.equipment,
+            ageRange: drill.ageRange,
+            expertSource: drill.expertSource,
+            mechanicTags: drill.mechanicTags,
+            issueAddressed: drill.issueAddressed,
+          });
+          imported++;
+        } catch (err) {
+          errors.push(`Failed to import "${drill.name}": ${err instanceof Error ? err.message : 'Unknown error'}`);
+        }
+      }
+      
+      res.status(201).json({ 
+        message: `Imported ${imported} of ${drills.length} drills`,
+        imported,
+        total: drills.length,
+        errors: errors.length > 0 ? errors : undefined
+      });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Invalid JSON format", 
+          errors: err.errors.map(e => `${e.path.join('.')}: ${e.message}`)
+        });
+      }
+      console.error("Import drills error:", err);
+      res.status(500).json({ message: "Failed to import drills" });
+    }
+  });
+
   // Delete a drill
   app.delete("/api/drills/:id", async (req, res) => {
     try {

@@ -13,6 +13,7 @@ import Assessments from "@/pages/Assessments";
 import AssessmentDetail from "@/pages/AssessmentDetail";
 import Drills from "@/pages/Drills";
 import TrainBrain from "@/pages/TrainBrain";
+import AdminUpload from "@/pages/AdminUpload";
 import RoleSelection from "@/pages/RoleSelection";
 import PlayerDashboard from "@/pages/PlayerDashboard";
 import TeamCoachDashboard from "@/pages/TeamCoachDashboard";
@@ -111,6 +112,7 @@ function Router() {
           <Route path="/assessments/:id" component={AssessmentDetail} />
           <Route path="/drills" component={Drills} />
           <Route path="/admin/train-brain" component={TrainBrain} />
+          <Route path="/admin/upload" component={AdminUpload} />
           {/* Safety Net: Redirect all unknown routes to dashboard */}
           <Route path="*">
             <Redirect to="/dashboard" />
@@ -135,6 +137,7 @@ function Router() {
           <Route path="/assessments/:id" component={AssessmentDetail} />
           <Route path="/drills" component={Drills} />
           <Route path="/admin/train-brain" component={TrainBrain} />
+          <Route path="/admin/upload" component={AdminUpload} />
           {/* Safety Net: Redirect all unknown routes to dashboard */}
           <Route path="*">
             <Redirect to="/dashboard" />
@@ -158,6 +161,7 @@ function Router() {
         <Route path="/assessments/:id" component={AssessmentDetail} />
         <Route path="/drills" component={Drills} />
         <Route path="/admin/train-brain" component={TrainBrain} />
+        <Route path="/admin/upload" component={AdminUpload} />
         {/* Safety Net: Redirect all unknown routes to dashboard */}
         <Route path="*">
           <Redirect to="/dashboard" />

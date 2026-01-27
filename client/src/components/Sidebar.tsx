@@ -9,7 +9,8 @@ import {
   ShieldCheck,
   Menu,
   X,
-  Brain
+  Brain,
+  Database
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ export function Sidebar() {
     { name: 'Drills', href: '/drills', icon: Dumbbell },
     { name: 'Teams', href: '/teams', icon: ShieldCheck },
     { name: 'Train Brain', href: '/admin/train-brain', icon: Brain },
+    { name: 'KB Import', href: '/admin/upload', icon: Database },
   ];
 
   const NavContent = () => (

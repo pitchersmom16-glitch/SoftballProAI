@@ -54,6 +54,7 @@ export interface IStorage {
   createFeedback(feedback: CreateFeedbackRequest): Promise<Feedback>;
   
   // User Role
+  getUser(userId: string): Promise<{ id: string; role: UserRole | null } | undefined>;
   updateUserRole(userId: string, role: UserRole): Promise<void>;
   
   // Player Check-ins
@@ -230,6 +231,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   // User Role
+  async getUser(userId: string): Promise<{ id: string; role: UserRole | null } | undefined> {
+    const result = await db.select({ id: users.id, role: users.role }).from(users).where(eq(users.id, userId));
+    return result[0];
+  }
+  
   async updateUserRole(userId: string, role: UserRole): Promise<void> {
     await db.update(users).set({ role }).where(eq(users.id, userId));
   }
