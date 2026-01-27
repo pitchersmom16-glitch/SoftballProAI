@@ -52,33 +52,33 @@ export default function Landing() {
             {/* The AI Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
               <span className="w-2 h-2 rounded-full bg-brand-blue animate-pulse"/>
-              <span className="text-sm font-medium text-gray-300 tracking-wide">AI-POWERED ACADEMY</span>
+              <span className="text-sm font-medium text-gray-300 tracking-wide">AI-POWERED COACH</span>
             </div>
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-tight">
               The World's First <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-pink to-brand-blue">
-                AI-Powered Softball Academy
+                AI-Powered Softball Coach
               </span>
             </h1>
 
             <p className="text-lg md:text-xl text-gray-400 max-w-2xl leading-relaxed">
-              Master mechanics, mental toughness, and strength with the only AI that sees what the human eye misses. Built specifically for 8U to 16U athletes.
+              Your personal pitching, hitting, and mental performance coach—available 24/7. Built for the 8U to 16U athlete.
             </p>
 
             {/* Feature Bullets */}
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-center gap-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-brand-pink" />
-                <span>Instant Pitching, Hitting & Catching Biometrics</span>
+                <span>Instant Mechanics Analysis</span>
               </li>
               <li className="flex items-center gap-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-brand-pink" />
-                <span>Daily Championship Mindset & Audio Visualization</span>
+                <span>Daily Mindset Coaching</span>
               </li>
               <li className="flex items-center gap-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-brand-pink" />
-                <span>AI-Generated Strength & Conditioning Plans</span>
+                <span>Custom Strength Plans</span>
               </li>
             </ul>
 
