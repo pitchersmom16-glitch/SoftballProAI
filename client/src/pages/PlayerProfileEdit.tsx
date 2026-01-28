@@ -75,6 +75,7 @@ export default function PlayerProfileEdit() {
     weightLbs: number | null;
     bats: string | null;
     throws: string | null;
+    primaryPosition: string | null;
     photoUrl: string | null;
   }>({
     queryKey: ["/api/player/athlete"],
@@ -96,6 +97,7 @@ export default function PlayerProfileEdit() {
       weightLbs: null,
       bats: "",
       throws: "",
+      primaryPosition: "",
     },
     values: playerAthlete ? {
       firstName: playerAthlete.firstName,
@@ -111,6 +113,7 @@ export default function PlayerProfileEdit() {
       weightLbs: playerAthlete.weightLbs,
       bats: playerAthlete.bats || "",
       throws: playerAthlete.throws || "",
+      primaryPosition: playerAthlete.primaryPosition || "",
     } : undefined,
   });
 
@@ -374,6 +377,38 @@ export default function PlayerProfileEdit() {
                   )}
                 />
               </div>
+
+              <FormField
+                control={form.control}
+                name="primaryPosition"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Primary Position</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-position">
+                          <SelectValue placeholder="Select position..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="P">Pitcher (P)</SelectItem>
+                        <SelectItem value="C">Catcher (C)</SelectItem>
+                        <SelectItem value="1B">First Base (1B)</SelectItem>
+                        <SelectItem value="2B">Second Base (2B)</SelectItem>
+                        <SelectItem value="SS">Shortstop (SS)</SelectItem>
+                        <SelectItem value="3B">Third Base (3B)</SelectItem>
+                        <SelectItem value="LF">Left Field (LF)</SelectItem>
+                        <SelectItem value="CF">Center Field (CF)</SelectItem>
+                        <SelectItem value="RF">Right Field (RF)</SelectItem>
+                        <SelectItem value="DP">Designated Player (DP)</SelectItem>
+                        <SelectItem value="FLEX">Flex</SelectItem>
+                        <SelectItem value="UTIL">Utility</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <FormField
