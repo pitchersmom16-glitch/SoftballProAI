@@ -166,6 +166,7 @@ Head coaches can invite players directly to their teams using team-specific refe
 - **Auto Team Assignment**: Players using team links are automatically added to the team's roster
 - **No Baseline Required**: Team players can access their dashboard immediately (unlike Private Instructor Mode)
 - **Write Permissions**: Head coaches have full edit access to all athletes on their team
+- **Invite UI**: Teams page displays referral links with copy button for manual sharing
 
 **Database Fields:**
 - `teams.referralCode` - Unique referral code for each team (e.g., "TEAM_ABC123")
@@ -175,11 +176,13 @@ Head coaches can invite players directly to their teams using team-specific refe
 - `GET /api/coach/teams` - Get all teams for current head coach with referral info
 
 **Registration Flow:**
-1. Head coach generates team referral link via `/api/team/:teamId/referral-code`
+1. Head coach copies team referral link from Teams page "Invite Players" section
 2. Player opens `/register?ref=TEAM_ABC123`
 3. After OAuth login, player calls `POST /api/register/complete` with referralCode
 4. System creates athlete record with teamId assignment
 5. Player's dashboard is immediately unlocked (no baseline videos required)
+
+**Note:** SMS invites are not currently implemented. Twilio integration was skipped. Coaches share referral links manually via copy/paste.
 
 ### Private Instructor Mode
 The Private Instructor workflow is distinct from Team Coach mode, designed for 1-on-1 remote training for Pitching, Hitting & Catching.
