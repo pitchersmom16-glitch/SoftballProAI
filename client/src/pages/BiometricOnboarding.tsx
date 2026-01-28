@@ -3,7 +3,9 @@ import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Video, 
@@ -14,7 +16,9 @@ import {
   AlertCircle,
   Timer,
   ArrowLeft,
-  ArrowRight
+  ArrowRight,
+  TrendingUp,
+  Crosshair
 } from "lucide-react";
 
 type Position = "PITCHER" | "CATCHER" | "INFIELD" | "OUTFIELD" | "HITTER";
@@ -75,15 +79,86 @@ interface UploadedVideo {
   duration: number;
 }
 
+interface GoalMetric {
+  id: string;
+  label: string;
+  unit: string;
+  direction: "increase" | "decrease" | "target";
+  prefix: string;
+}
+
+interface StructuredGoal {
+  metric: string;
+  metricLabel: string;
+  target: number;
+  unit: string;
+  currentBaseline: number | null;
+}
+
+const POSITION_GOAL_METRICS: Record<Position, GoalMetric[]> = {
+  PITCHER: [
+    { id: "velocity", label: "Increase Velocity", unit: "mph", direction: "increase", prefix: "+" },
+    { id: "spin_rate", label: "Improve Spin Rate", unit: "rpm", direction: "increase", prefix: "+" },
+    { id: "strike_zone", label: "Increase Strike Zone %", unit: "%", direction: "target", prefix: "" },
+  ],
+  HITTER: [
+    { id: "exit_velocity", label: "Increase Exit Velocity", unit: "mph", direction: "increase", prefix: "+" },
+    { id: "launch_angle", label: "Improve Launch Angle", unit: "degrees", direction: "target", prefix: "" },
+    { id: "swing_miss", label: "Reduce Swing-and-Miss %", unit: "%", direction: "decrease", prefix: "-" },
+  ],
+  CATCHER: [
+    { id: "pop_time", label: "Improve Pop-Time", unit: "sec", direction: "decrease", prefix: "-" },
+    { id: "blocking_efficiency", label: "Increase Blocking Efficiency", unit: "%", direction: "target", prefix: "" },
+  ],
+  INFIELD: [
+    { id: "lateral_range", label: "Increase Lateral Range", unit: "feet", direction: "increase", prefix: "+" },
+    { id: "throwing_velocity", label: "Improve Throwing Velocity", unit: "mph", direction: "increase", prefix: "+" },
+  ],
+  OUTFIELD: [
+    { id: "lateral_range", label: "Increase Lateral Range", unit: "feet", direction: "increase", prefix: "+" },
+    { id: "throwing_velocity", label: "Improve Throwing Velocity", unit: "mph", direction: "increase", prefix: "+" },
+  ],
+};
+
 export default function BiometricOnboarding() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [step, setStep] = useState<"position" | "goals" | "videos">("position");
   const [selectedPositions, setSelectedPositions] = useState<Position[]>([]);
-  const [seasonGoals, setSeasonGoals] = useState("");
+  const [selectedMetric, setSelectedMetric] = useState<string>("");
+  const [targetValue, setTargetValue] = useState<string>("");
+  const [baselineValue, setBaselineValue] = useState<string>("");
   const [uploadedVideos, setUploadedVideos] = useState<UploadedVideo[]>([]);
   const [uploadingVideo, setUploadingVideo] = useState<number | null>(null);
   const fileInputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({});
+
+  const getAvailableMetrics = (): GoalMetric[] => {
+    if (selectedPositions.length === 0) return [];
+    return POSITION_GOAL_METRICS[selectedPositions[0]] || [];
+  };
+
+  const getSelectedMetricInfo = (): GoalMetric | undefined => {
+    return getAvailableMetrics().find(m => m.id === selectedMetric);
+  };
+
+  const isGoalComplete = (): boolean => {
+    return selectedMetric !== "" && targetValue !== "" && parseFloat(targetValue) > 0;
+  };
+
+  const saveGoalToStorage = () => {
+    const metricInfo = getSelectedMetricInfo();
+    if (!metricInfo) return;
+
+    const structuredGoal: StructuredGoal = {
+      metric: selectedMetric,
+      metricLabel: metricInfo.label,
+      target: parseFloat(targetValue),
+      unit: metricInfo.unit,
+      currentBaseline: baselineValue ? parseFloat(baselineValue) : null,
+    };
+
+    localStorage.setItem("biometricGoal", JSON.stringify(structuredGoal));
+  };
 
   const selectPosition = (pos: Position) => {
     setSelectedPositions([pos]);
@@ -158,7 +233,7 @@ export default function BiometricOnboarding() {
 
   const handleContinueToAuth = () => {
     localStorage.setItem("onboarding_positions", JSON.stringify(selectedPositions));
-    localStorage.setItem("onboarding_goals", seasonGoals);
+    saveGoalToStorage();
     localStorage.setItem("onboarding_videos", JSON.stringify(uploadedVideos.map(v => ({
       number: v.number,
       category: v.category,
@@ -242,6 +317,9 @@ export default function BiometricOnboarding() {
   }
 
   if (step === "goals") {
+    const availableMetrics = getAvailableMetrics();
+    const selectedMetricInfo = getSelectedMetricInfo();
+
     return (
       <div className="min-h-screen bg-[#050505] text-white p-6">
         <div className="max-w-2xl mx-auto">
@@ -262,25 +340,116 @@ export default function BiometricOnboarding() {
             <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent" data-testid="text-goals-title">
               2026 Season Goals
             </h1>
-            <p className="text-gray-400 max-w-md mx-auto">
-              What do you want to accomplish this season? Be specific about your goals.
+          </div>
+
+          {/* Instructional Text */}
+          <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-4 mb-6 flex items-start gap-3">
+            <Crosshair className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
+            <p className="text-gray-300 text-sm" data-testid="text-goal-instruction">
+              Choose a specific, measurable goal. Our AI Biometrics will track your mechanics against these targets to help you reach them faster.
             </p>
           </div>
 
-          <Card className="bg-[#0a0a0a] border-purple-500/30 p-6 mb-6">
-            <Textarea
-              value={seasonGoals}
-              onChange={(e) => setSeasonGoals(e.target.value)}
-              placeholder="Example: I want to increase my pitching velocity by 5 mph, make the varsity team, and improve my change-up location..."
-              className="min-h-[200px] bg-[#0f0f0f] border-gray-700 text-white"
-              data-testid="textarea-goals"
-            />
+          {/* Goal Constructor Card */}
+          <Card className="bg-[#0a0a0a] border-purple-500/30 p-6 mb-6" data-testid="card-goal-constructor">
+            <div className="flex items-center gap-2 mb-6">
+              <TrendingUp className="w-5 h-5 text-pink-400" />
+              <h2 className="text-lg font-semibold text-white">Goal Builder</h2>
+            </div>
+
+            {/* Metric Selection */}
+            <div className="space-y-4">
+              <div>
+                <Label className="text-gray-400 mb-2 block">Select Your Primary Goal</Label>
+                <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+                  <SelectTrigger 
+                    className="bg-[#0f0f0f] border-gray-700 text-white h-12"
+                    data-testid="select-goal-metric"
+                  >
+                    <SelectValue placeholder="Choose a performance metric..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0f0f0f] border-gray-700">
+                    {availableMetrics.map((metric) => (
+                      <SelectItem 
+                        key={metric.id} 
+                        value={metric.id}
+                        className="text-white hover:bg-purple-900/30"
+                      >
+                        {metric.label} ({metric.unit})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {selectedMetricInfo && (
+                <>
+                  {/* Target Value */}
+                  <div>
+                    <Label className="text-gray-400 mb-2 block">
+                      Target {selectedMetricInfo.direction === "increase" ? "Improvement" : selectedMetricInfo.direction === "decrease" ? "Reduction" : "Value"}
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      {selectedMetricInfo.prefix && (
+                        <span className="text-2xl font-bold text-purple-400">{selectedMetricInfo.prefix}</span>
+                      )}
+                      <Input
+                        type="number"
+                        value={targetValue}
+                        onChange={(e) => setTargetValue(e.target.value)}
+                        placeholder="0"
+                        className="bg-[#0f0f0f] border-gray-700 text-white h-12 text-xl font-semibold w-32"
+                        data-testid="input-target-value"
+                      />
+                      <span className="text-gray-400 text-lg">{selectedMetricInfo.unit}</span>
+                    </div>
+                  </div>
+
+                  {/* Current Baseline (Optional) */}
+                  <div>
+                    <Label className="text-gray-400 mb-2 block">
+                      Current Baseline <span className="text-gray-600">(optional)</span>
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        value={baselineValue}
+                        onChange={(e) => setBaselineValue(e.target.value)}
+                        placeholder="Your current value"
+                        className="bg-[#0f0f0f] border-gray-700 text-white h-12 w-40"
+                        data-testid="input-baseline-value"
+                      />
+                      <span className="text-gray-400 text-lg">{selectedMetricInfo.unit}</span>
+                    </div>
+                    <p className="text-gray-500 text-xs mt-1">If you know your current stats, enter them here</p>
+                  </div>
+
+                  {/* Goal Preview */}
+                  {targetValue && parseFloat(targetValue) > 0 && (
+                    <div className="mt-6 p-4 bg-gradient-to-r from-purple-900/30 to-pink-900/30 rounded-lg border border-purple-500/30">
+                      <p className="text-sm text-gray-400 mb-1">Your 2026 Goal:</p>
+                      <p className="text-xl font-bold text-white" data-testid="text-goal-preview">
+                        {selectedMetricInfo.label}: {selectedMetricInfo.prefix}{targetValue} {selectedMetricInfo.unit}
+                        {baselineValue && (
+                          <span className="text-gray-400 text-sm font-normal ml-2">
+                            (from {baselineValue} {selectedMetricInfo.unit})
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </Card>
 
           <div className="text-center">
             <Button
-              onClick={() => setStep("videos")}
-              disabled={!seasonGoals.trim()}
+              onClick={() => {
+                saveGoalToStorage();
+                setStep("videos");
+              }}
+              disabled={!isGoalComplete()}
               className="bg-gradient-to-r from-purple-600 to-pink-600 h-12 px-8"
               data-testid="button-continue-videos"
             >
