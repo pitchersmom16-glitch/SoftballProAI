@@ -33,8 +33,10 @@ Preferred communication style: Simple, everyday language.
 - **Database**: PostgreSQL with Drizzle ORM.
 - **Schema**: `shared/schema.ts` defines all tables.
 - **Migrations**: Drizzle Kit.
-- **Core Entities**: `coaches`, `teams`, `athletes`, `drills`, `mentalEdge`, `assessments`, `assessmentFeedback`.
+- **Core Entities**: `coaches`, `teams`, `athletes`, `drills`, `mentalEdge`, `assessments`, `assessmentFeedback`, `teamStats`, `userSubscriptions`.
 - **Athlete Fields**: `firstName`, `lastName`, `playerPhone`, `parentPhone`, `parentEmail`, `goals`, `preferredTrainingDays`, `graduationYear`, `school`.
+- **Team Stats**: `teamStats` table stores imported GameChanger CSV data with calculated Team ERA, AVG, WHIP, and Quality At-Bats.
+- **Subscriptions**: `userSubscriptions` table tracks Stripe customer IDs, tier, coupon codes, and founding member status.
 
 ### Authentication
 - **Provider**: Replit Auth (OpenID Connect).
