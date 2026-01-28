@@ -26,6 +26,7 @@ import PlayerProfileEdit from "@/pages/PlayerProfileEdit";
 import BiometricOnboarding from "@/pages/BiometricOnboarding";
 import StatsImport from "@/pages/StatsImport";
 import PublicProfile from "@/pages/PublicProfile";
+import Pricing from "@/pages/Pricing";
 import { OnboardingGate } from "@/components/OnboardingGate";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -43,6 +44,7 @@ function Router() {
       <Layout>
         <Switch>
           <Route path="/" component={Landing} />
+          <Route path="/pricing" component={Pricing} />
           <Route path="/onboarding" component={BiometricOnboarding} />
           <Route path="/register" component={Register} />
           <Route path="/profile/:id" component={PublicProfile} />

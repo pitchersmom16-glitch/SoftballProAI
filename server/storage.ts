@@ -3,15 +3,18 @@ import {
   coaches, teams, athletes, drills, assessments, assessmentFeedback, mentalEdge, playerCheckins,
   practicePlans, coachStudents, homeworkAssignments, playerCoachRelationships, coachInvites, playerSettings,
   studentInvites, baselineVideos, playerOnboarding, notifications, gameChangerStats, skeletalAnalysis,
+  teamStats, userSubscriptions,
   type Coach, type Team, type Athlete, type Drill, type Assessment, type Feedback, type MentalEdge, type PlayerCheckin,
   type PracticePlan, type CoachStudent, type HomeworkAssignment, type PlayerCoachRelationship, type CoachInvite, type PlayerSettings,
   type StudentInvite, type BaselineVideo, type PlayerOnboarding, type Notification, type GameChangerStats, type SkeletalAnalysis,
+  type TeamStats, type UserSubscription,
   type CreateCoachRequest, type CreateTeamRequest, type CreateAthleteRequest, 
   type CreateDrillRequest, type CreateMentalEdgeRequest, type CreateAssessmentRequest, type CreateFeedbackRequest,
   type CreatePlayerCheckinRequest, type UpdateAthleteRequest, type UpdateAssessmentRequest,
   type CreatePlayerCoachRelationshipRequest, type CreateCoachInviteRequest, type CreatePlayerSettingsRequest,
   type CreateStudentInviteRequest, type CreateBaselineVideoRequest, type CreatePlayerOnboardingRequest,
-  type CreateNotificationRequest, type CreateGameChangerStatsRequest, type CreateSkeletalAnalysisRequest
+  type CreateNotificationRequest, type CreateGameChangerStatsRequest, type CreateSkeletalAnalysisRequest,
+  type CreateTeamStatsRequest, type CreateUserSubscriptionRequest
 } from "@shared/schema";
 import { users, type UserRole } from "@shared/models/auth";
 import { eq, desc, and } from "drizzle-orm";
@@ -615,6 +618,53 @@ export class DatabaseStorage implements IStorage {
       .where(eq(skeletalAnalysis.userId, userId))
       .orderBy(desc(skeletalAnalysis.createdAt));
     return analysis;
+  }
+
+  // === TEAM STATS ===
+  async createTeamStats(stats: CreateTeamStatsRequest): Promise<TeamStats> {
+    const [newStats] = await db.insert(teamStats).values(stats).returning();
+    return newStats;
+  }
+
+  async getTeamStatsByTeamId(teamId: number): Promise<TeamStats | undefined> {
+    const [stats] = await db.select().from(teamStats)
+      .where(eq(teamStats.teamId, teamId))
+      .orderBy(desc(teamStats.createdAt));
+    return stats;
+  }
+
+  async getTeamStatsByCoachId(coachId: number): Promise<TeamStats[]> {
+    return db.select().from(teamStats)
+      .where(eq(teamStats.coachId, coachId))
+      .orderBy(desc(teamStats.createdAt));
+  }
+
+  // === USER SUBSCRIPTIONS ===
+  async getUserSubscription(userId: string): Promise<UserSubscription | undefined> {
+    const [sub] = await db.select().from(userSubscriptions)
+      .where(eq(userSubscriptions.userId, userId));
+    return sub;
+  }
+
+  async createUserSubscription(sub: CreateUserSubscriptionRequest): Promise<UserSubscription> {
+    const [newSub] = await db.insert(userSubscriptions).values(sub).returning();
+    return newSub;
+  }
+
+  async updateUserSubscription(userId: string, update: Partial<UserSubscription>): Promise<UserSubscription> {
+    const [updated] = await db.update(userSubscriptions)
+      .set(update)
+      .where(eq(userSubscriptions.userId, userId))
+      .returning();
+    return updated;
+  }
+
+  async upsertUserSubscription(sub: CreateUserSubscriptionRequest): Promise<UserSubscription> {
+    const existing = await this.getUserSubscription(sub.userId);
+    if (existing) {
+      return this.updateUserSubscription(sub.userId, sub);
+    }
+    return this.createUserSubscription(sub);
   }
 }
 

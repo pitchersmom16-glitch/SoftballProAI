@@ -7,6 +7,8 @@ import { setupAuth, registerAuthRoutes, isAuthenticated } from "./replit_integra
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 import { openai } from "./replit_integrations/audio"; // Use the audio client for openai instance
 import { analyzeMechanics, getCorrectiveDrills, getDrillsByTag, getDrillsByExpert } from "./brain/analyze_mechanics";
+import { stripeService } from "./stripeService";
+import { getStripePublishableKey, getUncachableStripeClient } from "./stripeClient";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -2262,6 +2264,311 @@ export async function registerRoutes(
         { metric: "spin_rate", metricLabel: "Improve Spin Rate", target: 200, unit: "rpm", currentBaseline: 1800, progress: 45 },
         { metric: "strike_zone", metricLabel: "Strike Zone %", target: 70, unit: "%", currentBaseline: 62, progress: 75 },
       ]);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // === STRIPE PAYMENT ROUTES ===
+
+  // Get Stripe publishable key
+  app.get("/api/stripe/config", async (req, res) => {
+    try {
+      const publishableKey = await getStripePublishableKey();
+      res.json({ publishableKey });
+    } catch (err) {
+      console.error("Failed to get Stripe config:", err);
+      res.status(500).json({ message: "Stripe not configured" });
+    }
+  });
+
+  // List products with prices
+  app.get("/api/stripe/products", async (req, res) => {
+    try {
+      const products = await stripeService.listProductsWithPrices();
+      const productsMap = new Map();
+      for (const row of products) {
+        if (!productsMap.has(row.product_id)) {
+          productsMap.set(row.product_id, {
+            id: row.product_id,
+            name: row.product_name,
+            description: row.product_description,
+            active: row.product_active,
+            metadata: row.product_metadata,
+            prices: []
+          });
+        }
+        if (row.price_id) {
+          productsMap.get(row.product_id).prices.push({
+            id: row.price_id,
+            unit_amount: row.unit_amount,
+            currency: row.currency,
+            recurring: row.recurring,
+            active: row.price_active,
+            metadata: row.price_metadata,
+          });
+        }
+      }
+      res.json(Array.from(productsMap.values()));
+    } catch (err) {
+      console.error("Failed to list products:", err);
+      res.status(500).json({ message: "Failed to list products" });
+    }
+  });
+
+  // Validate coupon code
+  app.post("/api/stripe/validate-coupon", async (req, res) => {
+    try {
+      const { code } = req.body;
+      if (!code) {
+        return res.status(400).json({ valid: false, message: "Coupon code required" });
+      }
+
+      const coupon = await stripeService.validateCoupon(code.toUpperCase());
+      if (coupon) {
+        res.json({
+          valid: true,
+          percentOff: coupon.percent_off,
+          amountOff: coupon.amount_off,
+          badge: coupon.metadata?.badge || null
+        });
+      } else {
+        res.json({ valid: false });
+      }
+    } catch (err) {
+      console.error("Coupon validation error:", err);
+      res.json({ valid: false });
+    }
+  });
+
+  // Create checkout session
+  app.post("/api/stripe/checkout", isAuthenticated, async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const userClaims = (req.user as any).claims;
+      const { tier, couponCode } = req.body;
+
+      if (!tier) {
+        return res.status(400).json({ message: "Tier is required" });
+      }
+
+      // Map tier to metadata for finding the right price
+      const products = await stripeService.listProductsWithPrices();
+      
+      // Find the product for this tier
+      let priceId: string | null = null;
+      for (const row of products) {
+        const metadata = (row as any).product_metadata;
+        if (metadata?.tier === tier && (row as any).price_id) {
+          priceId = String((row as any).price_id);
+          break;
+        }
+      }
+
+      if (!priceId) {
+        return res.status(400).json({ message: "Invalid tier" });
+      }
+
+      // Get or create Stripe customer
+      let subscription = await storage.getUserSubscription(userId);
+      let customerId = subscription?.stripeCustomerId;
+
+      if (!customerId) {
+        const email = userClaims.email || `${userId}@example.com`;
+        const name = `${userClaims.first_name || ''} ${userClaims.last_name || ''}`.trim() || undefined;
+        const customer = await stripeService.createCustomer(email, userId, name);
+        customerId = customer.id;
+        
+        // Save customer ID
+        await storage.upsertUserSubscription({
+          userId,
+          stripeCustomerId: customerId,
+          tier: tier,
+        });
+      }
+
+      const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+      const session = await stripeService.createCheckoutSession(
+        customerId,
+        priceId,
+        `${baseUrl}/dashboard?checkout=success`,
+        `${baseUrl}/pricing?checkout=cancelled`,
+        couponCode
+      );
+
+      // If using DONOR100, mark as founding member
+      if (couponCode?.toUpperCase() === 'DONOR100') {
+        await storage.upsertUserSubscription({
+          userId,
+          stripeCustomerId: customerId,
+          tier: tier,
+          couponCode: 'DONOR100',
+          isFoundingMember: true,
+        });
+      }
+
+      res.json({ url: session.url });
+    } catch (err) {
+      console.error("Checkout error:", err);
+      res.status(500).json({ message: "Failed to create checkout session" });
+    }
+  });
+
+  // Get user subscription status
+  app.get("/api/stripe/subscription", isAuthenticated, async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
+      const subscription = await storage.getUserSubscription(userId);
+      res.json(subscription || { status: "none" });
+    } catch (err) {
+      console.error("Subscription fetch error:", err);
+      res.status(500).json({ message: "Failed to get subscription" });
+    }
+  });
+
+  // Create customer portal session
+  app.post("/api/stripe/portal", isAuthenticated, async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
+      const subscription = await storage.getUserSubscription(userId);
+      if (!subscription?.stripeCustomerId) {
+        return res.status(400).json({ message: "No subscription found" });
+      }
+
+      const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+      const session = await stripeService.createCustomerPortalSession(
+        subscription.stripeCustomerId,
+        `${baseUrl}/dashboard`
+      );
+
+      res.json({ url: session.url });
+    } catch (err) {
+      console.error("Portal error:", err);
+      res.status(500).json({ message: "Failed to create portal session" });
+    }
+  });
+
+  // === TEAM STATS IMPORT ===
+  
+  // Import team stats from CSV
+  app.post("/api/team-stats/import", isAuthenticated, async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
+      const coach = await storage.getCoachByUserId(userId);
+      if (!coach) {
+        return res.status(403).json({ message: "Coach account required" });
+      }
+
+      const { teamId, csvData, season } = req.body;
+      if (!csvData) {
+        return res.status(400).json({ message: "CSV data required" });
+      }
+
+      // Parse CSV data to extract team-level stats
+      const rows = csvData.split('\n').filter((r: string) => r.trim());
+      if (rows.length < 2) {
+        return res.status(400).json({ message: "Invalid CSV format" });
+      }
+
+      const headers = rows[0].split(',').map((h: string) => h.trim().toLowerCase());
+      const dataRows = rows.slice(1);
+
+      // Calculate aggregate team stats
+      let totalAvg = 0, totalOps = 0, totalEra = 0, totalWhip = 0, qabCount = 0;
+      let avgCount = 0, opsCount = 0, eraCount = 0, whipCount = 0;
+
+      for (const row of dataRows) {
+        const values = row.split(',').map((v: string) => v.trim());
+        const record: any = {};
+        headers.forEach((h: string, i: number) => {
+          record[h] = values[i];
+        });
+
+        // Batting stats
+        if (record.avg && !isNaN(parseFloat(record.avg))) {
+          totalAvg += parseFloat(record.avg);
+          avgCount++;
+        }
+        if (record.ops && !isNaN(parseFloat(record.ops))) {
+          totalOps += parseFloat(record.ops);
+          opsCount++;
+        }
+        
+        // Pitching stats
+        if (record.era && !isNaN(parseFloat(record.era))) {
+          totalEra += parseFloat(record.era);
+          eraCount++;
+        }
+        if (record.whip && !isNaN(parseFloat(record.whip))) {
+          totalWhip += parseFloat(record.whip);
+          whipCount++;
+        }
+
+        // Quality at-bats (estimate based on OPS > .700 or AVG > .300)
+        const playerOps = parseFloat(record.ops) || 0;
+        const playerAvg = parseFloat(record.avg) || 0;
+        if (playerOps > 0.700 || playerAvg > 0.300) {
+          qabCount += parseInt(record.ab || record.games_played || '10');
+        }
+      }
+
+      const teamStatsData = {
+        teamId: teamId || null,
+        coachId: coach.id,
+        season: season || `${new Date().getFullYear()} Season`,
+        gamesPlayed: dataRows.length,
+        teamAvg: avgCount > 0 ? (totalAvg / avgCount).toFixed(3) : null,
+        teamOps: opsCount > 0 ? (totalOps / opsCount).toFixed(3) : null,
+        teamEra: eraCount > 0 ? (totalEra / eraCount).toFixed(2) : null,
+        teamWhip: whipCount > 0 ? (totalWhip / whipCount).toFixed(2) : null,
+        totalQualityAtBats: qabCount,
+        rawData: { headers, rowCount: dataRows.length },
+      };
+
+      const stats = await storage.createTeamStats(teamStatsData);
+      res.status(201).json(stats);
+    } catch (err) {
+      console.error("Team stats import error:", err);
+      res.status(500).json({ message: "Failed to import team stats" });
+    }
+  });
+
+  // Get team stats by team ID
+  app.get("/api/team-stats/:teamId", isAuthenticated, async (req, res) => {
+    try {
+      const teamIdParam = req.params.teamId;
+      const teamId = parseInt(typeof teamIdParam === 'string' ? teamIdParam : teamIdParam[0]);
+      if (isNaN(teamId)) {
+        return res.status(400).json({ message: "Invalid team ID" });
+      }
+      
+      const stats = await storage.getTeamStatsByTeamId(teamId);
+      res.json(stats || null);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Get team stats for coach
+  app.get("/api/coach/team-stats", isAuthenticated, async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      
+      const coach = await storage.getCoachByUserId(userId);
+      if (!coach) {
+        return res.json([]);
+      }
+      
+      const stats = await storage.getTeamStatsByCoachId(coach.id);
+      res.json(stats);
     } catch (err) {
       throw err;
     }

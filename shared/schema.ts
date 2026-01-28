@@ -490,3 +490,46 @@ export type UpdateAthleteRequest = Partial<CreateAthleteRequest>;
 export type UpdateAssessmentRequest = Partial<CreateAssessmentRequest> & { status?: string, metrics?: any };
 export type UpdateHomeworkRequest = Partial<CreateHomeworkRequest> & { status?: string, completedAt?: Date };
 
+// Team Stats Import - Aggregated team-level statistics from GameChanger CSV
+export const teamStats = pgTable("team_stats", {
+  id: serial("id").primaryKey(),
+  teamId: integer("team_id").references(() => teams.id),
+  coachId: integer("coach_id").references(() => coaches.id),
+  season: text("season"), // e.g., "Fall 2025", "Spring 2026"
+  gamesPlayed: integer("games_played"),
+  // Team-level batting stats
+  teamAvg: numeric("team_avg"), // Team Batting Average
+  teamOps: numeric("team_ops"), // Team OPS
+  totalQualityAtBats: integer("total_quality_at_bats"), // QAB count
+  // Team-level pitching stats
+  teamEra: numeric("team_era"), // Team ERA
+  teamWhip: numeric("team_whip"), // Team WHIP
+  // Raw data
+  rawData: jsonb("raw_data"), // Store aggregated CSV data
+  importedAt: timestamp("imported_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User Subscription Info - Tracks subscription tier and founding member status
+export const userSubscriptions = pgTable("user_subscriptions", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id).unique(),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  tier: text("tier"), // "basic", "elite", "coach"
+  couponCode: text("coupon_code"), // Applied coupon code
+  isFoundingMember: boolean("is_founding_member").default(false),
+  status: text("status").default("inactive"), // "active", "inactive", "cancelled", "past_due"
+  currentPeriodEnd: timestamp("current_period_end"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertTeamStatsSchema = createInsertSchema(teamStats).omit({ id: true, createdAt: true, importedAt: true });
+export const insertUserSubscriptionSchema = createInsertSchema(userSubscriptions).omit({ id: true, createdAt: true, updatedAt: true });
+
+export type TeamStats = typeof teamStats.$inferSelect;
+export type UserSubscription = typeof userSubscriptions.$inferSelect;
+export type CreateTeamStatsRequest = z.infer<typeof insertTeamStatsSchema>;
+export type CreateUserSubscriptionRequest = z.infer<typeof insertUserSubscriptionSchema>;
+

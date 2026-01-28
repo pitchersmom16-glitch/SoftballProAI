@@ -15,7 +15,7 @@ export default function Landing() {
           </div>
           <div className="flex items-center gap-4">
             <Link href="/auth" className="text-sm font-medium text-gray-400 hover:text-white transition-colors" data-testid="link-signin">Sign In</Link>
-            <Link href="/onboarding">
+            <Link href="/pricing">
               <button className="px-5 py-2.5 rounded-full btn-primary-glow text-sm" data-testid="button-get-started">
                 Get Started
               </button>
@@ -84,15 +84,15 @@ export default function Landing() {
 
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Link href="/onboarding">
+              <Link href="/pricing">
                 <Button 
                   className="h-14 px-8 text-lg bg-gradient-to-r from-brand-pink to-purple-600 transition-all shadow-[0_0_20px_rgba(236,72,153,0.3)]"
                   data-testid="button-analyze-video"
                 >
-                  Analyze My Video
+                  Start Free Trial
                 </Button>
               </Link>
-              <Link href="/auth?role=coach">
+              <Link href="/pricing">
                 <Button 
                   variant="outline" 
                   className="h-14 px-8 text-lg border-white/20 text-white backdrop-blur-md"

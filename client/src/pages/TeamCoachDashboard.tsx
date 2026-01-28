@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -20,9 +20,12 @@ import {
   Dumbbell,
   Activity,
   ChevronRight,
-  Trash2
+  Trash2,
+  Upload,
+  BarChart3,
+  FileSpreadsheet
 } from "lucide-react";
-import type { Team, Athlete, PracticePlan } from "@shared/schema";
+import type { Team, Athlete, PracticePlan, TeamStats } from "@shared/schema";
 
 interface RosterHealthData {
   athlete: Athlete;
@@ -52,6 +55,8 @@ export default function TeamCoachDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showPracticeBuilder, setShowPracticeBuilder] = useState(false);
+  const [showStatsImport, setShowStatsImport] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [practiceData, setPracticeData] = useState({
     name: "",
     duration: 90,
@@ -74,6 +79,10 @@ export default function TeamCoachDashboard() {
 
   const { data: rosterHealth } = useQuery<RosterHealthData[]>({
     queryKey: ["/api/roster-health"],
+  });
+
+  const { data: teamStats } = useQuery<TeamStats[]>({
+    queryKey: ["/api/coach/team-stats"],
   });
 
   const createPracticeMutation = useMutation({
@@ -103,6 +112,44 @@ export default function TeamCoachDashboard() {
       });
     },
   });
+
+  const importStatsMutation = useMutation({
+    mutationFn: async (csvData: string) => {
+      const teamId = teams?.[0]?.id;
+      return apiRequest("POST", "/api/team-stats/import", {
+        teamId,
+        csvData,
+        season: `${new Date().getFullYear()} Season`
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/coach/team-stats"] });
+      setShowStatsImport(false);
+      toast({
+        title: "Team Stats Imported!",
+        description: "Your team statistics have been calculated.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Import Failed",
+        description: "Could not parse the CSV file. Please check the format.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const csvData = event.target?.result as string;
+      importStatsMutation.mutate(csvData);
+    };
+    reader.readAsText(file);
+  };
 
   const healthData = rosterHealth || [];
   const healthyCount = healthData.filter(r => r.healthStatus === "healthy").length;
@@ -134,6 +181,23 @@ export default function TeamCoachDashboard() {
             </p>
           </div>
           <div className="flex gap-3">
+            <input
+              type="file"
+              accept=".csv"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <Button 
+              variant="outline" 
+              className="border-neon-green/50 text-neon-green hover-elevate"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={importStatsMutation.isPending}
+              data-testid="button-import-team-stats"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              {importStatsMutation.isPending ? "Importing..." : "Import Team Stats"}
+            </Button>
             <Link href="/teams">
               <Button 
                 variant="outline" 
@@ -145,6 +209,112 @@ export default function TeamCoachDashboard() {
               </Button>
             </Link>
           </div>
+        </div>
+
+        {/* Team Stats Summary */}
+        {teamStats && teamStats.length > 0 && (
+          <Card className="p-6 bg-card border-neon-green/30">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 rounded-lg bg-neon-green/20">
+                <BarChart3 className="w-6 h-6 text-neon-green" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">Season Stats Summary</h2>
+                <p className="text-sm text-muted-foreground">{teamStats[0].season}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="p-4 rounded-lg bg-background border border-border">
+                <p className="text-sm text-muted-foreground">Team ERA</p>
+                <p className="text-2xl font-bold text-neon-green">{teamStats[0].teamEra || "--"}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-background border border-border">
+                <p className="text-sm text-muted-foreground">Team AVG</p>
+                <p className="text-2xl font-bold text-neon-pink">{teamStats[0].teamAvg || "--"}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-background border border-border">
+                <p className="text-sm text-muted-foreground">Team WHIP</p>
+                <p className="text-2xl font-bold text-neon-yellow">{teamStats[0].teamWhip || "--"}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-background border border-border">
+                <p className="text-sm text-muted-foreground">Quality At-Bats</p>
+                <p className="text-2xl font-bold text-neon-blue">{teamStats[0].totalQualityAtBats || 0}</p>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Position-Specific Biomechanics Metrics */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Hitting Metrics - Exit Velocity Focus */}
+          <Card className="p-6 bg-card border-neon-pink/30">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 rounded-lg bg-gradient-to-r from-pink-500/30 to-red-500/30">
+                <Activity className="w-6 h-6 text-neon-pink" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold">Hitting Analytics</h2>
+                <p className="text-xs text-muted-foreground">AI-powered swing analysis</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 rounded-lg bg-background border border-border text-center">
+                <p className="text-xs text-muted-foreground">Avg Exit Velo</p>
+                <p className="text-xl font-bold text-neon-pink" data-testid="metric-exit-velocity">--</p>
+                <p className="text-xs text-muted-foreground">mph</p>
+              </div>
+              <div className="p-3 rounded-lg bg-background border border-border text-center">
+                <p className="text-xs text-muted-foreground">Launch Angle</p>
+                <p className="text-xl font-bold text-neon-green" data-testid="metric-launch-angle">--</p>
+                <p className="text-xs text-muted-foreground">degrees</p>
+              </div>
+              <div className="p-3 rounded-lg bg-background border border-border text-center">
+                <p className="text-xs text-muted-foreground">Bat Speed</p>
+                <p className="text-xl font-bold text-neon-yellow" data-testid="metric-bat-speed">--</p>
+                <p className="text-xs text-muted-foreground">mph</p>
+              </div>
+              <div className="p-3 rounded-lg bg-background border border-border text-center">
+                <p className="text-xs text-muted-foreground">Swing Path</p>
+                <p className="text-xl font-bold text-neon-blue" data-testid="metric-swing-path">--</p>
+                <p className="text-xs text-muted-foreground">efficiency</p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Catching Metrics - Pop-time Focus */}
+          <Card className="p-6 bg-card border-neon-yellow/30">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 rounded-lg bg-gradient-to-r from-yellow-500/30 to-orange-500/30">
+                <Target className="w-6 h-6 text-neon-yellow" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold">Catching Analytics</h2>
+                <p className="text-xs text-muted-foreground">Defense & transfer speed</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 rounded-lg bg-background border border-border text-center">
+                <p className="text-xs text-muted-foreground">Avg Pop-time</p>
+                <p className="text-xl font-bold text-neon-yellow" data-testid="metric-pop-time">--</p>
+                <p className="text-xs text-muted-foreground">seconds</p>
+              </div>
+              <div className="p-3 rounded-lg bg-background border border-border text-center">
+                <p className="text-xs text-muted-foreground">Transfer Speed</p>
+                <p className="text-xl font-bold text-neon-pink" data-testid="metric-transfer-speed">--</p>
+                <p className="text-xs text-muted-foreground">ms</p>
+              </div>
+              <div className="p-3 rounded-lg bg-background border border-border text-center">
+                <p className="text-xs text-muted-foreground">Block Rate</p>
+                <p className="text-xl font-bold text-neon-green" data-testid="metric-block-rate">--</p>
+                <p className="text-xs text-muted-foreground">%</p>
+              </div>
+              <div className="p-3 rounded-lg bg-background border border-border text-center">
+                <p className="text-xs text-muted-foreground">Framing Grade</p>
+                <p className="text-xl font-bold text-neon-blue" data-testid="metric-framing-grade">--</p>
+                <p className="text-xs text-muted-foreground">AI Rating</p>
+              </div>
+            </div>
+          </Card>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

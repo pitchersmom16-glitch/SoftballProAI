@@ -21,7 +21,11 @@ import {
   Target,
   Play,
   MessageSquare,
-  Eye
+  Eye,
+  Gauge,
+  CircleDot,
+  TrendingUp,
+  Zap
 } from "lucide-react";
 import type { Athlete, HomeworkAssignment, CoachStudent, Drill } from "@shared/schema";
 
@@ -191,6 +195,52 @@ export default function PitchingCoachDashboard() {
             </div>
           </Card>
         </div>
+
+        {/* PITCHING METRICS - Position-Specific Dashboard */}
+        <Card className="p-6 bg-card border-neon-yellow/30">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 rounded-lg bg-gradient-to-r from-purple-600/30 to-pink-500/30">
+              <Gauge className="w-6 h-6 text-neon-pink" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">Pitching Biomechanics Dashboard</h2>
+              <p className="text-sm text-muted-foreground">Position-specific metrics from AI analysis</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="p-4 rounded-lg bg-background border border-border text-center">
+              <CircleDot className="w-8 h-8 mx-auto mb-2 text-neon-pink" />
+              <p className="text-sm text-muted-foreground mb-1">Arm Circle Speed</p>
+              <p className="text-2xl font-bold text-neon-pink" data-testid="metric-arm-circle-speed">--</p>
+              <p className="text-xs text-muted-foreground">deg/sec</p>
+            </div>
+            <div className="p-4 rounded-lg bg-background border border-border text-center">
+              <TrendingUp className="w-8 h-8 mx-auto mb-2 text-neon-green" />
+              <p className="text-sm text-muted-foreground mb-1">Stride Length</p>
+              <p className="text-2xl font-bold text-neon-green" data-testid="metric-stride-length">--</p>
+              <p className="text-xs text-muted-foreground">% of height</p>
+            </div>
+            <div className="p-4 rounded-lg bg-background border border-border text-center">
+              <Zap className="w-8 h-8 mx-auto mb-2 text-neon-yellow" />
+              <p className="text-sm text-muted-foreground mb-1">Hip-Shoulder Sep.</p>
+              <p className="text-2xl font-bold text-neon-yellow" data-testid="metric-hip-shoulder">--</p>
+              <p className="text-xs text-muted-foreground">degrees</p>
+            </div>
+            <div className="p-4 rounded-lg bg-background border border-border text-center">
+              <Target className="w-8 h-8 mx-auto mb-2 text-neon-blue" />
+              <p className="text-sm text-muted-foreground mb-1">Drag Foot Grade</p>
+              <p className="text-2xl font-bold text-neon-blue" data-testid="metric-drag-foot">--</p>
+              <p className="text-xs text-muted-foreground">AI Rating</p>
+            </div>
+          </div>
+
+          <div className="mt-4 text-center">
+            <p className="text-sm text-muted-foreground">
+              Metrics update automatically when students submit baseline videos for analysis
+            </p>
+          </div>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="p-6 bg-card border-neon-yellow/20 hover-elevate col-span-2">
