@@ -1654,11 +1654,15 @@ export async function registerRoutes(
           await storage.updatePlayerSettings(userId, { subscriptionMode: "coached" });
         }
         
+        // CRITICAL: Set user role to "player" so they skip role selection
+        await storage.updateUserRole(userId, "player");
+        
         return res.json({ 
           message: "Welcome to the team! You're all set.",
           requiresBaseline: false,
           coachId,
-          teamId
+          teamId,
+          role: "player"
         });
       }
       

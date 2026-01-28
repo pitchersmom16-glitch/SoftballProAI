@@ -103,6 +103,12 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
   app.get("/api/login", (req, res, next) => {
+    // Store the return URL in session for post-login redirect
+    // Security: Only allow relative paths starting with "/" to prevent open redirect
+    const returnTo = req.query.returnTo as string;
+    if (returnTo && req.session && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
+      (req.session as any).returnTo = returnTo;
+    }
     ensureStrategy(req.hostname);
     passport.authenticate(`replitauth:${req.hostname}`, {
       prompt: "login consent",
@@ -113,9 +119,19 @@ export async function setupAuth(app: Express) {
   app.get("/api/callback", (req, res, next) => {
     ensureStrategy(req.hostname);
     passport.authenticate(`replitauth:${req.hostname}`, {
-      successReturnToOrRedirect: "/",
       failureRedirect: "/api/login",
-    })(req, res, next);
+    })(req, res, () => {
+      // Check for stored return URL, otherwise redirect to home
+      // Security: Validate returnTo is a safe relative path
+      let returnTo = (req.session as any)?.returnTo || "/";
+      delete (req.session as any)?.returnTo;
+      
+      // Double-check: only redirect to relative paths
+      if (!returnTo.startsWith("/") || returnTo.startsWith("//")) {
+        returnTo = "/";
+      }
+      res.redirect(returnTo);
+    });
   });
 
   app.get("/api/logout", (req, res) => {

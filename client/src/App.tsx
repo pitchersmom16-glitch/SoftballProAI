@@ -60,7 +60,13 @@ function Router() {
   // ROLE SELECTION (Logged in but no role)
   // ============================================
   if (!user.role) {
-    return <RoleSelection />;
+    // Allow /register route for team referral flow, otherwise show role selection
+    return (
+      <Switch>
+        <Route path="/register" component={Register} />
+        <Route path="*" component={RoleSelection} />
+      </Switch>
+    );
   }
 
   // Helper: Check if user is any type of coach

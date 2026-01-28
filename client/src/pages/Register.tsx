@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,11 +59,13 @@ export default function Register() {
         primaryPosition: primaryPosition || undefined,
       });
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       setRegistrationStep("done");
+      // Invalidate user cache so the new role is picked up
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       setTimeout(() => {
-        // Team players go to dashboard, Private Instructor students go to onboarding
-        setLocation(isTeamReferral ? "/" : "/player/onboarding");
+        // Team players go to profile to complete setup, Private Instructor students go to onboarding
+        setLocation(isTeamReferral ? "/profile" : "/player/onboarding");
       }, 2000);
     },
     onError: () => {
@@ -145,7 +147,7 @@ export default function Register() {
             }
           </p>
           <p className="text-purple-400">
-            {isTeamReferral ? "Redirecting to your dashboard..." : "Redirecting to your onboarding..."}
+            {isTeamReferral ? "Redirecting to complete your profile..." : "Redirecting to your onboarding..."}
           </p>
         </Card>
       </div>
@@ -270,7 +272,17 @@ export default function Register() {
 
         {!user ? (
           <Button
-            onClick={() => window.location.href = "/api/login"}
+            onClick={() => {
+              // Store the referral code in localStorage before login so we can recover after redirect
+              if (referralCode) {
+                localStorage.setItem("pendingTeamReferral", referralCode);
+              } else if (inviteToken) {
+                localStorage.setItem("pendingInviteToken", inviteToken);
+              }
+              // Pass the current URL as returnTo so user comes back here after login
+              const returnTo = encodeURIComponent(window.location.pathname + window.location.search);
+              window.location.href = `/api/login?returnTo=${returnTo}`;
+            }}
             className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-lg py-6"
             data-testid="button-login-register"
           >

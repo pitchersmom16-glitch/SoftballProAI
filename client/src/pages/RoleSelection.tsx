@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -61,6 +62,27 @@ const roles = [
 export default function RoleSelection() {
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
+
+  // Check for pending referral codes in localStorage - redirect back to register if found
+  useEffect(() => {
+    const pendingReferral = localStorage.getItem("pendingTeamReferral");
+    const pendingInvite = localStorage.getItem("pendingInviteToken");
+    
+    if (pendingReferral) {
+      // Clear and redirect to register with the referral code
+      localStorage.removeItem("pendingTeamReferral");
+      setLocation(`/register?ref=${pendingReferral}`);
+      return;
+    }
+    
+    if (pendingInvite) {
+      // Clear and redirect to register with the invite token
+      localStorage.removeItem("pendingInviteToken");
+      setLocation(`/register?invite=${pendingInvite}`);
+      return;
+    }
+  }, [setLocation]);
 
   const setRoleMutation = useMutation({
     mutationFn: async (role: UserRole) => {

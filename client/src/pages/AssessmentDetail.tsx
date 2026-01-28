@@ -111,13 +111,14 @@ export default function AssessmentDetail() {
             
             <div className="grid grid-cols-2 gap-4">
               {assessment.metrics && typeof assessment.metrics === 'object' && 
-                Object.entries(assessment.metrics as Record<string, string | number>).map(([key, val]) => (
-                <div key={key} className="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl">
-                  <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">{key}</p>
-                  <p className="text-xl font-bold">{String(val)}</p>
-                </div>
-              ))}
-              {(!assessment.metrics || (typeof assessment.metrics === 'object' && Object.keys(assessment.metrics as object).length === 0)) && (
+                Object.keys(assessment.metrics as Record<string, unknown>).length > 0 ? (
+                  Object.entries(assessment.metrics as Record<string, unknown>).map(([key, val]) => (
+                    <div key={key} className="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl">
+                      <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">{key}</p>
+                      <p className="text-xl font-bold">{String(val)}</p>
+                    </div>
+                  ))
+                ) : (
                 <div className="col-span-2 text-center py-4 text-slate-400 text-sm">
                   Play video to see live analysis
                 </div>
