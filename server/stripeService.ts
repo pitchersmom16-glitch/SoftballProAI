@@ -51,6 +51,34 @@ export class StripeService {
   }
 
   async validateCoupon(code: string): Promise<any | null> {
+    // Local coupon definitions for testing - bypass Stripe check
+    const localCoupons: Record<string, any> = {
+      'DONOR100': {
+        id: 'DONOR100',
+        valid: true,
+        percent_off: 100,
+        amount_off: null,
+        duration: 'forever',
+        metadata: { badge: 'founding_member' }
+      },
+      'FRIEND50': {
+        id: 'FRIEND50',
+        valid: true,
+        percent_off: 50,
+        amount_off: null,
+        duration: 'forever',
+        metadata: {}
+      }
+    };
+
+    const upperCode = code.toUpperCase();
+    
+    // Check local coupons first (bypass Stripe for testing)
+    if (localCoupons[upperCode]) {
+      return localCoupons[upperCode];
+    }
+
+    // Fall back to Stripe API for other coupons
     const stripe = await getUncachableStripeClient();
     try {
       const coupon = await stripe.coupons.retrieve(code);
