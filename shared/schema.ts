@@ -443,6 +443,49 @@ export type CreateBaselineVideoRequest = z.infer<typeof insertBaselineVideoSchem
 export type CreatePlayerOnboardingRequest = z.infer<typeof insertPlayerOnboardingSchema>;
 export type CreateNotificationRequest = z.infer<typeof insertNotificationSchema>;
 
+// GameChanger Stats Import - Stores parsed CSV data from GameChanger exports
+export const gameChangerStats = pgTable("game_changer_stats", {
+  id: serial("id").primaryKey(),
+  athleteId: integer("athlete_id").references(() => athletes.id),
+  userId: text("user_id").references(() => users.id),
+  season: text("season"), // e.g., "Fall 2025", "Spring 2026"
+  gamesPlayed: integer("games_played"),
+  // Hitting stats
+  avg: numeric("avg"), // Batting Average
+  ops: numeric("ops"), // On-base Plus Slugging
+  exitVelocity: numeric("exit_velocity"), // Exit Velocity (mph)
+  // Pitching stats
+  era: numeric("era"), // Earned Run Average
+  whip: numeric("whip"), // Walks + Hits per Inning Pitched
+  kPercent: numeric("k_percent"), // Strikeout Percentage
+  firstPitchStrikePercent: numeric("first_pitch_strike_percent"), // First Pitch Strike %
+  // Raw CSV data for reference
+  rawData: jsonb("raw_data"), // Store full CSV row
+  importedAt: timestamp("imported_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// AI Skeletal Analysis Results - Stores biomechanical highlights for recruiting
+export const skeletalAnalysis = pgTable("skeletal_analysis", {
+  id: serial("id").primaryKey(),
+  athleteId: integer("athlete_id").references(() => athletes.id),
+  userId: text("user_id").references(() => users.id),
+  assessmentId: integer("assessment_id").references(() => assessments.id),
+  skillType: text("skill_type").notNull(), // "PITCHING", "HITTING", etc.
+  highlights: text("highlights").array(), // e.g., ["Elite Arm Circle Speed", "Strong Knee Drive"]
+  metrics: jsonb("metrics"), // Detailed measurements
+  overallGrade: text("overall_grade"), // A, B, C, D
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertGameChangerStatsSchema = createInsertSchema(gameChangerStats).omit({ id: true, createdAt: true, importedAt: true });
+export const insertSkeletalAnalysisSchema = createInsertSchema(skeletalAnalysis).omit({ id: true, createdAt: true });
+
+export type GameChangerStats = typeof gameChangerStats.$inferSelect;
+export type SkeletalAnalysis = typeof skeletalAnalysis.$inferSelect;
+export type CreateGameChangerStatsRequest = z.infer<typeof insertGameChangerStatsSchema>;
+export type CreateSkeletalAnalysisRequest = z.infer<typeof insertSkeletalAnalysisSchema>;
+
 export type UpdateAthleteRequest = Partial<CreateAthleteRequest>;
 export type UpdateAssessmentRequest = Partial<CreateAssessmentRequest> & { status?: string, metrics?: any };
 export type UpdateHomeworkRequest = Partial<CreateHomeworkRequest> & { status?: string, completedAt?: Date };

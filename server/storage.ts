@@ -2,16 +2,16 @@ import { db } from "./db";
 import { 
   coaches, teams, athletes, drills, assessments, assessmentFeedback, mentalEdge, playerCheckins,
   practicePlans, coachStudents, homeworkAssignments, playerCoachRelationships, coachInvites, playerSettings,
-  studentInvites, baselineVideos, playerOnboarding, notifications,
+  studentInvites, baselineVideos, playerOnboarding, notifications, gameChangerStats, skeletalAnalysis,
   type Coach, type Team, type Athlete, type Drill, type Assessment, type Feedback, type MentalEdge, type PlayerCheckin,
   type PracticePlan, type CoachStudent, type HomeworkAssignment, type PlayerCoachRelationship, type CoachInvite, type PlayerSettings,
-  type StudentInvite, type BaselineVideo, type PlayerOnboarding, type Notification,
+  type StudentInvite, type BaselineVideo, type PlayerOnboarding, type Notification, type GameChangerStats, type SkeletalAnalysis,
   type CreateCoachRequest, type CreateTeamRequest, type CreateAthleteRequest, 
   type CreateDrillRequest, type CreateMentalEdgeRequest, type CreateAssessmentRequest, type CreateFeedbackRequest,
   type CreatePlayerCheckinRequest, type UpdateAthleteRequest, type UpdateAssessmentRequest,
   type CreatePlayerCoachRelationshipRequest, type CreateCoachInviteRequest, type CreatePlayerSettingsRequest,
   type CreateStudentInviteRequest, type CreateBaselineVideoRequest, type CreatePlayerOnboardingRequest,
-  type CreateNotificationRequest
+  type CreateNotificationRequest, type CreateGameChangerStatsRequest, type CreateSkeletalAnalysisRequest
 } from "@shared/schema";
 import { users, type UserRole } from "@shared/models/auth";
 import { eq, desc, and } from "drizzle-orm";
@@ -132,6 +132,16 @@ export interface IStorage {
   createNotification(notification: CreateNotificationRequest): Promise<Notification>;
   markNotificationRead(id: number): Promise<Notification>;
   markAllNotificationsRead(userId: string): Promise<void>;
+  
+  // === GAMECHANGER STATS ===
+  createGameChangerStats(stats: CreateGameChangerStatsRequest): Promise<GameChangerStats>;
+  getGameChangerStatsByUserId(userId: string): Promise<GameChangerStats | undefined>;
+  getGameChangerStatsByAthleteId(athleteId: number): Promise<GameChangerStats | undefined>;
+  
+  // === SKELETAL ANALYSIS ===
+  createSkeletalAnalysis(analysis: CreateSkeletalAnalysisRequest): Promise<SkeletalAnalysis>;
+  getSkeletalAnalysisByAthleteId(athleteId: number): Promise<SkeletalAnalysis | undefined>;
+  getSkeletalAnalysisByUserId(userId: string): Promise<SkeletalAnalysis | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -565,6 +575,46 @@ export class DatabaseStorage implements IStorage {
     await db.update(notifications)
       .set({ read: true })
       .where(eq(notifications.userId, userId));
+  }
+
+  // === GAMECHANGER STATS ===
+  async createGameChangerStats(stats: CreateGameChangerStatsRequest): Promise<GameChangerStats> {
+    const [newStats] = await db.insert(gameChangerStats).values(stats).returning();
+    return newStats;
+  }
+
+  async getGameChangerStatsByUserId(userId: string): Promise<GameChangerStats | undefined> {
+    const [stats] = await db.select().from(gameChangerStats)
+      .where(eq(gameChangerStats.userId, userId))
+      .orderBy(desc(gameChangerStats.createdAt));
+    return stats;
+  }
+
+  async getGameChangerStatsByAthleteId(athleteId: number): Promise<GameChangerStats | undefined> {
+    const [stats] = await db.select().from(gameChangerStats)
+      .where(eq(gameChangerStats.athleteId, athleteId))
+      .orderBy(desc(gameChangerStats.createdAt));
+    return stats;
+  }
+
+  // === SKELETAL ANALYSIS ===
+  async createSkeletalAnalysis(analysis: CreateSkeletalAnalysisRequest): Promise<SkeletalAnalysis> {
+    const [newAnalysis] = await db.insert(skeletalAnalysis).values(analysis).returning();
+    return newAnalysis;
+  }
+
+  async getSkeletalAnalysisByAthleteId(athleteId: number): Promise<SkeletalAnalysis | undefined> {
+    const [analysis] = await db.select().from(skeletalAnalysis)
+      .where(eq(skeletalAnalysis.athleteId, athleteId))
+      .orderBy(desc(skeletalAnalysis.createdAt));
+    return analysis;
+  }
+
+  async getSkeletalAnalysisByUserId(userId: string): Promise<SkeletalAnalysis | undefined> {
+    const [analysis] = await db.select().from(skeletalAnalysis)
+      .where(eq(skeletalAnalysis.userId, userId))
+      .orderBy(desc(skeletalAnalysis.createdAt));
+    return analysis;
   }
 }
 

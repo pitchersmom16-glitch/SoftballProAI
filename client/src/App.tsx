@@ -24,6 +24,8 @@ import Register from "@/pages/Register";
 import PlayerOnboarding from "@/pages/PlayerOnboarding";
 import PlayerProfileEdit from "@/pages/PlayerProfileEdit";
 import BiometricOnboarding from "@/pages/BiometricOnboarding";
+import StatsImport from "@/pages/StatsImport";
+import PublicProfile from "@/pages/PublicProfile";
 import { OnboardingGate } from "@/components/OnboardingGate";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -43,6 +45,7 @@ function Router() {
           <Route path="/" component={Landing} />
           <Route path="/onboarding" component={BiometricOnboarding} />
           <Route path="/register" component={Register} />
+          <Route path="/profile/:id" component={PublicProfile} />
           <Route path="/auth">
             {() => {
               window.location.href = "/api/login";
@@ -103,6 +106,10 @@ function Router() {
           </Route>
           <Route path="/profile">
             <OnboardingGate><PlayerProfileEdit /></OnboardingGate>
+          </Route>
+          <Route path="/profile/:id" component={PublicProfile} />
+          <Route path="/stats-import">
+            <OnboardingGate><StatsImport /></OnboardingGate>
           </Route>
           {/* Safety Net: Redirect all unknown routes to dashboard */}
           <Route path="*">

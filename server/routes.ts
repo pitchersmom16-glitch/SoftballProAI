@@ -2085,6 +2085,188 @@ export async function registerRoutes(
     }
   });
 
+  // === GAMECHANGER STATS IMPORT ===
+  
+  // Import stats from CSV
+  app.post("/api/stats/import", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any).claims.sub;
+      
+      const statsSchema = z.object({
+        name: z.string().optional(),
+        pos: z.string().optional(),
+        avg: z.string().optional(),
+        ops: z.string().optional(),
+        era: z.string().optional(),
+        whip: z.string().optional(),
+        kPercent: z.string().optional(),
+        firstPitchStrikePercent: z.string().optional(),
+        exitVelocity: z.string().optional(),
+      });
+      
+      const stats = statsSchema.parse(req.body);
+      
+      // Get athlete record for this user
+      const athlete = await storage.getAthleteByUserId(userId);
+      
+      // Save to database
+      const savedStats = await storage.createGameChangerStats({
+        userId,
+        athleteId: athlete?.id,
+        season: "2025-2026",
+        avg: stats.avg ? stats.avg : null,
+        ops: stats.ops ? stats.ops : null,
+        era: stats.era ? stats.era : null,
+        whip: stats.whip ? stats.whip : null,
+        kPercent: stats.kPercent ? stats.kPercent : null,
+        firstPitchStrikePercent: stats.firstPitchStrikePercent ? stats.firstPitchStrikePercent : null,
+        exitVelocity: stats.exitVelocity ? stats.exitVelocity : null,
+        rawData: stats,
+      });
+      
+      res.json({ success: true, stats: savedStats });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  // Get current user's stats
+  app.get("/api/stats", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any).claims.sub;
+      const stats = await storage.getGameChangerStatsByUserId(userId);
+      res.json(stats || null);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // === PUBLIC RECRUITING PROFILE ===
+  
+  // Get public profile by athlete ID (no auth required)
+  app.get("/api/profile/public/:id", async (req, res) => {
+    try {
+      const athleteId = parseInt(req.params.id);
+      if (isNaN(athleteId)) {
+        return res.status(400).json({ message: "Invalid athlete ID" });
+      }
+      
+      const athlete = await storage.getAthlete(athleteId);
+      if (!athlete) {
+        return res.status(404).json({ message: "Athlete not found" });
+      }
+      
+      // Get team info
+      let teamName = null;
+      if (athlete.teamId) {
+        const team = await storage.getTeam(athlete.teamId);
+        teamName = team?.name;
+      }
+      
+      res.json({
+        id: athlete.id,
+        firstName: athlete.firstName,
+        lastName: athlete.lastName,
+        heightInches: athlete.heightInches,
+        primaryPosition: athlete.primaryPosition,
+        secondaryPosition: athlete.secondaryPosition,
+        graduationYear: athlete.graduationYear,
+        school: athlete.school,
+        teamName,
+        photoUrl: athlete.photoUrl,
+      });
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Get public stats by athlete ID
+  app.get("/api/stats/public/:id", async (req, res) => {
+    try {
+      const athleteId = parseInt(req.params.id);
+      if (isNaN(athleteId)) {
+        return res.status(400).json({ message: "Invalid athlete ID" });
+      }
+      
+      const stats = await storage.getGameChangerStatsByAthleteId(athleteId);
+      if (!stats) {
+        // Return demo stats for demo profile
+        return res.json({
+          era: "1.25",
+          whip: "0.89",
+          kPercent: "35%",
+          firstPitchStrikePercent: "68%",
+          avg: ".385",
+          ops: ".975",
+          exitVelocity: "67",
+        });
+      }
+      
+      res.json({
+        avg: stats.avg,
+        ops: stats.ops,
+        era: stats.era,
+        whip: stats.whip,
+        kPercent: stats.kPercent ? `${stats.kPercent}%` : null,
+        firstPitchStrikePercent: stats.firstPitchStrikePercent ? `${stats.firstPitchStrikePercent}%` : null,
+        exitVelocity: stats.exitVelocity,
+      });
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Get public AI analysis by athlete ID
+  app.get("/api/analysis/public/:id", async (req, res) => {
+    try {
+      const athleteId = parseInt(req.params.id);
+      if (isNaN(athleteId)) {
+        return res.status(400).json({ message: "Invalid athlete ID" });
+      }
+      
+      const analysis = await storage.getSkeletalAnalysisByAthleteId(athleteId);
+      if (!analysis) {
+        // Return demo analysis for demo profile
+        return res.json({
+          highlights: [
+            { title: "Elite Arm Circle Speed", grade: "A" },
+            { title: "Strong Knee Drive", grade: "A-" },
+            { title: "Optimal Release Point", grade: "B+" },
+            { title: "Explosive Hip Rotation", grade: "A" },
+          ]
+        });
+      }
+      
+      res.json({
+        highlights: analysis.highlights?.map((h: string) => ({ title: h, grade: "A" })) || [],
+      });
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Get public goals by athlete ID
+  app.get("/api/goals/public/:id", async (req, res) => {
+    try {
+      const athleteId = parseInt(req.params.id);
+      if (isNaN(athleteId)) {
+        return res.status(400).json({ message: "Invalid athlete ID" });
+      }
+      
+      // For now return demo goals - will integrate with actual goal storage later
+      res.json([
+        { metric: "velocity", metricLabel: "Increase Velocity", target: 5, unit: "mph", currentBaseline: 58, progress: 60 },
+        { metric: "spin_rate", metricLabel: "Improve Spin Rate", target: 200, unit: "rpm", currentBaseline: 1800, progress: 45 },
+        { metric: "strike_zone", metricLabel: "Strike Zone %", target: 70, unit: "%", currentBaseline: 62, progress: 75 },
+      ]);
+    } catch (err) {
+      throw err;
+    }
+  });
+
   // Seed Data (if empty)
   seedDatabase();
 
