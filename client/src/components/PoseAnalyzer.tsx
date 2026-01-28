@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Pose, Results, POSE_CONNECTIONS, NormalizedLandmark } from "@mediapipe/pose";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ChevronLeft, ChevronRight, Gauge } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface BiomechanicsMetrics {
   armSlotAngle: number | null;
@@ -73,11 +74,14 @@ export default function PoseAnalyzer({ videoUrl, onMetricsUpdate }: PoseAnalyzer
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [trackingLost, setTrackingLost] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
   const [metrics, setMetrics] = useState<BiomechanicsMetrics>({
     armSlotAngle: null,
     kneeFlexion: null,
     torqueSeparation: null,
   });
+
+  const SPEED_OPTIONS = [0.25, 0.5, 1] as const;
 
   const calculateMetrics = useCallback((landmarks: NormalizedLandmark[]): BiomechanicsMetrics | null => {
     if (!landmarks || landmarks.length < 33) {
@@ -283,11 +287,64 @@ export default function PoseAnalyzer({ videoUrl, onMetricsUpdate }: PoseAnalyzer
     stopProcessing();
   }, [stopProcessing]);
 
-  const handleSeeked = useCallback(() => {
+  const handleSeeked = useCallback(async () => {
     if (!videoRef.current?.paused && isProcessingRef.current === false) {
       startProcessing();
     }
+    // Process single frame when paused and seeked
+    if (videoRef.current?.paused && poseRef.current) {
+      try {
+        await poseRef.current.send({ image: videoRef.current });
+      } catch (err) {
+        console.error("Frame processing error:", err);
+      }
+    }
   }, [startProcessing]);
+
+  const changeSpeed = useCallback((speed: number) => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = speed;
+      setPlaybackSpeed(speed);
+    }
+  }, []);
+
+  const stepFrame = useCallback(async (direction: 'forward' | 'backward') => {
+    const video = videoRef.current;
+    if (!video) return;
+    
+    // Each frame at ~30fps is about 0.033s, we'll use 0.04s for safety
+    const frameTime = 0.04;
+    const newTime = direction === 'forward' 
+      ? Math.min(video.currentTime + frameTime, video.duration)
+      : Math.max(video.currentTime - frameTime, 0);
+    
+    video.currentTime = newTime;
+    
+    // Process frame immediately for pose overlay sync
+    if (poseRef.current) {
+      try {
+        await poseRef.current.send({ image: video });
+      } catch (err) {
+        console.error("Frame processing error:", err);
+      }
+    }
+  }, []);
+
+  // Keyboard event handler for frame-by-frame control
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        stepFrame('backward');
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        stepFrame('forward');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [stepFrame]);
 
   if (loadError) {
     return (
@@ -353,6 +410,60 @@ export default function PoseAnalyzer({ videoUrl, onMetricsUpdate }: PoseAnalyzer
           <span className="text-white text-xs font-medium">ANALYZING</span>
         </div>
       )}
+
+      {/* Playback Controls */}
+      <div className="mt-4 flex items-center justify-between gap-4 bg-slate-900/80 p-3 rounded-lg" data-testid="playback-controls">
+        {/* Frame-by-Frame Controls */}
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => stepFrame('backward')}
+            className="h-8 px-2 border-slate-700 hover:border-purple-500 hover:bg-purple-900/30"
+            data-testid="button-frame-backward"
+          >
+            <ChevronLeft className="w-4 h-4 mr-1" />
+            Frame
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => stepFrame('forward')}
+            className="h-8 px-2 border-slate-700 hover:border-purple-500 hover:bg-purple-900/30"
+            data-testid="button-frame-forward"
+          >
+            Frame
+            <ChevronRight className="w-4 h-4 ml-1" />
+          </Button>
+          <span className="text-xs text-slate-500 ml-2 hidden sm:inline">
+            (← → keys)
+          </span>
+        </div>
+
+        {/* Slow Motion Controls */}
+        <div className="flex items-center gap-2">
+          <Gauge className="w-4 h-4 text-slate-400" />
+          <span className="text-xs text-slate-400 hidden sm:inline">Speed:</span>
+          <div className="flex gap-1">
+            {SPEED_OPTIONS.map((speed) => (
+              <Button
+                key={speed}
+                size="sm"
+                variant={playbackSpeed === speed ? "default" : "outline"}
+                onClick={() => changeSpeed(speed)}
+                className={`h-7 px-2 text-xs ${
+                  playbackSpeed === speed 
+                    ? "bg-gradient-to-r from-purple-600 to-pink-600 border-0" 
+                    : "border-slate-700 hover:border-pink-500"
+                }`}
+                data-testid={`button-speed-${speed}x`}
+              >
+                {speed}x
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <div className="mt-4 grid grid-cols-3 gap-3" data-testid="live-metrics">
         <div className="bg-slate-900 p-3 rounded-lg text-center">

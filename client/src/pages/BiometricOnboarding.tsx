@@ -118,10 +118,10 @@ export default function BiometricOnboarding() {
         video.src = URL.createObjectURL(file);
       });
 
-      if (duration < 20) {
+      if (duration > 20) {
         toast({
-          title: "Video Too Short",
-          description: "Please upload a video that is at least 20 seconds long.",
+          title: "Video Too Long",
+          description: "Please upload a video that is no longer than 20 seconds.",
           variant: "destructive",
         });
         setUploadingVideo(null);
@@ -331,7 +331,7 @@ export default function BiometricOnboarding() {
         <div className="bg-amber-900/20 border border-amber-500/30 rounded-lg p-4 mb-6 flex items-start gap-3">
           <Timer className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
           <div>
-            <p className="text-amber-400 font-medium">Minimum 20 seconds per video</p>
+            <p className="text-amber-400 font-medium">Maximum 20 seconds per video</p>
             <p className="text-gray-400 text-sm">Show 3-5 repetitions of your motion in each video for accurate analysis.</p>
           </div>
         </div>
@@ -453,7 +453,7 @@ export default function BiometricOnboarding() {
             </li>
             <li className="flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
-              Keep each video at least 20 seconds long
+              Keep each video under 20 seconds
             </li>
             <li className="flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
