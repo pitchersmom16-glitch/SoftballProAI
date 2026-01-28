@@ -406,14 +406,16 @@ export default function TeamCoachDashboard() {
                 <p className="text-sm text-muted-foreground">{athletes?.length || 0} athletes across all teams</p>
               </div>
             </div>
-            <Button 
-              variant="outline"
-              className="border-neon-green/50 text-neon-green hover-elevate"
-              data-testid="button-add-athlete"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Athlete
-            </Button>
+            <Link href="/athletes">
+              <Button 
+                variant="outline"
+                className="border-neon-green/50 text-neon-green hover-elevate"
+                data-testid="button-add-athlete"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Athlete
+              </Button>
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

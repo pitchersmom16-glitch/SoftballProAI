@@ -333,6 +333,8 @@ export default function PlayerDashboard() {
                 </p>
                 <Button
                   className="mt-4 bg-neon-pink/20 text-neon-pink border border-neon-pink/40 hover:bg-neon-pink/30"
+                  onClick={() => navigate("/drills")}
+                  data-testid="button-recovery-drills"
                 >
                   View Recovery Drills
                 </Button>

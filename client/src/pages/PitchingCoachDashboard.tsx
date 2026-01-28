@@ -148,6 +148,7 @@ export default function PitchingCoachDashboard() {
               variant="outline" 
               className="border-neon-yellow/50 text-neon-yellow hover-elevate"
               data-testid="button-add-student"
+              onClick={() => toast({ title: "Coming Soon", description: "Student invitation system will be available soon." })}
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Student
@@ -289,7 +290,13 @@ export default function PitchingCoachDashboard() {
                           <p className="font-medium text-sm">{h.title}</p>
                           <p className="text-xs text-muted-foreground">{h.description?.slice(0, 30) || "Pitching drill"}</p>
                         </div>
-                        <Button size="icon" variant="ghost" className="text-neon-pink">
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="text-neon-pink"
+                          onClick={() => toast({ title: "Video Review", description: "Opening video review panel..." })}
+                          data-testid={`button-play-review-${h.id}`}
+                        >
                           <Play className="w-4 h-4" />
                         </Button>
                       </div>
@@ -456,6 +463,7 @@ export default function PitchingCoachDashboard() {
               variant="outline" 
               className="border-neon-green/50 text-neon-green"
               onClick={() => toast({ title: "Coming Soon", description: "Pro Model comparison will be available in a future update." })}
+              data-testid="button-load-pro-model"
             >
               <Eye className="w-4 h-4 mr-2" />
               Load Pro Model
@@ -463,6 +471,7 @@ export default function PitchingCoachDashboard() {
             <Button 
               variant="outline"
               onClick={() => toast({ title: "Coming Soon", description: "Video annotations will be available in a future update." })}
+              data-testid="button-add-annotation"
             >
               <MessageSquare className="w-4 h-4 mr-2" />
               Add Annotation

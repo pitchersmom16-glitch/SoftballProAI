@@ -92,7 +92,7 @@ export default function Landing() {
                   Analyze My Video
                 </Button>
               </Link>
-              <Link href="#features">
+              <Link href="/auth?role=coach">
                 <Button 
                   variant="outline" 
                   className="h-14 px-8 text-lg border-white/20 text-white backdrop-blur-md"
