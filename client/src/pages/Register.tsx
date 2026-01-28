@@ -64,8 +64,8 @@ export default function Register() {
       // Invalidate user cache so the new role is picked up
       await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       setTimeout(() => {
-        // Team players go to profile to complete setup, Private Instructor students go to onboarding
-        setLocation(isTeamReferral ? "/profile" : "/player/onboarding");
+        // All players now go to onboarding to upload baseline videos
+        setLocation("/player/onboarding");
       }, 2000);
     },
     onError: () => {
@@ -142,12 +142,12 @@ export default function Register() {
           </h1>
           <p className="text-gray-400 mb-4">
             {isTeamReferral 
-              ? "You're now on the roster and ready to train."
+              ? "You're now on the roster! Next step: upload your baseline videos."
               : `You're now connected with Coach ${validation?.coachName}.`
             }
           </p>
           <p className="text-purple-400">
-            {isTeamReferral ? "Redirecting to complete your profile..." : "Redirecting to your onboarding..."}
+            Redirecting to your onboarding checklist...
           </p>
         </Card>
       </div>

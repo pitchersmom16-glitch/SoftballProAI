@@ -60,17 +60,48 @@ Preferred communication style: Simple, everyday language.
 - **Admin Dashboard**: `/admin/train-brain` for continuous training, adding drills, and mental content.
 - **Issue Mapping**: Maps biomechanical issues to mechanic tags for drill matching.
 
+### Multi-Mode Baseline Protocol
+All athletes (team and private instructor) must upload 4 baseline videos (minimum 20 seconds each) before accessing the dashboard.
+
+**Head Coach Mode (team_coach)**:
+- Athletes join via team referral links (`/register?ref=TEAM_ABC123`)
+- Required baseline videos: Hitting, Throwing, Fielding, Pitching/Catching
+- Focus areas: bat path, arm slot, glove position, arm circle
+
+**Pitching Instructor Mode (pitching_instructor)**:
+- Athletes join via coach referral links (`/register?ref=COACH_ABC123`)
+- Required baseline videos: Fastball, Drop Ball, Change-up, Pitcher's Choice
+- Focus areas: arm circle, knee drive, wrist snap, release point
+
+**Catching Instructor Mode (catching_instructor)**:
+- Athletes join via catching coach referral links
+- Required baseline videos: Framing, Blocking, Transfer (Pop-time), Bunt Coverage
+- Focus areas: glove angle, drop mechanics, transfer speed, first step
+
+**Database Schema**:
+- `playerOnboarding.onboardingType`: "team_coach", "pitching_instructor", "catching_instructor"
+- `playerOnboarding.teamId`: Links to team for Head Coach Mode
+- `baselineVideos.videoCategory`: Specific video type (e.g., "fastball", "hitting", "framing")
+- `baselineVideos.assessmentId`: Links to assessment for PoseAnalyzer review
+
+**Flow**:
+1. Player registers via referral link
+2. Onboarding record created with appropriate `onboardingType`
+3. Player uploads 4 baseline videos (20s minimum each)
+4. Each video creates an assessment for PoseAnalyzer analysis
+5. Coach reviews baseline videos and approves to unlock dashboard
+
 ### Head Coach Mode - Team Referrals
 - **Functionality**: Coaches invite players to teams via unique referral links (`/register?ref=TEAM_ABC123`).
 - **Automation**: Players automatically assigned to teams upon registration.
 - **Permissions**: Head coaches have full edit access to team athletes.
-- **Flow**: Coach shares link, player registers, profile created, role set to "player", dashboard unlocked.
+- **Baseline Requirement**: All team players must complete 4 baseline videos before dashboard access.
 
 ### Private Instructor Mode
 - **Functionality**: Manages 1-on-1 remote training for up to 25 students.
 - **Smart Invites**: Unique referral URLs (`/register?ref=COACH_ABC123`) link students to coaches.
-- **Baseline Protocol**: Students must upload 4 videos for coach approval before dashboard access.
-- **Coach Review**: Coaches approve baseline before training plan release.
+- **Baseline Protocol**: Students must upload 4 skill-specific videos for coach approval.
+- **Coach Review**: Coaches approve baseline using PoseAnalyzer before training plan release.
 - **Database**: `coaches.referralCode`, `coaches.specialty`, `studentInvites`, `baselineVideos`, `playerOnboarding`.
 
 ### Universal Notification Engine

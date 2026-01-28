@@ -230,6 +230,7 @@ export const baselineVideos = pgTable("baseline_videos", {
   userId: text("user_id").notNull().references(() => users.id),
   coachId: integer("coach_id").references(() => coaches.id),
   skillType: text("skill_type").notNull(), // "PITCHING", "CATCHING", etc.
+  videoCategory: text("video_category").notNull(), // Specific video type: "fastball", "drop_ball", "framing", "hitting", etc.
   videoNumber: integer("video_number").notNull(), // 1-4 for the baseline protocol
   videoUrl: text("video_url").notNull(),
   durationSeconds: integer("duration_seconds"),
@@ -242,7 +243,9 @@ export const baselineVideos = pgTable("baseline_videos", {
 export const playerOnboarding = pgTable("player_onboarding", {
   id: serial("id").primaryKey(),
   userId: text("user_id").notNull().references(() => users.id).unique(),
-  coachId: integer("coach_id").references(() => coaches.id), // Linked coach
+  coachId: integer("coach_id").references(() => coaches.id), // Linked coach (for Private Instructor Mode)
+  teamId: integer("team_id").references(() => teams.id), // Linked team (for Head Coach Mode)
+  onboardingType: text("onboarding_type").notNull().default("team_coach"), // "team_coach", "pitching_instructor", "catching_instructor"
   skillType: text("skill_type"), // Specialty they signed up for
   baselineComplete: boolean("baseline_complete").default(false), // Set to true after 4 videos
   baselineApprovedAt: timestamp("baseline_approved_at"), // When coach approved

@@ -1646,7 +1646,21 @@ export async function registerRoutes(
           });
         }
         
-        // Set player settings (no baseline required for team players)
+        // Create onboarding record for team players (requires 4 baseline videos)
+        const existingOnboarding = await storage.getPlayerOnboarding(userId);
+        if (!existingOnboarding) {
+          await storage.createPlayerOnboarding({
+            userId,
+            coachId,
+            teamId,
+            onboardingType: "team_coach",
+            skillType: primaryPosition === "P" ? "PITCHING" : "HITTING",
+            baselineComplete: false,
+            dashboardUnlocked: false,
+          });
+        }
+        
+        // Set player settings
         let settings = await storage.getPlayerSettings(userId);
         if (!settings) {
           await storage.createPlayerSettings({ userId, subscriptionMode: "coached" });
@@ -1658,8 +1672,8 @@ export async function registerRoutes(
         await storage.updateUserRole(userId, "player");
         
         return res.json({ 
-          message: "Welcome to the team! You're all set.",
-          requiresBaseline: false,
+          message: "Welcome to the team! Please complete your baseline videos.",
+          requiresBaseline: true,
           coachId,
           teamId,
           role: "player"
@@ -1675,10 +1689,18 @@ export async function registerRoutes(
         subscriptionMode: "coached",
       });
       
+      // Determine onboarding type based on coach specialty
+      const coach = await storage.getCoach(coachId);
+      let onboardingType = "pitching_instructor";
+      if (skillType === "CATCHING" || coach?.specialty === "CATCHING") {
+        onboardingType = "catching_instructor";
+      }
+      
       // Create onboarding record (dashboard locked until baseline complete)
       await storage.createPlayerOnboarding({
         userId,
         coachId,
+        onboardingType,
         skillType,
         baselineComplete: false,
         dashboardUnlocked: false,
@@ -1708,6 +1730,28 @@ export async function registerRoutes(
 
   // === BASELINE PROTOCOL ===
 
+  // Video prompts for different onboarding modes
+  const VIDEO_PROMPTS = {
+    team_coach: [
+      { number: 1, category: "hitting", title: "Hitting", description: "Record your swing from the side - show full stance through follow-through", focusAreas: ["bat path", "hip rotation", "contact point"] },
+      { number: 2, category: "throwing", title: "Throwing", description: "Record your throwing motion from the side - show arm action and release", focusAreas: ["arm slot", "stride length", "follow-through"] },
+      { number: 3, category: "fielding", title: "Fielding", description: "Record yourself fielding ground balls - show ready position and transfers", focusAreas: ["glove position", "footwork", "transfer speed"] },
+      { number: 4, category: "pitching_or_catching", title: "Pitching or Catching", description: "Record your pitch (if pitcher) OR a blocking/framing drill (if catcher)", focusAreas: ["arm circle", "leg drive", "release point"] },
+    ],
+    pitching_instructor: [
+      { number: 1, category: "fastball", title: "Fastball", description: "Record 3-5 fastballs from the side view - full windmill motion", focusAreas: ["arm circle", "knee drive", "hip-shoulder separation", "release point"] },
+      { number: 2, category: "drop_ball", title: "Drop Ball", description: "Record 3-5 drop balls from the side view - focus on spin and release", focusAreas: ["wrist snap", "release angle", "leg drive"] },
+      { number: 3, category: "change_up", title: "Change-up", description: "Record 3-5 change-ups - show deceptive motion and grip release", focusAreas: ["arm speed", "deception", "grip release"] },
+      { number: 4, category: "pitchers_choice", title: "Pitcher's Choice", description: "Record your specialty pitch (rise ball, curve, screw, etc.)", focusAreas: ["spin direction", "movement", "command"] },
+    ],
+    catching_instructor: [
+      { number: 1, category: "framing", title: "Framing", description: "Record yourself receiving 5+ pitches - show glove presentation and stick", focusAreas: ["glove angle", "subtle movement", "stick presentation"] },
+      { number: 2, category: "blocking", title: "Blocking", description: "Record yourself blocking balls in the dirt - show stance and body position", focusAreas: ["drop mechanics", "glove position", "body angle"] },
+      { number: 3, category: "transfer", title: "Transfer (Pop-time)", description: "Record catch-to-throw transfer - show footwork and arm action", focusAreas: ["transfer speed", "footwork", "arm slot", "pop-time"] },
+      { number: 4, category: "bunt_coverage", title: "Bunt Coverage", description: "Record fielding bunts - show explosiveness and throw accuracy", focusAreas: ["first step", "barehand technique", "throw accuracy"] },
+    ],
+  };
+
   // Get onboarding status (including baseline progress)
   app.get("/api/player/onboarding", async (req, res) => {
     try {
@@ -1722,11 +1766,16 @@ export async function registerRoutes(
       
       const baselineVideos = await storage.getBaselineVideos(userId);
       
+      // Get video prompts based on onboarding type
+      const onboardingType = (onboarding.onboardingType as keyof typeof VIDEO_PROMPTS) || "team_coach";
+      const videoPrompts = VIDEO_PROMPTS[onboardingType] || VIDEO_PROMPTS.team_coach;
+      
       res.json({
         ...onboarding,
         baselineVideoCount: baselineVideos.length,
         baselineVideosRequired: 4,
         baselineVideos,
+        videoPrompts,
       });
     } catch (err) {
       throw err;
@@ -1742,10 +1791,16 @@ export async function registerRoutes(
       const videoSchema = z.object({
         videoUrl: z.string().url(),
         videoNumber: z.number().min(1).max(4),
+        videoCategory: z.string(), // e.g., "fastball", "hitting", "framing"
         durationSeconds: z.number().optional(),
       });
       
       const data = videoSchema.parse(req.body);
+      
+      // Validate duration is at least 20 seconds
+      if (data.durationSeconds && data.durationSeconds < 20) {
+        return res.status(400).json({ message: "Video must be at least 20 seconds long" });
+      }
       
       // Get onboarding to find coach
       const onboarding = await storage.getPlayerOnboarding(userId);
@@ -1753,15 +1808,47 @@ export async function registerRoutes(
         return res.status(400).json({ message: "No onboarding record found" });
       }
       
+      // Determine skill type based on category and onboarding type
+      let skillType = onboarding.skillType || "GENERAL";
+      if (["fastball", "drop_ball", "change_up", "pitchers_choice"].includes(data.videoCategory)) {
+        skillType = "PITCHING";
+      } else if (["framing", "blocking", "transfer", "bunt_coverage"].includes(data.videoCategory)) {
+        skillType = "CATCHING";
+      } else if (data.videoCategory === "hitting") {
+        skillType = "HITTING";
+      } else if (data.videoCategory === "throwing") {
+        skillType = "THROWING";
+      } else if (data.videoCategory === "fielding") {
+        skillType = "FIELDING";
+      }
+      
+      // Get athlete record to link assessment
+      const athlete = await storage.getAthleteByUserId(userId);
+      
+      // Create an assessment for this baseline video (for PoseAnalyzer analysis)
+      let assessmentId: number | undefined;
+      if (athlete) {
+        const assessment = await storage.createAssessment({
+          athleteId: athlete.id,
+          coachId: onboarding.coachId || undefined,
+          skillType,
+          videoUrl: data.videoUrl,
+          notes: `Baseline ${data.videoCategory} video - ${new Date().toLocaleDateString()}`,
+        });
+        assessmentId = assessment.id;
+      }
+      
       // Create baseline video record
       const video = await storage.createBaselineVideo({
         userId,
         coachId: onboarding.coachId,
-        skillType: onboarding.skillType || "PITCHING",
+        skillType,
+        videoCategory: data.videoCategory,
         videoNumber: data.videoNumber,
         videoUrl: data.videoUrl,
         durationSeconds: data.durationSeconds,
-        status: "uploaded",
+        status: "analyzing",
+        assessmentId,
       });
       
       // Check if all 4 videos are uploaded
