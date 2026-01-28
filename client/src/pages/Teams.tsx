@@ -115,13 +115,13 @@ export default function Teams() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {teams?.map(team => (
           <Card key={team.id} className="p-6 border-slate-100 hover:shadow-lg transition-all duration-300" data-testid={`card-team-${team.id}`}>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="h-16 w-16 rounded-2xl bg-slate-900 text-white flex items-center justify-center">
-                <ShieldCheck className="h-8 w-8" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold font-display text-slate-900" data-testid={`text-team-name-${team.id}`}>{team.name}</h3>
-                <p className="text-sm text-slate-500">{team.ageDivision} {team.season && `• ${team.season}`}</p>
+            <div className="mb-6">
+              <div className="p-4 rounded-2xl bg-slate-900 text-white">
+                <div className="flex items-center gap-3 mb-2">
+                  <ShieldCheck className="h-6 w-6 text-neon-green" />
+                  <h3 className="text-lg font-bold truncate" data-testid={`text-team-name-${team.id}`}>{team.name}</h3>
+                </div>
+                <p className="text-sm text-slate-400">{team.ageDivision} {team.season && `• ${team.season}`}</p>
               </div>
             </div>
             
