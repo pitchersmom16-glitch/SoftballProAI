@@ -85,31 +85,13 @@ export default function BiometricOnboarding() {
   const [uploadingVideo, setUploadingVideo] = useState<number | null>(null);
   const fileInputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({});
 
-  const togglePosition = (pos: Position) => {
-    setSelectedPositions(prev => {
-      if (prev.includes(pos)) {
-        return prev.filter(p => p !== pos);
-      }
-      if (prev.length < 2) {
-        return [...prev, pos];
-      }
-      return prev;
-    });
+  const selectPosition = (pos: Position) => {
+    setSelectedPositions([pos]);
   };
 
   const getVideoPrompts = (): VideoPrompt[] => {
     if (selectedPositions.length === 0) return [];
-    
-    const primary = selectedPositions[0];
-    const primaryPack = POSITION_VIDEO_PACKS[primary];
-    
-    if (selectedPositions.length === 1) {
-      return primaryPack;
-    }
-    
-    const secondary = selectedPositions[1];
-    const secondaryPack = POSITION_VIDEO_PACKS[secondary];
-    return [...primaryPack, ...secondaryPack.slice(0, 2).map((v, i) => ({ ...v, number: 5 + i }))];
+    return POSITION_VIDEO_PACKS[selectedPositions[0]];
   };
 
   const handleFileSelect = async (videoNumber: number, category: string, file: File) => {
@@ -188,7 +170,7 @@ export default function BiometricOnboarding() {
   };
 
   const videoPrompts = getVideoPrompts();
-  const requiredCount = selectedPositions.length === 2 ? 6 : 4;
+  const requiredCount = 4;
   const progress = (uploadedVideos.length / requiredCount) * 100;
   const allVideosUploaded = uploadedVideos.length >= requiredCount;
 
@@ -212,12 +194,11 @@ export default function BiometricOnboarding() {
             {(Object.entries(POSITION_INFO) as [Position, typeof POSITION_INFO[Position]][]).map(([pos, info]) => {
               const isSelected = selectedPositions.includes(pos);
               const isPrimary = selectedPositions[0] === pos;
-              const isSecondary = selectedPositions[1] === pos;
               
               return (
                 <Card
                   key={pos}
-                  onClick={() => togglePosition(pos)}
+                  onClick={() => selectPosition(pos)}
                   className={`p-6 cursor-pointer transition-all ${
                     isSelected 
                       ? isPrimary 
@@ -232,12 +213,7 @@ export default function BiometricOnboarding() {
                   <p className="text-sm text-gray-400">{info.description}</p>
                   {isPrimary && (
                     <span className="inline-block mt-2 text-xs bg-purple-600 text-white px-2 py-0.5 rounded">
-                      Primary
-                    </span>
-                  )}
-                  {isSecondary && (
-                    <span className="inline-block mt-2 text-xs bg-pink-600 text-white px-2 py-0.5 rounded">
-                      Secondary
+                      Selected
                     </span>
                   )}
                 </Card>
@@ -248,10 +224,7 @@ export default function BiometricOnboarding() {
           {selectedPositions.length > 0 && (
             <div className="text-center">
               <p className="text-gray-400 mb-4">
-                {selectedPositions.length === 1 
-                  ? "You'll upload 4 videos for analysis"
-                  : "You'll upload 6 videos (4 primary + 2 secondary)"
-                }
+                You'll upload exactly 4 videos for biomechanical analysis
               </p>
               <Button
                 onClick={() => setStep("goals")}
