@@ -23,6 +23,7 @@ import SpecialistRoster from "@/pages/SpecialistRoster";
 import Register from "@/pages/Register";
 import PlayerOnboarding from "@/pages/PlayerOnboarding";
 import PlayerProfileEdit from "@/pages/PlayerProfileEdit";
+import BiometricOnboarding from "@/pages/BiometricOnboarding";
 import { OnboardingGate } from "@/components/OnboardingGate";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -40,6 +41,7 @@ function Router() {
       <Layout>
         <Switch>
           <Route path="/" component={Landing} />
+          <Route path="/onboarding" component={BiometricOnboarding} />
           <Route path="/register" component={Register} />
           <Route path="/auth">
             {() => {

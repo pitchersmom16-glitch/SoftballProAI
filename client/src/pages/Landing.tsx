@@ -15,7 +15,7 @@ export default function Landing() {
           </div>
           <div className="flex items-center gap-4">
             <Link href="/auth" className="text-sm font-medium text-gray-400 hover:text-white transition-colors" data-testid="link-signin">Sign In</Link>
-            <Link href="/auth">
+            <Link href="/onboarding">
               <button className="px-5 py-2.5 rounded-full btn-primary-glow text-sm" data-testid="button-get-started">
                 Get Started
               </button>
@@ -84,7 +84,7 @@ export default function Landing() {
 
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Link href="/auth">
+              <Link href="/onboarding">
                 <Button 
                   className="h-14 px-8 text-lg bg-gradient-to-r from-brand-pink to-purple-600 transition-all shadow-[0_0_20px_rgba(236,72,153,0.3)]"
                   data-testid="button-analyze-video"
@@ -161,7 +161,7 @@ export default function Landing() {
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
           <h2 className="text-4xl font-bold font-display text-white mb-6">Ready to dominate the circle?</h2>
           <p className="text-gray-400 text-lg mb-8">Join thousands of fastpitch coaches using AI to develop elite athletes.</p>
-          <Link href="/auth">
+          <Link href="/onboarding">
             <button className="h-14 px-10 rounded-full btn-primary-glow text-lg" data-testid="button-start-trial">
               Start Free Trial
             </button>
