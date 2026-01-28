@@ -24,6 +24,7 @@ export async function registerRoutes(
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
+      const userClaims = (req.user as any).claims;
       
       const roleSchema = z.object({
         role: z.enum(["player", "team_coach", "pitching_coach"])
@@ -31,6 +32,40 @@ export async function registerRoutes(
       
       const { role } = roleSchema.parse(req.body);
       await storage.updateUserRole(userId, role);
+      
+      // For coach roles, ensure coach record exists
+      if (role === "team_coach" || role === "pitching_coach") {
+        let existingCoach = await storage.getCoachByUserId(userId);
+        
+        if (!existingCoach) {
+          // Create coach record
+          const firstName = userClaims.given_name || userClaims.first_name || "Coach";
+          const lastName = userClaims.family_name || userClaims.last_name || "";
+          const coachName = `${firstName} ${lastName}`.trim();
+          
+          existingCoach = await storage.createCoach({
+            userId,
+            name: coachName,
+            specialty: role === "pitching_coach" ? "PITCHING" : null,
+          });
+        }
+        
+        // For team coaches, ensure they have at least one team
+        if (role === "team_coach") {
+          const existingTeams = await storage.getTeamsByHeadCoach(existingCoach.id);
+          if (!existingTeams || existingTeams.length === 0) {
+            const firstName = userClaims.given_name || userClaims.first_name || "Coach";
+            const lastName = userClaims.family_name || userClaims.last_name || "";
+            const coachName = `${firstName} ${lastName}`.trim();
+            const teamCode = `TEAM_${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+            await storage.createTeam({
+              name: `${coachName}'s Team`,
+              headCoachId: existingCoach.id,
+              referralCode: teamCode,
+            });
+          }
+        }
+      }
       
       res.json({ success: true, role });
     } catch (err) {

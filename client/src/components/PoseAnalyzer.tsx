@@ -61,6 +61,7 @@ function chooseDominantSide(landmarks: NormalizedLandmark[]): 'left' | 'right' {
 }
 
 export default function PoseAnalyzer({ videoUrl, onMetricsUpdate }: PoseAnalyzerProps) {
+  console.log('POSE MODEL INITIALIZING');
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const poseRef = useRef<Pose | null>(null);
