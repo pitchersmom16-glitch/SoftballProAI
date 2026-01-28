@@ -1568,6 +1568,7 @@ export async function registerRoutes(
         referralCode: z.string().optional(),
         firstName: z.string().optional(),
         lastName: z.string().optional(),
+        primaryPosition: z.string().optional(),
       });
       
       const data = completeSchema.parse(req.body);
@@ -1622,12 +1623,18 @@ export async function registerRoutes(
       if (isTeamReferral && teamId) {
         const firstName = data.firstName || userClaims.given_name || "Player";
         const lastName = data.lastName || userClaims.family_name || "Name";
+        const primaryPosition = data.primaryPosition || null;
         
         // Check if athlete already exists for this user
         const existingAthlete = await storage.getAthleteByUserId(userId);
         if (existingAthlete) {
-          // Update existing athlete with team assignment
-          await storage.updateAthlete(existingAthlete.id, { teamId });
+          // Update existing athlete with team assignment and position
+          await storage.updateAthlete(existingAthlete.id, { 
+            teamId, 
+            firstName, 
+            lastName,
+            primaryPosition 
+          });
         } else {
           // Create new athlete linked to the team
           await storage.createAthlete({
@@ -1635,6 +1642,7 @@ export async function registerRoutes(
             firstName,
             lastName,
             teamId,
+            primaryPosition,
           });
         }
         

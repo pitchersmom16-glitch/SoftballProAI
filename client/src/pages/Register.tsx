@@ -4,21 +4,29 @@ import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle2, Users, Sparkles } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, CheckCircle2, Users, Sparkles, Shield } from "lucide-react";
 
 interface ValidationData {
-  type: "invite" | "referral";
+  type: "invite" | "referral" | "team_referral";
   coachId: number;
   coachName?: string;
   skillType?: string;
   studentName?: string;
   inviteToken?: string;
   referralCode?: string;
+  teamId?: number;
+  teamName?: string;
 }
 
 export default function Register() {
   const [, setLocation] = useLocation();
   const [registrationStep, setRegistrationStep] = useState<"validating" | "ready" | "completing" | "done" | "error">("validating");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [primaryPosition, setPrimaryPosition] = useState("");
 
   const params = new URLSearchParams(window.location.search);
   const inviteToken = params.get("invite");
@@ -39,17 +47,23 @@ export default function Register() {
     queryKey: ["/api/auth/user"],
   });
 
+  const isTeamReferral = validation?.type === "team_referral";
+
   const completeMutation = useMutation({
     mutationFn: async () => {
       return apiRequest("POST", "/api/register/complete", {
         inviteToken: validation?.inviteToken,
         referralCode: validation?.referralCode,
+        firstName: firstName || undefined,
+        lastName: lastName || undefined,
+        primaryPosition: primaryPosition || undefined,
       });
     },
     onSuccess: () => {
       setRegistrationStep("done");
       setTimeout(() => {
-        setLocation("/player/onboarding");
+        // Team players go to dashboard, Private Instructor students go to onboarding
+        setLocation(isTeamReferral ? "/" : "/player/onboarding");
       }, 2000);
     },
     onError: () => {
@@ -67,11 +81,13 @@ export default function Register() {
   }, [isLoading, validation, validationError]);
 
   useEffect(() => {
-    if (user && validation && registrationStep === "ready") {
+    // For non-team referrals (Private Instructor Mode), auto-complete when logged in
+    // For team referrals, wait for user to fill out the form and click submit
+    if (user && validation && registrationStep === "ready" && !isTeamReferral) {
       setRegistrationStep("completing");
       completeMutation.mutate();
     }
-  }, [user, validation, registrationStep]);
+  }, [user, validation, registrationStep, isTeamReferral]);
 
   if (!inviteToken && !referralCode) {
     return (
@@ -119,11 +135,18 @@ export default function Register() {
       <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4">
         <Card className="max-w-md w-full p-8 bg-[#0a0a0a] border-green-500/30 text-center">
           <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-4">Welcome to the Team!</h1>
+          <h1 className="text-2xl font-bold text-white mb-4">
+            {isTeamReferral ? `Welcome to ${validation?.teamName}!` : "Welcome to the Team!"}
+          </h1>
           <p className="text-gray-400 mb-4">
-            You're now connected with Coach {validation?.coachName}.
+            {isTeamReferral 
+              ? "You're now on the roster and ready to train."
+              : `You're now connected with Coach ${validation?.coachName}.`
+            }
           </p>
-          <p className="text-purple-400">Redirecting to your onboarding...</p>
+          <p className="text-purple-400">
+            {isTeamReferral ? "Redirecting to your dashboard..." : "Redirecting to your onboarding..."}
+          </p>
         </Card>
       </div>
     );
@@ -145,15 +168,17 @@ export default function Register() {
       <Card className="max-w-lg w-full p-8 bg-[#0a0a0a] border-purple-500/30">
         <div className="text-center mb-8">
           <div className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center mx-auto mb-4">
-            <Sparkles className="w-10 h-10 text-white" />
+            {isTeamReferral ? <Shield className="w-10 h-10 text-white" /> : <Sparkles className="w-10 h-10 text-white" />}
           </div>
           <h1 className="text-3xl font-bold text-white mb-2" data-testid="text-welcome-title">
-            Welcome to AI Coach
+            {isTeamReferral ? "Join Your Team" : "Welcome to AI Coach"}
           </h1>
           <p className="text-gray-400">
-            {validation?.studentName 
-              ? `${validation.studentName}, you're invited to train with`
-              : "You're invited to train with"
+            {isTeamReferral 
+              ? `You're invited to join ${validation?.teamName}`
+              : validation?.studentName 
+                ? `${validation.studentName}, you're invited to train with`
+                : "You're invited to train with"
             }
           </p>
         </div>
@@ -161,14 +186,17 @@ export default function Register() {
         <div className="bg-purple-900/20 rounded-lg p-6 mb-6 border border-purple-500/20">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center">
-              <Users className="w-6 h-6 text-white" />
+              {isTeamReferral ? <Shield className="w-6 h-6 text-white" /> : <Users className="w-6 h-6 text-white" />}
             </div>
             <div>
               <p className="text-white font-semibold text-lg" data-testid="text-coach-name">
-                Coach {validation?.coachName || "Your Coach"}
+                {isTeamReferral ? validation?.teamName : `Coach ${validation?.coachName || "Your Coach"}`}
               </p>
               <p className="text-purple-400" data-testid="text-skill-type">
-                {validation?.skillType || "Specialist"} Training
+                {isTeamReferral 
+                  ? `Head Coach: ${validation?.coachName || "Coach"}`
+                  : `${validation?.skillType || "Specialist"} Training`
+                }
               </p>
             </div>
           </div>
@@ -177,7 +205,7 @@ export default function Register() {
         <div className="space-y-4 mb-8">
           <div className="flex items-center gap-3 text-gray-300">
             <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-            <span>Personalized training program designed for you</span>
+            <span>{isTeamReferral ? "Join your team roster instantly" : "Personalized training program designed for you"}</span>
           </div>
           <div className="flex items-center gap-3 text-gray-300">
             <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
@@ -185,9 +213,60 @@ export default function Register() {
           </div>
           <div className="flex items-center gap-3 text-gray-300">
             <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-            <span>Direct communication with your coach</span>
+            <span>{isTeamReferral ? "Access team drills and training plans" : "Direct communication with your coach"}</span>
           </div>
         </div>
+
+        {/* Team referral registration form */}
+        {isTeamReferral && user && (
+          <div className="space-y-4 mb-6 p-4 bg-gray-900/50 rounded-lg border border-gray-800">
+            <h3 className="text-white font-semibold mb-2">Complete Your Profile</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-gray-400 text-sm">First Name</Label>
+                <Input 
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Shannon"
+                  className="bg-gray-800 border-gray-700 text-white"
+                  data-testid="input-first-name"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-gray-400 text-sm">Last Name</Label>
+                <Input 
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Smith"
+                  className="bg-gray-800 border-gray-700 text-white"
+                  data-testid="input-last-name"
+                />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-gray-400 text-sm">Primary Position</Label>
+              <Select value={primaryPosition} onValueChange={setPrimaryPosition}>
+                <SelectTrigger className="bg-gray-800 border-gray-700 text-white" data-testid="select-position">
+                  <SelectValue placeholder="Select your position..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="P">Pitcher (P)</SelectItem>
+                  <SelectItem value="C">Catcher (C)</SelectItem>
+                  <SelectItem value="1B">First Base (1B)</SelectItem>
+                  <SelectItem value="2B">Second Base (2B)</SelectItem>
+                  <SelectItem value="SS">Shortstop (SS)</SelectItem>
+                  <SelectItem value="3B">Third Base (3B)</SelectItem>
+                  <SelectItem value="LF">Left Field (LF)</SelectItem>
+                  <SelectItem value="CF">Center Field (CF)</SelectItem>
+                  <SelectItem value="RF">Right Field (RF)</SelectItem>
+                  <SelectItem value="DP">Designated Player (DP)</SelectItem>
+                  <SelectItem value="FLEX">Flex</SelectItem>
+                  <SelectItem value="UTIL">Utility</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
 
         {!user ? (
           <Button
@@ -199,8 +278,11 @@ export default function Register() {
           </Button>
         ) : (
           <Button
-            onClick={() => completeMutation.mutate()}
-            disabled={completeMutation.isPending}
+            onClick={() => {
+              setRegistrationStep("completing");
+              completeMutation.mutate();
+            }}
+            disabled={completeMutation.isPending || (isTeamReferral && (!firstName || !lastName))}
             className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-lg py-6"
             data-testid="button-complete-registration"
           >
@@ -210,7 +292,7 @@ export default function Register() {
                 Setting Up...
               </>
             ) : (
-              "Complete Registration"
+              isTeamReferral ? "Join Team" : "Complete Registration"
             )}
           </Button>
         )}
