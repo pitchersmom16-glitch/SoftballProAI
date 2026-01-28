@@ -172,10 +172,10 @@ export default function Dashboard() {
                     <div key={assessment.id} className="p-4 hover:bg-white/5 transition-colors flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="h-10 w-10 rounded-lg bg-neon-green/20 flex items-center justify-center text-lg font-bold text-neon-green">
-                          {athlete?.name[0] || '?'}
+                          {athlete?.firstName?.[0] || '?'}
                         </div>
                         <div>
-                          <p className="font-medium text-white">{athlete?.name || 'Unknown Athlete'}</p>
+                          <p className="font-medium text-white">{athlete ? `${athlete.firstName} ${athlete.lastName}` : 'Unknown Athlete'}</p>
                           <p className="text-xs text-gray-400 capitalize">{assessment.skillType} • {new Date(assessment.date || '').toLocaleDateString()}</p>
                         </div>
                       </div>
