@@ -51,6 +51,8 @@ Preferred communication style: Simple, everyday language.
 - **Component**: `client/src/components/PoseAnalyzer.tsx`.
 - **Features**: Real-time pose detection, skeleton overlay, auto-detection of dominant side, tracking loss detection.
 - **Metrics Calculated**: Arm Slot Angle, Knee Flexion, Torque Separation (2D estimates).
+- **Video Playback Controls**: Slow motion (0.25x, 0.5x, 1x), frame-by-frame scrubbing (arrow keys or buttons).
+- **Overlay Sync**: Skeleton overlay stays synced at all playback speeds via `requestAnimationFrame` processing.
 - **Integration**: Used in AssessmentDetail page for live biomechanics display.
 
 ### AI Brain System
@@ -61,7 +63,7 @@ Preferred communication style: Simple, everyday language.
 - **Issue Mapping**: Maps biomechanical issues to mechanic tags for drill matching.
 
 ### Multi-Mode Baseline Protocol
-All athletes (team and private instructor) must upload 4 baseline videos (minimum 20 seconds each) before accessing the dashboard.
+All athletes (team and private instructor) must upload 4 baseline videos (MAXIMUM 20 seconds each) before accessing the dashboard.
 
 **Head Coach Mode (team_coach)**:
 - Athletes join via team referral links (`/register?ref=TEAM_ABC123`)
