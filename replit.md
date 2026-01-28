@@ -113,6 +113,32 @@ All athletes (team and private instructor) must upload 4 baseline videos (MAXIMU
 - **Trigger Points**: Player check-ins, video uploads, baseline completions, baseline approvals.
 - **UI**: `NotificationBell` in dashboard header with unread count.
 
+### Goal Builder (Biometric Onboarding)
+- **Purpose**: Structured goal setting during athlete onboarding.
+- **Position-Specific Metrics**:
+  - PITCHER: Velocity (mph), Spin Rate (rpm), Strike Zone %
+  - HITTER: Exit Velocity (mph), Launch Angle (degrees), Swing-Miss %
+  - CATCHER: Pop-Time (sec), Blocking Efficiency %
+  - INFIELD/OUTFIELD: Lateral Range (feet), Throwing Velocity (mph)
+- **Storage**: JSON format in localStorage: `{ metric, metricLabel, target, unit, currentBaseline }`
+- **UI**: Dropdown selector for metric + target value input + optional baseline
+
+### GameChanger Stats Integration
+- **Route**: `/stats-import` (authenticated players)
+- **CSV Parsing**: Supports Name, Pos, AVG, OPS, ERA, WHIP, K%, First Pitch Strike %, Exit Velocity
+- **Database**: `gameChangerStats` table stores imported data
+- **Purpose**: Import on-field stats to power recruiting profile
+
+### Public Recruiting Profile
+- **Route**: `/profile/:id` (public, no auth required)
+- **Sections**:
+  1. Athlete Bio: Name, Height, Position, Graduation Year, Team
+  2. AI Skeletal Analysis: Biomechanical highlights with grades (A, B+, etc.)
+  3. GameChanger Stats: ERA, K%, WHIP, AVG, OPS, Exit Velocity
+  4. 2026 Season Goals: Progress bars toward performance targets
+- **Database**: `skeletalAnalysis` table for AI highlights
+- **Demo Data**: Falls back to demo data when real data not available
+
 ## External Dependencies
 
 ### Replit Integrations
