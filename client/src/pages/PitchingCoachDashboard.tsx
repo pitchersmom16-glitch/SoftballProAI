@@ -217,11 +217,11 @@ export default function PitchingCoachDashboard() {
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-full bg-neon-yellow/20 flex items-center justify-center">
                           <span className="text-neon-yellow font-bold text-lg">
-                            {item.student.athlete?.name?.charAt(0) || "?"}
+                            {item.student.athlete?.firstName?.charAt(0) || "?"}
                           </span>
                         </div>
                         <div>
-                          <h4 className="font-medium">{item.student.athlete?.name || "Unknown Student"}</h4>
+                          <h4 className="font-medium">{item.student.athlete ? `${item.student.athlete.firstName} ${item.student.athlete.lastName}` : "Unknown Student"}</h4>
                           <p className="text-sm text-muted-foreground">
                             Started {item.student.startDate || "N/A"}
                           </p>

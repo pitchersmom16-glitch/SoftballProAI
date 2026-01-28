@@ -95,7 +95,7 @@ export default function Assessments() {
                   </SelectTrigger>
                   <SelectContent>
                     {athletes?.map(a => (
-                      <SelectItem key={a.id} value={a.id.toString()}>{a.name}</SelectItem>
+                      <SelectItem key={a.id} value={a.id.toString()}>{a.firstName} {a.lastName}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -167,7 +167,7 @@ export default function Assessments() {
                 
                 <div className="p-5">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-lg text-slate-900">{athlete?.name || "Unknown Athlete"}</h3>
+                    <h3 className="font-bold text-lg text-slate-900">{athlete ? `${athlete.firstName} ${athlete.lastName}` : "Unknown Athlete"}</h3>
                     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide 
                       ${assessment.status === 'completed' ? 'bg-green-100 text-green-700' : 
                         assessment.status === 'analyzing' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>
