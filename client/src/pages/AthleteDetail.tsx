@@ -7,11 +7,12 @@ import { Card } from "@/components/ui/card";
 import { 
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription 
 } from "@/components/ui/dialog";
-import { ArrowLeft, Trash2, Camera, Loader2 } from "lucide-react";
+import { ArrowLeft, Trash2, Camera, Loader2, Rocket } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ObjectUploader } from "@/components/ObjectUploader";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@shared/routes";
+import PoseAnalyzer from "@/components/PoseAnalyzer";
 
 export default function AthleteDetail() {
   const { id } = useParams<{ id: string }>();
@@ -21,9 +22,12 @@ export default function AthleteDetail() {
   const deleteAthlete = useDeleteAthlete();
   const updateAthlete = useUpdateAthlete();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [showBiomechanics, setShowBiomechanics] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const pendingObjectPath = useRef<string | null>(null);
+  
+  const TEST_VIDEO_URL = "https://storage.googleapis.com/mediapipe-tasks/pose_landmarker/walking_preview.mp4";
 
   const team = teams?.find(t => t.id === athlete?.teamId);
 
@@ -179,6 +183,22 @@ export default function AthleteDetail() {
           </div>
         </div>
 
+        {(athlete.firstName.toLowerCase() === "shannon") && (
+          <div className="pt-6 border-t border-white/10">
+            <h3 className="text-sm font-semibold text-neon-pink uppercase tracking-wider mb-4">Biomechanics Analysis (Test Mode)</h3>
+            <Button 
+              className="bg-gradient-to-r from-neon-pink to-purple-600"
+              onClick={() => setShowBiomechanics(true)}
+              data-testid="button-test-biomechanics"
+            >
+              <Rocket className="mr-2 h-4 w-4" /> Test Biomechanics Now
+            </Button>
+            <p className="text-sm text-muted-foreground mt-2">
+              Bypass onboarding and instantly test the biomechanics analysis engine.
+            </p>
+          </div>
+        )}
+
         <div className="pt-6 border-t border-white/10">
           <h3 className="text-sm font-semibold text-red-400 uppercase tracking-wider mb-4">Danger Zone</h3>
           <Button 
@@ -193,6 +213,30 @@ export default function AthleteDetail() {
           </p>
         </div>
       </Card>
+
+      <Dialog open={showBiomechanics} onOpenChange={setShowBiomechanics}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-white">
+              Biomechanics Analysis - {athlete.firstName} {athlete.lastName}
+            </DialogTitle>
+            <DialogDescription>
+              Real-time pose detection with MediaPipe. Play the video to see skeletal overlay and metrics.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <PoseAnalyzer 
+              videoUrl={TEST_VIDEO_URL}
+              onMetricsUpdate={(metrics) => console.log("Biomechanics metrics:", metrics)}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBiomechanics(false)} data-testid="button-close-biomechanics">
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>

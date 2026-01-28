@@ -1,4 +1,4 @@
-import { useAthletes, useCreateAthlete } from "@/hooks/use-athletes";
+import { useAthletes, useCreateAthlete, useDeleteAthlete } from "@/hooks/use-athletes";
 import { useTeams } from "@/hooks/use-teams";
 import { useState } from "react";
 import { Link } from "wouter";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { 
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,7 +14,8 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertAthleteSchema } from "@shared/routes";
 import { z } from "zod";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const createAthleteFormSchema = insertAthleteSchema.extend({
   heightInches: z.coerce.number().optional(),
@@ -28,7 +29,33 @@ export default function Athletes() {
   const { data: athletes, isLoading } = useAthletes();
   const { data: teams } = useTeams();
   const createAthlete = useCreateAthlete();
+  const deleteAthlete = useDeleteAthlete();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [athleteToDelete, setAthleteToDelete] = useState<{ id: number; name: string } | null>(null);
+  const { toast } = useToast();
+
+  const handleDeleteClick = (e: React.MouseEvent, id: number, name: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setAthleteToDelete({ id, name });
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (athleteToDelete) {
+      deleteAthlete.mutate(athleteToDelete.id, {
+        onSuccess: () => {
+          toast({ title: "Athlete deleted", description: `${athleteToDelete.name} has been removed from your roster.` });
+          setDeleteDialogOpen(false);
+          setAthleteToDelete(null);
+        },
+        onError: () => {
+          toast({ title: "Error", description: "Failed to delete athlete.", variant: "destructive" });
+        }
+      });
+    }
+  };
 
   const form = useForm({
     resolver: zodResolver(createAthleteFormSchema),
@@ -65,8 +92,8 @@ export default function Athletes() {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold font-display text-slate-900">Athletes</h1>
-          <p className="text-slate-500 mt-1">Manage your roster and player profiles.</p>
+          <h1 className="text-3xl font-bold font-display text-white">Athletes</h1>
+          <p className="text-gray-400 mt-1">Manage your roster and player profiles.</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -205,7 +232,7 @@ export default function Athletes() {
             const team = teams?.find(t => t.id === athlete.teamId);
             const fullName = getFullName(athlete);
             return (
-              <Card key={athlete.id} className="p-6 hover:shadow-lg transition-all duration-300 border-slate-100 group" data-testid={`card-athlete-${athlete.id}`}>
+              <Card key={athlete.id} className="p-6 hover:shadow-lg transition-all duration-300 border-white/10 bg-card group" data-testid={`card-athlete-${athlete.id}`}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-4">
                     {athlete.photoUrl ? (
@@ -217,43 +244,54 @@ export default function Athletes() {
                       />
                     ) : (
                       <div 
-                        className="h-14 w-14 rounded-2xl bg-slate-100 flex items-center justify-center text-xl font-bold text-slate-400 group-hover:bg-primary group-hover:text-white transition-colors"
+                        className="h-14 w-14 rounded-2xl bg-neon-green/20 flex items-center justify-center text-xl font-bold text-neon-green group-hover:bg-neon-green group-hover:text-black transition-colors"
                         data-testid={`avatar-athlete-${athlete.id}`}
                       >
                         {athlete.firstName[0]}
                       </div>
                     )}
                     <div>
-                      <h3 className="font-bold text-lg text-slate-900">{fullName}</h3>
-                      <p className="text-sm text-slate-500">{athlete.primaryPosition} {athlete.jerseyNumber && `• #${athlete.jerseyNumber}`}</p>
+                      <h3 className="font-bold text-lg text-white">{fullName}</h3>
+                      <p className="text-sm text-gray-400">{athlete.primaryPosition} {athlete.jerseyNumber && `• #${athlete.jerseyNumber}`}</p>
                     </div>
                   </div>
-                  {team && (
-                    <span className="px-2 py-1 rounded-md bg-slate-100 text-xs font-semibold text-slate-600">
-                      {team.name}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {team && (
+                      <span className="px-2 py-1 rounded-md bg-neon-green/10 text-xs font-semibold text-neon-green border border-neon-green/30">
+                        {team.name}
+                      </span>
+                    )}
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => handleDeleteClick(e, athlete.id, fullName)}
+                      data-testid={`button-delete-athlete-${athlete.id}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
                 
-                <div className="grid grid-cols-3 gap-2 py-4 border-t border-slate-50">
+                <div className="grid grid-cols-3 gap-2 py-4 border-t border-white/10">
                   <div className="text-center">
-                    <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">Bats</p>
-                    <p className="font-semibold">{athlete.bats}</p>
+                    <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Bats</p>
+                    <p className="font-semibold text-white">{athlete.bats || 'N/A'}</p>
                   </div>
-                  <div className="text-center border-l border-slate-50">
-                    <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">Throws</p>
-                    <p className="font-semibold">{athlete.throws}</p>
+                  <div className="text-center border-l border-white/10">
+                    <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Throws</p>
+                    <p className="font-semibold text-white">{athlete.throws || 'N/A'}</p>
                   </div>
-                  <div className="text-center border-l border-slate-50">
-                    <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">Height</p>
-                    <p className="font-semibold">{athlete.heightInches ? `${Math.floor(athlete.heightInches/12)}'${athlete.heightInches%12}"` : '-'}</p>
+                  <div className="text-center border-l border-white/10">
+                    <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Height</p>
+                    <p className="font-semibold text-white">{athlete.heightInches ? `${Math.floor(athlete.heightInches/12)}'${athlete.heightInches%12}"` : 'N/A'}</p>
                   </div>
                 </div>
 
                 <Link href={`/athletes/${athlete.id}`}>
                   <Button 
                     variant="outline" 
-                    className="w-full mt-2 group-hover:border-primary group-hover:text-primary transition-colors"
+                    className="w-full mt-2 border-neon-green/30 text-neon-green"
                     data-testid={`button-view-profile-${athlete.id}`}
                   >
                     View Profile
@@ -264,6 +302,30 @@ export default function Athletes() {
           })}
         </div>
       )}
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Athlete</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete {athleteToDelete?.name}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} data-testid="button-cancel-delete">
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDelete}
+              disabled={deleteAthlete.isPending}
+              data-testid="button-confirm-delete"
+            >
+              {deleteAthlete.isPending ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

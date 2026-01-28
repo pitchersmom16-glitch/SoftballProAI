@@ -104,7 +104,7 @@ export default function Dashboard() {
           <p className="text-gray-400 mt-1">Welcome back, {coach?.name}. Here's what's happening.</p>
         </div>
         <Link href="/assessments">
-          <Button size="lg" className="shadow-lg shadow-primary/20">
+          <Button size="lg" className="shadow-lg shadow-primary/20 w-full md:w-auto" data-testid="button-new-assessment">
             <Video className="mr-2 h-4 w-4" />
             New Assessment
           </Button>

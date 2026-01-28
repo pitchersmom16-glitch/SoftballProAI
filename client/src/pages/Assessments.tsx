@@ -71,8 +71,8 @@ export default function Assessments() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold font-display text-slate-900">Assessments</h1>
-          <p className="text-slate-500 mt-1">Video analysis and biomechanical feedback.</p>
+          <h1 className="text-3xl font-bold font-display text-white">Assessments</h1>
+          <p className="text-gray-400 mt-1">Video analysis and biomechanical feedback.</p>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -152,7 +152,7 @@ export default function Assessments() {
           const athlete = athletes?.find(a => a.id === assessment.athleteId);
           return (
             <Link key={assessment.id} href={`/assessments/${assessment.id}`}>
-              <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-slate-100 cursor-pointer">
+              <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-white/10 bg-card cursor-pointer">
                 <div className="relative aspect-video bg-slate-900 flex items-center justify-center">
                   <Video className="h-12 w-12 text-slate-700 group-hover:text-white transition-colors" />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -167,16 +167,16 @@ export default function Assessments() {
                 
                 <div className="p-5">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-lg text-slate-900">{athlete ? `${athlete.firstName} ${athlete.lastName}` : "Unknown Athlete"}</h3>
+                    <h3 className="font-bold text-lg text-white">{athlete ? `${athlete.firstName} ${athlete.lastName}` : "Unknown Athlete"}</h3>
                     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide 
                       ${assessment.status === 'completed' ? 'bg-green-100 text-green-700' : 
                         assessment.status === 'analyzing' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>
                       {assessment.status}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-500 capitalize mb-4">{assessment.skillType} Analysis</p>
+                  <p className="text-sm text-gray-400 capitalize mb-4">{assessment.skillType} Analysis</p>
                   
-                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
                     {assessment.status === 'completed' ? (
                       <>
                         <CheckCircle className="h-4 w-4 text-green-500" />
