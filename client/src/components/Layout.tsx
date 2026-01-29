@@ -2,6 +2,8 @@ import { Sidebar } from "./Sidebar";
 import { NotificationBell } from "./NotificationBell";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
+import { Button } from "./ui/button";
+import { LogOut, User } from "lucide-react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -27,8 +29,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <div className={`lg:pl-72 transition-all duration-300 min-h-screen`}>
         {isAuthenticated && user?.role && (
           <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-sm border-b border-slate-200">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-end gap-2">
-              <NotificationBell />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <User className="h-4 w-4" />
+                <span className="font-medium capitalize">{user.role?.replace('_', ' ')}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <NotificationBell />
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => window.location.href = '/api/logout'}
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              </div>
             </div>
           </header>
         )}

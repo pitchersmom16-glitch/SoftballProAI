@@ -99,8 +99,8 @@ export async function setupAuth(app: Express) {
       return res.redirect("/");
     }
     
-    // Auto-login as dev user
-    const userId = "dev-user-" + Date.now();
+    // Auto-login as FIXED dev user (not timestamp-based)
+    const userId = "dev-user-local";
     
     req.logIn({ claims: { sub: userId, email: "dev@softballproai.com", given_name: "Dev", family_name: "User", first_name: "Dev", last_name: "User" } }, async (err) => {
       if (err) return res.status(500).json({ message: "Auto-login failed" });

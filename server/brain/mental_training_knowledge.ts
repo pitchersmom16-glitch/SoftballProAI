@@ -1,5 +1,5 @@
 /**
- * MENTAL TRAINING & MAMBA MENTALITY KNOWLEDGE BASE
+ * MENTAL TRAINING & CHAMPIONSHIP MINDSET KNOWLEDGE BASE
  * SoftballProAI Brain - Championship Mindset and Sports Psychology
  * 
  * Comprehensive mental training, motivational content, and psychological
@@ -8,10 +8,10 @@
  */
 
 // ============================================================================
-// MAMBA MENTALITY - Kobe Bryant's Philosophy
+// CHAMPIONSHIP MINDSET - Elite Athlete Philosophy
 // ============================================================================
 
-export const MAMBA_MENTALITY = {
+export const CHAMPIONSHIP_MINDSET = {
   definition: "Constantly striving to be the best version of yourself - a constant quest to be better today than you were yesterday",
   
   corePhilosophy: {
@@ -471,7 +471,7 @@ export const CONTEXTUAL_MENTAL_STRATEGIES = {
 };
 
 export default {
-  MAMBA_MENTALITY,
+  CHAMPIONSHIP_MINDSET,
   MOTIVATIONAL_QUOTES,
   SPORTS_PSYCHOLOGY,
   DAILY_MINDSET_THEMES,

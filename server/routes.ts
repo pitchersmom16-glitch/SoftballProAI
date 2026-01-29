@@ -1864,8 +1864,15 @@ export async function registerRoutes(
       
       const onboarding = await storage.getPlayerOnboarding(userId);
       if (!onboarding) {
-        // No onboarding = solo player, dashboard unlocked by default
-        return res.json({ dashboardUnlocked: true, baselineComplete: true });
+        // No onboarding record = new player, needs to complete onboarding
+        return res.json({ 
+          dashboardUnlocked: false, 
+          baselineComplete: false,
+          baselineVideoCount: 0,
+          baselineVideosRequired: 4,
+          baselineVideos: [],
+          videoPrompts: VIDEO_PROMPTS.team_coach,
+        });
       }
       
       const baselineVideos = await storage.getBaselineVideos(userId);

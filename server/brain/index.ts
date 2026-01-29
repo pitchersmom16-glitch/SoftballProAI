@@ -62,7 +62,7 @@ export {
 } from './softball_knowledge_base';
 
 export {
-  MAMBA_MENTALITY,
+  CHAMPIONSHIP_MINDSET,
   MOTIVATIONAL_QUOTES,
   SPORTS_PSYCHOLOGY,
   DAILY_MINDSET_THEMES,
@@ -120,7 +120,7 @@ export const SoftballKnowledge = {
 };
 
 export const MentalTraining = {
-  mamba: () => import('./mental_training_knowledge').then(m => m.MAMBA_MENTALITY),
+  championship: () => import('./mental_training_knowledge').then(m => m.CHAMPIONSHIP_MINDSET),
   quotes: () => import('./mental_training_knowledge').then(m => m.MOTIVATIONAL_QUOTES),
   psychology: () => import('./mental_training_knowledge').then(m => m.SPORTS_PSYCHOLOGY),
   daily: () => import('./mental_training_knowledge').then(m => m.DAILY_MINDSET_THEMES),
@@ -168,7 +168,7 @@ export async function getKnowledge(topic: string) {
     'outfield': SoftballKnowledge.outfield,
     'biomechanics': SoftballKnowledge.biomechanics,
     'experts': SoftballKnowledge.experts,
-    'mamba': MentalTraining.mamba,
+    'championship': MentalTraining.championship,
     'quotes': MentalTraining.quotes,
     'psychology': MentalTraining.psychology,
     'mental-daily': MentalTraining.daily,
@@ -224,20 +224,23 @@ export async function getMotivationalQuote(category?: string) {
 }
 
 /**
- * Helper to get daily Mamba Mentality content
+ * Helper to get daily Championship Mindset content
  */
-export async function getMambaDailyContent() {
-  const mamba = await MentalTraining.mamba();
+export async function getChampionshipDailyContent() {
+  const championship = await MentalTraining.championship();
   const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const today = days[new Date().getDay()];
   
   const dailyThemes = await MentalTraining.daily();
   return {
-    mambaPrinciple: mamba.keyPrinciples[Object.keys(mamba.keyPrinciples)[Math.floor(Math.random() * Object.keys(mamba.keyPrinciples).length)]],
+    championshipPrinciple: championship.keyPrinciples[Object.keys(championship.keyPrinciples)[Math.floor(Math.random() * Object.keys(championship.keyPrinciples).length)]],
     dailyTheme: dailyThemes[today as keyof typeof dailyThemes],
-    randomApplication: mamba.dailyApplications.morningMindset[Math.floor(Math.random() * mamba.dailyApplications.morningMindset.length)]
+    randomApplication: championship.dailyApplications.morningMindset[Math.floor(Math.random() * championship.dailyApplications.morningMindset.length)]
   };
 }
+
+// Legacy alias for backward compatibility
+export const getMambaDailyContent = getChampionshipDailyContent;
 
 /**
  * Helper to get age-appropriate training guidance
@@ -334,7 +337,8 @@ export default {
   // Helper functions
   getKnowledge,
   getMotivationalQuote,
-  getMambaDailyContent,
+  getChampionshipDailyContent,
+  getMambaDailyContent, // legacy alias
   getAgeAppropriateGuidance,
   getTournamentRules,
   generatePracticePlan

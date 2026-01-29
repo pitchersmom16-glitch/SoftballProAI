@@ -13,22 +13,371 @@
 
 export const CROSSFIT_FOR_SOFTBALL = {
   overview: {
-    philosophy: "Functional fitness that translates directly to softball performance",
+    philosophy: "Functional fitness that translates directly to softball performance through movement patterns that mirror sport-specific mechanics",
     focusAreas: [
       "Shoulder complex and rotator cuff strengthening",
-      "Core musculature stabilization",
+      "Core musculature stabilization and anti-rotation",
+      "Explosive rotational power development",
+      "Hip drive and posterior chain power",
       "Speed and power development",
       "Posture and movement quality improvement",
       "Mental toughness and work capacity"
     ],
-    benefits: "Increased power hitting, throwing velocity, injury prevention, and mental toughness"
+    benefits: "Increased power hitting, throwing velocity, injury prevention, mental toughness, and explosive movement capacity",
+    kineticChainPrinciple: "CrossFit movements train ground-to-extremity force transfer, identical to softball's kinetic chain sequencing"
+  },
+
+  // ============================================================================
+  // CROSSFIT DRILLS THAT BUILD SOFTBALL MECHANICS
+  // ============================================================================
+  
+  mechanicsTransfer: {
+    description: "How specific CrossFit movements directly improve softball skills",
+    
+    forPitching: {
+      primaryMovements: [
+        {
+          movement: "Medicine Ball Rotational Slams",
+          sets: "4x8 each side",
+          softballMechanic: "Hip-shoulder separation and explosive rotation through release",
+          carryover: "Teaches hips to fire first, creating lag with shoulders - the EXACT pitching sequence",
+          weight: "8-12 lbs for youth (12U-14U), 12-16 lbs for advanced (16U+)",
+          coachingCue: "Hips rotate explosively BEFORE shoulders, just like windmill delivery"
+        },
+        {
+          movement: "Kettlebell Swings",
+          sets: "3-4x15-20 reps",
+          softballMechanic: "Hip drive and posterior chain explosion (same as leg drive in pitching)",
+          carryover: "9.8% max strength increase, 19.8% explosive power increase in 6 weeks (research-proven)",
+          weight: "12-16 kg (26-35 lbs) for 14U+, 8-12 kg for 12U",
+          coachingCue: "Explosive hip snap - this is your leg drive power in pitching"
+        },
+        {
+          movement: "Landmine Rotations",
+          sets: "3x12 each side",
+          softballMechanic: "Controlled rotational power with resistance",
+          carryover: "Builds hip and core strength through full range of motion, mimics pitching rotation",
+          weight: "25-45 lbs on barbell",
+          coachingCue: "Maintain spine angle, rotate through hips - same posture as pitching"
+        },
+        {
+          movement: "Single-Leg Romanian Deadlifts (RDLs)",
+          sets: "3x10 each leg",
+          softballMechanic: "Balance and posterior chain strength on drive leg",
+          carryover: "Strengthens the exact muscles used during stride and drive phase",
+          weight: "Bodyweight to 20 lbs dumbbells",
+          coachingCue: "This is your push leg stability in pitching"
+        },
+        {
+          movement: "Pallof Press (Anti-Rotation)",
+          sets: "3x15 each side",
+          softballMechanic: "Core stability to resist rotation (creates the 'lag' in separation)",
+          carryover: "Prevents early rotation, builds the separation that creates velocity",
+          resistance: "Medium resistance band or cable",
+          coachingCue: "Resist the twist - this builds your separation power"
+        }
+      ],
+
+      researchBacked: "Medicine ball rotational work forms foundation of velocity development - engages full kinetic chain feet to fingertips",
+      velocityGain: "Properly executed rotational power training can add 3-7 mph in 8-12 weeks"
+    },
+
+    forHitting: {
+      primaryMovements: [
+        {
+          movement: "Medicine Ball Side Tosses",
+          sets: "4x10 each side",
+          softballMechanic: "Explosive hip rotation and weight transfer through contact",
+          carryover: "EXACT movement pattern as hitting - load, explode, release",
+          weight: "6-10 lbs for youth, 10-14 lbs for advanced",
+          progression: "Kneeling → Half-kneeling → Standing (adds more kinetic chain)",
+          coachingCue: "Load back hip, explode through - this IS your swing"
+        },
+        {
+          movement: "Figure-8 Medicine Ball Shotput",
+          sets: "3x8 each side",
+          softballMechanic: "Hip rotation with upper body lag (separation)",
+          carryover: "Creates the 'stretch-shortening cycle' used in powerful swings",
+          weight: "8-10 lbs",
+          coachingCue: "Keep head back, rotate hips aggressively - don't let shoulders lead"
+        },
+        {
+          movement: "Cable Chops (High to Low)",
+          sets: "3x10 each side",
+          softballMechanic: "Downward bat path with rotation (attack angle)",
+          carryover: "Teaches proper swing plane while building rotational strength",
+          weight: "20-40 lbs on cable",
+          coachingCue: "This is your swing path - rotate and chop down through zone"
+        },
+        {
+          movement: "Box Jumps / Broad Jumps",
+          sets: "3x5-8 reps",
+          softballMechanic: "Explosive lower body power (weight transfer in swing)",
+          carryover: "Builds the explosive hip drive that creates bat speed",
+          height: "12-24 inches for box jumps",
+          coachingCue: "Triple extension - same as driving through the ball"
+        },
+        {
+          movement: "Russian Twists with Med Ball",
+          sets: "3x20 total (10 each side)",
+          softballMechanic: "Rotational endurance and core control",
+          carryover: "Builds stamina for maintaining swing speed through entire game",
+          weight: "8-12 lbs",
+          coachingCue: "Control the rotation - don't let momentum do the work"
+        },
+        {
+          movement: "Glute Bridges & Hip Thrusts",
+          sets: "3x12-15",
+          softballMechanic: "Hip extension power (back hip driving through)",
+          carryover: "Strengthens the back hip drive that initiates rotation",
+          weight: "Bodyweight to 45 lbs on hips",
+          coachingCue: "Explosive bridge - this powers your back side rotation"
+        }
+      ],
+
+      earnTheRight: "Athletes must develop core stability BEFORE rotational power training - strong stable base prevents injury",
+      exitVelocityGain: "Proper rotational power training can add 5-10 mph exit velocity in 12 weeks"
+    },
+
+    forThrowing: {
+      primaryMovements: [
+        {
+          movement: "Overhead Medicine Ball Slams",
+          sets: "3x10",
+          softballMechanic: "Overhead throwing motion with deceleration",
+          carryover: "Builds shoulder stability and teaches proper deceleration (injury prevention)",
+          weight: "6-10 lbs",
+          coachingCue: "Explode up and slam down - full range throwing motion"
+        },
+        {
+          movement: "Wall Ball Shots",
+          sets: "3x15-20",
+          softballMechanic: "Explosive lower body drive to upper body release",
+          carryover: "Perfect kinetic chain sequencing - legs → core → arms",
+          weight: "10-14 lb ball, 10-foot target",
+          coachingCue: "Drive through legs, punch ball up - same as explosive throw"
+        },
+        {
+          movement: "Dumbbell Snatches",
+          sets: "3x6-8 each arm",
+          softballMechanic: "Triple extension and overhead stabilization",
+          carryover: "Builds explosive power from ground through shoulder",
+          weight: "15-30 lbs",
+          coachingCue: "Explosive pull overhead - this is throwing power"
+        },
+        {
+          movement: "Band Pull-Aparts",
+          sets: "4x20",
+          softballMechanic: "Scapular retraction and rear delt strength",
+          carryover: "Protects shoulder, improves throwing mechanics and arm health",
+          resistance: "Light to medium band",
+          coachingCue: "CRITICAL for arm health - do these EVERY day"
+        }
+      ]
+    },
+
+    forFielding: {
+      primaryMovements: [
+        {
+          movement: "Lateral Bounds / Skater Jumps",
+          sets: "3x10 each side",
+          softballMechanic: "Explosive lateral movement (range in field)",
+          carryover: "Develops first-step quickness and lateral range",
+          coachingCue: "Explode side to side - this is your range in the field"
+        },
+        {
+          movement: "Bulgarian Split Squats",
+          sets: "3x10 each leg",
+          softballMechanic: "Single-leg strength and stability (fielding grounders)",
+          carryover: "Builds the leg strength needed to stay low through fielding",
+          weight: "Bodyweight to 20 lbs dumbbells",
+          coachingCue: "Stay low, drive through front leg - fielding position"
+        },
+        {
+          movement: "Plyo Push-Ups / Clap Push-Ups",
+          sets: "3x8-10",
+          softballMechanic: "Explosive upper body power",
+          carryover: "Quick hands for fielding reactions",
+          modification: "Elevated hands for beginners",
+          coachingCue: "Explosive hands - quick reactions"
+        }
+      ]
+    }
   },
 
   realWorldResults: {
     caseStudy: "High school catcher started CrossFit at age 12, led team in home runs, broke school record for career home runs",
     powerTransfer: "Consistent weight room training directly translated to power hitting success",
     mentalBenefit: "Mental toughness from intense CrossFit workouts carries over to demanding games",
-    longTerm: "Athletes who strength train show reduced injury rates and longer careers"
+    longTerm: "Athletes who strength train show reduced injury rates and longer careers",
+    
+    researchFindings: {
+      kettlebellStudy: "6-week kettlebell swing training: 9.8% max strength increase, 19.8% explosive power (vertical jump) increase",
+      rotationalPower: "Medicine ball rotational training: 3-7 mph velocity increase in 8-12 weeks when combined with proper mechanics",
+      injuryReduction: "Posterior chain strengthening reduces ACL injury risk by 50-70% in female athletes",
+      exitVelocity: "Rotational power + hip drive training: 5-10 mph exit velocity gains in 12-week programs"
+    }
+  },
+
+  // ============================================================================
+  // CROSSFIT WODS FOR SOFTBALL ATHLETES
+  // ============================================================================
+
+  softballSpecificWODs: {
+    description: "CrossFit-style workouts designed specifically for softball performance",
+    
+    pitcherPowerWOD: {
+      name: "Velocity Builder",
+      focus: "Rotational power and hip drive for pitching",
+      duration: "20-25 minutes",
+      warmup: "10 min dynamic + arm care band work",
+      workout: [
+        "4 Rounds for quality (not time):",
+        "  - 8 Medicine Ball Rotational Slams each side (12 lbs)",
+        "  - 20 Kettlebell Swings (26 lbs / 12 kg)",
+        "  - 12 Landmine Rotations each side (35 lbs)",
+        "  - 10 Single-Leg RDLs each leg (bodyweight or 10 lbs)",
+        "  - Rest 90 seconds between rounds"
+      ],
+      cooldown: "Shoulder stretching, foam roll posterior chain",
+      frequency: "2x per week, at least 48 hours before pitching",
+      ageAppropriate: "14U+, reduce weights for 12U"
+    },
+
+    hitterExplosionWOD: {
+      name: "Exit Velocity Booster",
+      focus: "Rotational explosion and bat speed",
+      duration: "25-30 minutes",
+      warmup: "10 min dynamic + hip activation",
+      workout: [
+        "EMOM (Every Minute on the Minute) for 20 minutes:",
+        "  Minute 1: 10 Med Ball Side Tosses each side (10 lbs)",
+        "  Minute 2: 8 Box Jumps (18-24 inch box)",
+        "  Minute 3: 12 Cable Chops each side (30 lbs)",
+        "  Minute 4: 20 Russian Twists with Med Ball (10 lbs)",
+        "  Minute 5: Rest",
+        "Then:",
+        "  3 Rounds:",
+        "    - 15 Hip Thrusts (45 lbs on hips)",
+        "    - 10 Bulgarian Split Squats each leg"
+      ],
+      cooldown: "Hip flexor stretching, core stretching",
+      frequency: "2-3x per week during off-season",
+      ageAppropriate: "12U+ with proper supervision"
+    },
+
+    allAroundAthleteWOD: {
+      name: "Total Softball Conditioning",
+      focus: "Full-body power, endurance, mental toughness",
+      duration: "30-35 minutes",
+      warmup: "10 min dynamic warm-up",
+      workout: [
+        "21-15-9 reps for time:",
+        "  - Wall Ball Shots (10 lb ball, 10 ft target)",
+        "  - Kettlebell Swings (12 kg)",
+        "  - Box Jumps (18 inch)",
+        "Rest 3 minutes",
+        "Then 3 Rounds:",
+        "  - 10 Dumbbell Snatches each arm (20 lbs)",
+        "  - 20 Lateral Bounds (10 each side)",
+        "  - 30 second Plank Hold",
+        "  - Rest 60 seconds between rounds"
+      ],
+      cooldown: "Full body stretch, breathing work",
+      frequency: "2x per week",
+      ageAppropriate: "14U+ competitive athletes"
+    },
+
+    catcherStrengthWOD: {
+      name: "Behind the Plate Power",
+      focus: "Leg endurance, explosive throwing, blocking strength",
+      duration: "25 minutes",
+      warmup: "10 min dynamic + ankle mobility",
+      workout: [
+        "4 Rounds:",
+        "  - 20 Goblet Squats (25 lbs)",
+        "  - 10 Overhead Med Ball Slams (8 lbs)",
+        "  - 15 Glute Bridges (bodyweight)",
+        "  - 12 Band Pull-Aparts",
+        "  - 30 second Wall Sit",
+        "  - Rest 90 seconds"
+      ],
+      cooldown: "Hip and ankle mobility, quad stretching",
+      frequency: "2x per week",
+      ageAppropriate: "12U+",
+      note: "Builds leg endurance for squatting all game + throwing power"
+    },
+
+    speedAndAgilityWOD: {
+      name: "First Step Explosion",
+      focus: "Lateral quickness, acceleration, base running speed",
+      duration: "20-25 minutes",
+      warmup: "10 min dynamic + agility ladder",
+      workout: [
+        "Tabata Style (20 sec work / 10 sec rest) x 8 rounds:",
+        "  - Lateral Skater Jumps",
+        "  - High Knees",
+        "Then 4 Rounds:",
+        "  - 8 Broad Jumps (max distance)",
+        "  - 10 Lateral Bounds each side",
+        "  - 20 Mountain Climbers",
+        "  - Rest 60 seconds"
+      ],
+      cooldown: "Dynamic stretching, breathing",
+      frequency: "2-3x per week",
+      ageAppropriate: "10U+ (all ages benefit)"
+    },
+
+    recoveryWOD: {
+      name: "Active Recovery",
+      focus: "Movement quality, mobility, light work",
+      duration: "30 minutes",
+      warmup: "5 min easy movement",
+      workout: [
+        "3 Rounds (easy pace):",
+        "  - 10 Air Squats",
+        "  - 10 Push-Ups (or elevated)",
+        "  - 20 Alternating Lunges",
+        "  - 30 second Plank",
+        "  - 10 Inchworms",
+        "Then: 15 minutes yoga or mobility work"
+      ],
+      cooldown: "Deep stretching, foam rolling",
+      frequency: "1-2x per week between hard sessions",
+      ageAppropriate: "All ages",
+      purpose: "Promotes recovery, prevents overtraining"
+    }
+  },
+
+  programmingGuidelines: {
+    weeklyStructure: {
+      offSeason: "3-4 strength WODs + 2 skill days + 1-2 active recovery",
+      preseason: "2-3 strength WODs + 3-4 skill days + 1 recovery",
+      inSeason: "2 maintenance WODs + 4-5 games/practices + 1 recovery"
+    },
+
+    progression: {
+      beginners: "Start with bodyweight and light weights, focus on perfect form for 4-6 weeks",
+      intermediate: "Add weight progressively, increase volume, maintain quality",
+      advanced: "Periodize training, include heavy days and explosive days, track metrics"
+    },
+
+    safetyPrinciples: [
+      "ALWAYS warm up thoroughly (15 minutes minimum)",
+      "Master movement patterns before adding weight",
+      "Never sacrifice form for speed or weight",
+      "Rest 48 hours between high-intensity rotational work",
+      "Listen to soreness vs. pain - pain means stop",
+      "Scale workouts for age and experience"
+    ],
+
+    whenNotToWOD: [
+      "Day before pitching or tournament",
+      "When experiencing joint pain (not muscle soreness)",
+      "During high-stress competition periods",
+      "If arm/shoulder soreness >7/10",
+      "When recovering from injury (get medical clearance)"
+    ]
   },
 
   keyExercises: {

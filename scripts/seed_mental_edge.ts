@@ -13,7 +13,7 @@ import { sql } from "drizzle-orm";
 interface MentalEdgeSeed {
   title: string;
   contentType: "quote" | "video" | "principle" | "visualization";
-  category: "Pre-Game" | "Recovery" | "Focus" | "Confidence" | "Resilience" | "Work-Ethic" | "Teamwork" | "Mamba-Mentality";
+  category: "Pre-Game" | "Recovery" | "Focus" | "Confidence" | "Resilience" | "Work-Ethic" | "Teamwork" | "Championship-Mindset";
   source: string;
   content: string;
   videoUrl?: string;
@@ -23,21 +23,21 @@ interface MentalEdgeSeed {
 
 const MENTAL_EDGE_CONTENT: MentalEdgeSeed[] = [
   // ============================================================================
-  // MAMBA MENTALITY - Kobe Bryant
+  // CHAMPIONSHIP MINDSET - Elite Athlete Philosophy
   // ============================================================================
   {
-    title: "The Mamba Mentality Definition",
+    title: "The Championship Mindset Definition",
     contentType: "principle",
-    category: "Mamba-Mentality",
+    category: "Championship-Mindset",
     source: "Kobe Bryant",
     content: "Constantly striving to be the best version of yourself. It's a constant quest to be better today than you were yesterday. Focus on the process, not just the outcome.",
-    tags: ["mamba", "excellence", "process", "improvement"],
+    tags: ["championship", "excellence", "process", "improvement"],
     usageContext: "daily-mindset, pre-game, motivation"
   },
   {
     title: "Sacrifice for Greatness",
     contentType: "quote",
-    category: "Mamba-Mentality",
+    category: "Championship-Mindset",
     source: "Kobe Bryant",
     content: "A lot of people say they want to be great, but they're not willing to make the sacrifices necessary to achieve greatness.",
     tags: ["sacrifice", "commitment", "greatness", "dedication"],
@@ -46,7 +46,7 @@ const MENTAL_EDGE_CONTENT: MentalEdgeSeed[] = [
   {
     title: "Obsession with Your Craft",
     contentType: "quote",
-    category: "Mamba-Mentality",
+    category: "Championship-Mindset",
     source: "Kobe Bryant",
     content: "If you really want to be great at something you have to truly care about it. If you want to be great in a particular area, you have to obsess over it.",
     tags: ["obsession", "passion", "dedication", "greatness"],
@@ -55,7 +55,7 @@ const MENTAL_EDGE_CONTENT: MentalEdgeSeed[] = [
   {
     title: "Hard Work Beats Talent",
     contentType: "quote",
-    category: "Mamba-Mentality",
+    category: "Championship-Mindset",
     source: "Kobe Bryant",
     content: "Hard work outweighs talent—every time. You have to work hard in the dark to shine in the light.",
     tags: ["hard-work", "effort", "work-ethic", "dedication"],
@@ -64,7 +64,7 @@ const MENTAL_EDGE_CONTENT: MentalEdgeSeed[] = [
   {
     title: "Internal Motivation",
     contentType: "quote",
-    category: "Mamba-Mentality",
+    category: "Championship-Mindset",
     source: "Kobe Bryant",
     content: "I never tried to prove anything to someone else. I wanted to prove something to myself.",
     tags: ["self-motivation", "internal-drive", "personal-standards"],
@@ -303,7 +303,7 @@ const MENTAL_EDGE_CONTENT: MentalEdgeSeed[] = [
   {
     title: "Monday: Start Strong",
     contentType: "quote",
-    category: "Mamba-Mentality",
+    category: "Championship-Mindset",
     source: "Kobe Bryant Philosophy",
     content: "This week is a fresh start. Make every rep count. Champions are made on Monday mornings when no one is watching. Your competition is sleeping. Get to work.",
     tags: ["monday", "fresh-start", "week-start", "early-work"],
@@ -432,8 +432,8 @@ async function seedMentalEdge() {
     });
 
     console.log("\n✅ Mental Edge seeding complete!");
-    console.log("\n💪 Mamba Mentality, motivational quotes, and sports psychology loaded!");
-    console.log("🎯 Players now have access to championship mindset content.");
+    console.log("\n💪 Championship Mindset, motivational quotes, and sports psychology loaded!");
+    console.log("🎯 Players now have access to elite athlete mental training content.");
     
   } catch (error) {
     console.error("❌ Error seeding mental edge:", error);
