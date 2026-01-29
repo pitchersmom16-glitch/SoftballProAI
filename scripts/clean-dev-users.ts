@@ -3,6 +3,10 @@
  * Run with: npm run clean:dev
  */
 
+// Load environment variables
+import { config } from "dotenv";
+config();
+
 import { db } from "../server/db";
 import { users, playerOnboarding, playerCheckins } from "../shared/schema";
 import { eq, or, like } from "drizzle-orm";
