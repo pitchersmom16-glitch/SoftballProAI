@@ -391,16 +391,22 @@ export async function storeBiomechanicsData(
   metrics: BiomechanicsMetrics
 ): Promise<void> {
   try {
+    // Validate biomechanics ranges before storage
+    const validatedMetrics = validateBiomechanics(metrics);
+    
     await storage.createSkeletalAnalysis({
       assessmentId,
-      armSlotAngle: metrics.armSlotAngle,
-      kneeFlexion: metrics.kneeFlexion,
-      hipShoulderSeparation: metrics.torqueSeparation,
-      strideLength: null, // Not calculated in current PoseAnalyzer
-      backLegDrive: null,
-      headPosition: null,
-      analyzedAt: new Date(),
-      analysisVersion: "1.0"
+      skillType: "PITCHING",
+      metrics: {
+        armSlotAngle: validatedMetrics.armSlotAngle,
+        kneeFlexion: validatedMetrics.kneeFlexion,
+        hipShoulderSeparation: validatedMetrics.torqueSeparation,
+        strideLength: null, // Not calculated in current PoseAnalyzer
+        backLegDrive: null,
+        headPosition: null,
+        analyzedAt: new Date().toISOString(),
+        analysisVersion: "1.0"
+      }
     });
 
     console.log(`[VideoAnalysis] Stored biomechanics for assessment ${assessmentId}`);
@@ -408,4 +414,41 @@ export async function storeBiomechanicsData(
     console.error(`[VideoAnalysis] Error storing biomechanics:`, error);
     throw error;
   }
+}
+
+// Validate biomechanics metrics against physically possible ranges
+function validateBiomechanics(metrics: BiomechanicsMetrics): BiomechanicsMetrics {
+  const validated = { ...metrics };
+  
+  // Arm slot angle: 140-180° (high 3/4 to over the top)
+  if (metrics.armSlotAngle !== null) {
+    if (metrics.armSlotAngle < 0 || metrics.armSlotAngle > 360) {
+      console.warn(`[Validation] Invalid arm slot angle: ${metrics.armSlotAngle}° - setting to null`);
+      validated.armSlotAngle = null;
+    } else if (metrics.armSlotAngle < 120 || metrics.armSlotAngle > 190) {
+      console.warn(`[Validation] Unusual arm slot angle: ${metrics.armSlotAngle}° (expected 140-180°)`);
+    }
+  }
+  
+  // Knee flexion: 70-130° (90-110° optimal)
+  if (metrics.kneeFlexion !== null) {
+    if (metrics.kneeFlexion < 0 || metrics.kneeFlexion > 180) {
+      console.warn(`[Validation] Invalid knee flexion: ${metrics.kneeFlexion}° - setting to null`);
+      validated.kneeFlexion = null;
+    } else if (metrics.kneeFlexion < 60 || metrics.kneeFlexion > 140) {
+      console.warn(`[Validation] Unusual knee flexion: ${metrics.kneeFlexion}° (expected 90-110°)`);
+    }
+  }
+  
+  // Torque/hip-shoulder separation: 30-60° (40-50° optimal)
+  if (metrics.torqueSeparation !== null) {
+    if (metrics.torqueSeparation < 0 || metrics.torqueSeparation > 180) {
+      console.warn(`[Validation] Invalid torque separation: ${metrics.torqueSeparation}° - setting to null`);
+      validated.torqueSeparation = null;
+    } else if (metrics.torqueSeparation < 20 || metrics.torqueSeparation > 70) {
+      console.warn(`[Validation] Unusual torque separation: ${metrics.torqueSeparation}° (expected 40-50°)`);
+    }
+  }
+  
+  return validated;
 }

@@ -1,10 +1,22 @@
 import { useDrills } from "@/hooks/use-drills";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dumbbell, Play, Target, Users, Zap, Brain, Wind } from "lucide-react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Dumbbell, Play, Target, Users, Zap, Brain, Wind, HeartPulse, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+interface PlayerCheckin {
+  id: number;
+  mood: string;
+  sorenessAreas: string[] | null;
+  sorenessLevel: number;
+  blockedActivities: string[] | null;
+  notes: string | null;
+  createdAt: string;
+}
 
 const CATEGORIES = [
   { value: "all", label: "All", icon: Dumbbell },
@@ -27,11 +39,24 @@ export default function Drills() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [diffFilter, setDiffFilter] = useState<string>("all");
   
+  // Fetch today's check-in to check for injury blocks
+  const { data: todayCheckin } = useQuery<PlayerCheckin | null>({
+    queryKey: ["/api/player/checkin/today"],
+  });
+  
+  const blockedActivities = todayCheckin?.blockedActivities || [];
+  const isPitchingBlocked = blockedActivities.includes("pitching") || blockedActivities.includes("throwing");
+  
   const { data: drills, isLoading } = useDrills(
     categoryFilter === "all" ? undefined : categoryFilter
   );
 
   const filteredDrills = drills?.filter(drill => {
+    // SAFETY FIRST: Block pitching drills if arm/shoulder soreness detected
+    if (isPitchingBlocked && drill.category === "PITCHING") {
+      return false;
+    }
+    
     if (diffFilter !== "all" && drill.difficulty !== diffFilter) return false;
     return true;
   });
@@ -44,24 +69,54 @@ export default function Drills() {
           <p className="text-gray-400 mt-1" data-testid="text-drills-subtitle">Academy drills across all skill categories</p>
         </div>
         
+        {/* SAFETY WARNING: Pitching blocked due to soreness */}
+        {isPitchingBlocked && (
+          <Alert className="bg-red-500/10 border-red-500/50 text-red-100">
+            <AlertTriangle className="h-5 w-5 text-red-400" />
+            <AlertTitle className="text-red-200 font-semibold">Pitching Drills Blocked - Injury Prevention</AlertTitle>
+            <AlertDescription className="text-red-100/90">
+              Based on your check-in, pitching drills are temporarily blocked to protect your arm. 
+              Focus on <button 
+                onClick={() => setCategoryFilter("CONDITIONING")} 
+                className="underline font-semibold hover:text-white"
+              >
+                Recovery & Conditioning
+              </button> or <button 
+                onClick={() => setCategoryFilter("MENTAL")} 
+                className="underline font-semibold hover:text-white"
+              >
+                Mental Training
+              </button> today.
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <div className="flex flex-wrap gap-2" data-testid="filter-category-buttons">
           {CATEGORIES.map(cat => {
             const Icon = cat.icon;
             const isActive = categoryFilter === cat.value;
+            const isBlocked = isPitchingBlocked && cat.value === "PITCHING";
+            
             return (
               <Button
                 key={cat.value}
                 variant={isActive ? "default" : "outline"}
                 size="sm"
-                onClick={() => setCategoryFilter(cat.value)}
+                onClick={() => {
+                  if (isBlocked) return; // Don't allow selecting blocked category
+                  setCategoryFilter(cat.value);
+                }}
+                disabled={isBlocked}
                 className={cn(
                   "gap-2",
-                  isActive && "bg-gradient-to-r from-purple-600 to-pink-600 border-0"
+                  isActive && "bg-gradient-to-r from-purple-600 to-pink-600 border-0",
+                  isBlocked && "opacity-40 cursor-not-allowed hover:opacity-40"
                 )}
                 data-testid={`button-filter-${cat.value.toLowerCase()}`}
               >
                 <Icon className="h-4 w-4" />
                 {cat.label}
+                {isBlocked && <AlertTriangle className="h-3 w-3 text-red-400 ml-1" />}
               </Button>
             );
           })}

@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
 import { setupAuth, registerAuthRoutes, isAuthenticated } from "./auth/localAuth";
+import { requireRole, requireOwnership } from "./middleware/requireRole";
 import { registerObjectStorageRoutes } from "./storage/objectStorage";
 import { openai } from "./replit_integrations/audio"; // Use the audio client for openai instance
 import { analyzeMechanics, getCorrectiveDrills, getDrillsByTag, getDrillsByExpert } from "./brain/analyze_mechanics";
@@ -676,7 +677,7 @@ export async function registerRoutes(
   });
 
   // === COACH STUDENTS (Stable) ===
-  app.get("/api/coach/students", async (req, res) => {
+  app.get("/api/coach/students", requireRole("team_coach", "pitching_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
@@ -690,7 +691,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/coach/students", async (req, res) => {
+  app.post("/api/coach/students", requireRole("team_coach", "pitching_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
@@ -719,7 +720,7 @@ export async function registerRoutes(
   });
 
   // === HOMEWORK ASSIGNMENTS ===
-  app.get("/api/homework", async (req, res) => {
+  app.get("/api/homework", requireRole("team_coach", "pitching_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
@@ -733,7 +734,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/homework", async (req, res) => {
+  app.post("/api/homework", requireRole("team_coach", "pitching_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
@@ -812,10 +813,19 @@ export async function registerRoutes(
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       
       const schema = z.object({
-        assessmentId: z.number(),
-        armSlotAngle: z.number().nullable(),
-        kneeFlexion: z.number().nullable(),
-        torqueSeparation: z.number().nullable(),
+        assessmentId: z.number().positive(),
+        armSlotAngle: z.number().min(-1).max(360).nullable().refine(
+          (val) => val === null || (val >= 0 && val <= 360),
+          { message: "Arm slot angle must be between 0-360°" }
+        ),
+        kneeFlexion: z.number().min(-1).max(180).nullable().refine(
+          (val) => val === null || (val >= 0 && val <= 180),
+          { message: "Knee flexion must be between 0-180°" }
+        ),
+        torqueSeparation: z.number().min(-1).max(180).nullable().refine(
+          (val) => val === null || (val >= 0 && val <= 180),
+          { message: "Torque separation must be between 0-180°" }
+        ),
       });
       
       const data = schema.parse(req.body);
@@ -1198,7 +1208,7 @@ export async function registerRoutes(
   });
 
   // Get coach's received invites
-  app.get("/api/coach/invites", async (req, res) => {
+  app.get("/api/coach/invites", requireRole("team_coach", "pitching_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
@@ -1254,7 +1264,7 @@ export async function registerRoutes(
   });
 
   // Get coach's players (students)
-  app.get("/api/coach/players", async (req, res) => {
+  app.get("/api/coach/players", requireRole("team_coach", "pitching_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
@@ -1282,7 +1292,7 @@ export async function registerRoutes(
   // === COACH REVIEW QUEUE (Pending Assessments) ===
 
   // Get assessments pending coach review
-  app.get("/api/coach/review-queue", async (req, res) => {
+  app.get("/api/coach/review-queue", requireRole("team_coach", "pitching_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
@@ -1297,7 +1307,7 @@ export async function registerRoutes(
   });
 
   // Approve assessment (release drills to player)
-  app.post("/api/coach/assessments/:id/approve", async (req, res) => {
+  app.post("/api/coach/assessments/:id/approve", requireRole("team_coach", "pitching_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const assessmentId = Number(req.params.id);
@@ -1310,7 +1320,7 @@ export async function registerRoutes(
   });
 
   // Edit and approve assessment
-  app.post("/api/coach/assessments/:id/edit-approve", async (req, res) => {
+  app.post("/api/coach/assessments/:id/edit-approve", requireRole("team_coach", "pitching_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const assessmentId = Number(req.params.id);
@@ -1385,7 +1395,7 @@ export async function registerRoutes(
   });
 
   // Get teams for current head coach
-  app.get("/api/coach/teams", async (req, res) => {
+  app.get("/api/coach/teams", requireRole("team_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
@@ -1414,7 +1424,7 @@ export async function registerRoutes(
   // === SPECIALIST COACH MODE ===
 
   // Generate or get coach's referral code
-  app.get("/api/specialist/referral-code", async (req, res) => {
+  app.get("/api/specialist/referral-code", requireRole("pitching_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
@@ -1440,7 +1450,7 @@ export async function registerRoutes(
   });
 
   // Get coach's roster (My Students)
-  app.get("/api/specialist/roster", async (req, res) => {
+  app.get("/api/specialist/roster", requireRole("pitching_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
@@ -1555,7 +1565,7 @@ export async function registerRoutes(
   });
 
   // Get coach's sent invites
-  app.get("/api/specialist/invites", async (req, res) => {
+  app.get("/api/specialist/invites", requireRole("pitching_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
@@ -1571,7 +1581,7 @@ export async function registerRoutes(
   });
 
   // Archive student (remove from active roster)
-  app.post("/api/specialist/roster/:id/archive", async (req, res) => {
+  app.post("/api/specialist/roster/:id/archive", requireRole("pitching_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const relationshipId = Number(req.params.id);
@@ -2052,7 +2062,7 @@ export async function registerRoutes(
   });
 
   // Coach: Approve baseline and unlock dashboard
-  app.post("/api/specialist/baseline/:playerId/approve", async (req, res) => {
+  app.post("/api/specialist/baseline/:playerId/approve", requireRole("pitching_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
