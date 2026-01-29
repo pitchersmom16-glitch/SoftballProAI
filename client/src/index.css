@@ -143,7 +143,38 @@
 
 .gradient-text {
   @apply bg-clip-text text-transparent;
-  background-image: linear-gradient(to right, #39FF14, #2800FF, #FF10F0, #FAFF00);
+  background-image: linear-gradient(to right, #39FF14, #00F5FF, #FF10F0, #FAFF00, #FF8C42);
+}
+
+/* Rainbow Swirl Gradient */
+.gradient-rainbow {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(
+    135deg,
+    #FF10F0 0%,    /* Neon Pink */
+    #A020F0 14%,   /* UV Purple */
+    #00D4FF 28%,   /* Electric Blue */
+    #00F5FF 42%,   /* Turquoise */
+    #39FF14 56%,   /* Lime Green */
+    #FAFF00 70%,   /* Electric Yellow */
+    #FF8C42 84%,   /* Mango Orange */
+    #FF00FF 100%   /* Magenta */
+  );
+}
+
+/* Aqua + Pink Gradient */
+.gradient-aqua-pink {
+  background-image: linear-gradient(135deg, #00FFFF 0%, #FF10F0 100%);
+}
+
+/* Purple + Orange Gradient */
+.gradient-sunset {
+  background-image: linear-gradient(135deg, #A020F0 0%, #FF8C42 100%);
+}
+
+/* Turquoise + Magenta Gradient */
+.gradient-electric {
+  background-image: linear-gradient(135deg, #00F5FF 0%, #FF00FF 100%);
 }
 
 .neon-glow {
@@ -159,20 +190,66 @@
 }
 
 .neon-glow-blue {
-  box-shadow: 0 0 20px rgba(40, 0, 255, 0.6), 0 0 40px rgba(40, 0, 255, 0.3), 0 0 60px rgba(40, 0, 255, 0.1);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.6), 0 0 40px rgba(0, 212, 255, 0.3), 0 0 60px rgba(0, 212, 255, 0.1);
+}
+
+.neon-glow-purple {
+  box-shadow: 0 0 20px rgba(160, 32, 240, 0.6), 0 0 40px rgba(160, 32, 240, 0.3), 0 0 60px rgba(160, 32, 240, 0.1);
+}
+
+.neon-glow-orange {
+  box-shadow: 0 0 20px rgba(255, 140, 66, 0.6), 0 0 40px rgba(255, 140, 66, 0.3), 0 0 60px rgba(255, 140, 66, 0.1);
+}
+
+.neon-glow-turquoise {
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.6), 0 0 40px rgba(0, 245, 255, 0.3), 0 0 60px rgba(0, 245, 255, 0.1);
+}
+
+.neon-glow-aqua {
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.6), 0 0 40px rgba(0, 255, 255, 0.3), 0 0 60px rgba(0, 255, 255, 0.1);
+}
+
+.neon-glow-magenta {
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.6), 0 0 40px rgba(255, 0, 255, 0.3), 0 0 60px rgba(255, 0, 255, 0.1);
 }
 
 /* Primary CTA Button with gradient */
 .btn-primary-glow {
-  background: linear-gradient(135deg, #FF10F0, #8B5CF6);
+  background: linear-gradient(135deg, #FF10F0, #A020F0);
   color: white;
   font-weight: 700;
   transition: all 0.3s ease;
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 0 20px rgba(160, 32, 240, 0.3);
 }
 .btn-primary-glow:hover {
-  box-shadow: 0 0 30px rgba(139, 92, 246, 0.5), 0 0 60px rgba(255, 16, 240, 0.3);
+  box-shadow: 0 0 30px rgba(160, 32, 240, 0.5), 0 0 60px rgba(255, 16, 240, 0.3);
   transform: translateY(-2px);
+}
+
+/* Softball-themed Button Variants */
+.btn-softball-rainbow {
+  background: linear-gradient(135deg, #FF10F0, #A020F0, #00D4FF, #39FF14, #FAFF00, #FF8C42);
+  background-size: 200% 200%;
+  animation: rainbow-shift 3s ease infinite;
+  color: white;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.btn-aqua-pink {
+  background: linear-gradient(135deg, #00FFFF, #FF10F0);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+.btn-aqua-pink:hover {
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.5), 0 0 60px rgba(255, 16, 240, 0.3);
+  transform: translateY(-2px);
+}
+
+@keyframes rainbow-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 /* Frosted Glass Badge */

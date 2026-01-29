@@ -88,10 +88,15 @@ export default {
         },
         brand: {
           black: "#050505",
-          neon: "#39FF14",
-          pink: "#FF10F0",
-          yellow: "#FAFF00",
-          blue: "#2800FF",
+          neon: "#39FF14", // Lime Green
+          pink: "#FF10F0", // Neon Pink
+          yellow: "#FAFF00", // Electric Yellow
+          blue: "#00D4FF", // Electric Blue (upgraded)
+          purple: "#A020F0", // UV Purple / Hot Purple
+          orange: "#FF8C42", // Mango Orange
+          magenta: "#FF00FF", // Magenta
+          turquoise: "#00F5FF", // Vibrant Turquoise
+          aqua: "#00FFFF", // Aqua
         },
       },
       fontFamily: {

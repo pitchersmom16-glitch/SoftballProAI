@@ -18,7 +18,10 @@ import {
   Upload,
   Play,
   Quote,
-  Loader2
+  Loader2,
+  Dumbbell,
+  Target,
+  BarChart3
 } from "lucide-react";
 import { 
   Dialog, 
@@ -52,7 +55,7 @@ const SORENESS_AREAS = [
 export default function PlayerDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const [showCheckin, setShowCheckin] = useState(false);
   const [mood, setMood] = useState<string>("");
   const [sorenessAreas, setSorenessAreas] = useState<string[]>([]);
@@ -215,20 +218,20 @@ export default function PlayerDashboard() {
               {/* Mood Selection */}
               <div>
                 <p className="text-sm text-gray-400 mb-3">How's your energy today?</p>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                   {MOOD_OPTIONS.map((option) => (
                     <button
                       key={option.value}
                       data-testid={`mood-${option.value}`}
                       onClick={() => setMood(option.value)}
-                      className={`p-3 rounded-xl border-2 transition-all ${
+                      className={`p-3 min-h-[44px] rounded-xl border-2 transition-all flex flex-col items-center justify-center ${
                         mood === option.value
                           ? `border-${option.color} bg-${option.color}/20`
                           : "border-white/10 bg-white/5 hover:bg-white/10"
                       }`}
                     >
                       <option.icon className="h-6 w-6 mb-1" />
-                      <div className="text-xs text-gray-400">{option.label}</div>
+                      <div className="text-sm text-gray-400">{option.label}</div>
                     </button>
                   ))}
                 </div>
@@ -417,16 +420,16 @@ export default function PlayerDashboard() {
           <h2 className="text-lg font-bold text-white mb-4">Quick Actions</h2>
           <div className="grid grid-cols-3 gap-3">
             <Button 
-              onClick={() => setLocation("/drills")}
+              onClick={() => navigate("/drills")}
               variant="outline"
               className="h-20 flex flex-col items-center justify-center gap-2"
               data-testid="button-nav-drills"
             >
               <Dumbbell className="h-5 w-5 text-purple-400" />
-              <span className="text-xs">Drills</span>
+              <span className="text-sm font-medium">Drills</span>
             </Button>
             <Button 
-              onClick={() => setLocation("/goals")}
+              onClick={() => navigate("/goals")}
               variant="outline"
               className="h-20 flex flex-col items-center justify-center gap-2"
               data-testid="button-nav-goals"
@@ -441,7 +444,7 @@ export default function PlayerDashboard() {
               data-testid="button-nav-stats"
             >
               <BarChart3 className="h-5 w-5 text-green-400" />
-              <span className="text-xs">Stats</span>
+              <span className="text-sm font-medium">Stats</span>
             </Button>
           </div>
         </Card>
