@@ -109,8 +109,6 @@ export async function setupAuth(app: Express) {
       await storage.upsertUser({
         id: userId,
         email: "dev@softballproai.com",
-        firstName: "Dev",
-        lastName: "User",
       });
       
       res.redirect("/");
