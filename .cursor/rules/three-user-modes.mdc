@@ -1,0 +1,41 @@
+---
+description: Three user modes — Player, Team Coach, Pitching Coach
+alwaysApply: true
+---
+
+# Three User Modes (Role-Based Logic)
+
+Support three distinct views. Provide a **Role Selection** screen at signup.
+
+## A. Player Mode ("My Journey")
+
+**Focus:** Personal growth, gamification, and safety.
+
+| Feature | Description |
+|--------|-------------|
+| **Daily Vibe Check-in** | "How are you feeling?" (soreness tracker). If "My arm hurts" → block pitching drills, show Recovery/Stretching instead. |
+| **Mamba Feed** | Daily motivational quote or video (Kobe Bryant / Mamba Mentality or college softball highlights). |
+| **Coach Me** | One-click video upload for instant mechanic feedback. |
+
+## B. Team Mode ("Coach" View)
+
+**Focus:** Managing a roster of 12–15 players.
+
+| Feature | Description |
+|--------|-------------|
+| **Practice Architect** | Auto-generate practice plans (e.g. "2-Hour Defensive Focus") that split the team into stations: Infield, Outfield, Catcher. |
+| **Roster Health** | Dashboard showing players as **Red/Injured** or **Green/Ready** based on their inputs. |
+
+## C. Pitching Coach Mode ("Specialist" View)
+
+**Focus:** Remote training for specific students.
+
+| Feature | Description |
+|--------|-------------|
+| **Stable Management** | Assign "Homework Drills" (e.g. "Do 20 K-Drills") to a specific player's app. |
+| **Split-Screen Analysis** | Compare a student's video side-by-side with a **Pro Model** from the library. |
+
+## Data & Execution
+
+- **Database:** `users` (or equivalent) must include a **role** column to support Player / Team Coach / Pitching Coach.
+- **Role Selection:** Required at signup; gate subsequent flows by selected role.

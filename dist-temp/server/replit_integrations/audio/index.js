@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.speechToTextStream = exports.speechToText = exports.textToSpeechStream = exports.textToSpeech = exports.voiceChatStream = exports.voiceChat = exports.ensureCompatibleFormat = exports.convertToWav = exports.detectAudioFormat = exports.openai = exports.registerAudioRoutes = void 0;
+var routes_1 = require("./routes");
+Object.defineProperty(exports, "registerAudioRoutes", { enumerable: true, get: function () { return routes_1.registerAudioRoutes; } });
+var client_1 = require("./client");
+Object.defineProperty(exports, "openai", { enumerable: true, get: function () { return client_1.openai; } });
+Object.defineProperty(exports, "detectAudioFormat", { enumerable: true, get: function () { return client_1.detectAudioFormat; } });
+Object.defineProperty(exports, "convertToWav", { enumerable: true, get: function () { return client_1.convertToWav; } });
+Object.defineProperty(exports, "ensureCompatibleFormat", { enumerable: true, get: function () { return client_1.ensureCompatibleFormat; } });
+Object.defineProperty(exports, "voiceChat", { enumerable: true, get: function () { return client_1.voiceChat; } });
+Object.defineProperty(exports, "voiceChatStream", { enumerable: true, get: function () { return client_1.voiceChatStream; } });
+Object.defineProperty(exports, "textToSpeech", { enumerable: true, get: function () { return client_1.textToSpeech; } });
+Object.defineProperty(exports, "textToSpeechStream", { enumerable: true, get: function () { return client_1.textToSpeechStream; } });
+Object.defineProperty(exports, "speechToText", { enumerable: true, get: function () { return client_1.speechToText; } });
+Object.defineProperty(exports, "speechToTextStream", { enumerable: true, get: function () { return client_1.speechToTextStream; } });

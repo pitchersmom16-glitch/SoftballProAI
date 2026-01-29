@@ -3,8 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
-import { setupAuth, registerAuthRoutes, isAuthenticated } from "./replit_integrations/auth";
-import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
+import { setupAuth, registerAuthRoutes, isAuthenticated } from "./auth/localAuth";
+import { registerObjectStorageRoutes } from "./storage/objectStorage";
 import { openai } from "./replit_integrations/audio"; // Use the audio client for openai instance
 import { analyzeMechanics, getCorrectiveDrills, getDrillsByTag, getDrillsByExpert } from "./brain/analyze_mechanics";
 import { stripeService } from "./stripeService";
@@ -14,7 +14,7 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  // Wire up integrations
+  // Wire up local authentication
   await setupAuth(app);
   registerAuthRoutes(app);
   registerObjectStorageRoutes(app);
@@ -2388,7 +2388,7 @@ export async function registerRoutes(
         });
       }
 
-      const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+      const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
       const session = await stripeService.createCheckoutSession(
         customerId,
         priceId,
@@ -2440,7 +2440,7 @@ export async function registerRoutes(
         return res.status(400).json({ message: "No subscription found" });
       }
 
-      const baseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+      const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
       const session = await stripeService.createCustomerPortalSession(
         subscription.stripeCustomerId,
         `${baseUrl}/dashboard`
