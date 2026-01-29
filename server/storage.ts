@@ -62,6 +62,7 @@ export interface IStorage {
   // User Role
   getUser(userId: string): Promise<{ id: string; role: UserRole | null } | undefined>;
   updateUserRole(userId: string, role: UserRole): Promise<void>;
+  upsertUser(user: { id: string; email: string; role?: UserRole }): Promise<void>;
   
   // Player Check-ins
   getPlayerCheckinByDate(userId: string, date: string): Promise<PlayerCheckin | undefined>;
@@ -279,6 +280,23 @@ export class DatabaseStorage implements IStorage {
   
   async updateUserRole(userId: string, role: UserRole): Promise<void> {
     await db.update(users).set({ role }).where(eq(users.id, userId));
+  }
+
+  async upsertUser(user: { id: string; email: string; role?: UserRole }): Promise<void> {
+    const existing = await this.getUser(user.id);
+    if (existing) {
+      // User exists, update if role changed
+      if (user.role && existing.role !== user.role) {
+        await this.updateUserRole(user.id, user.role);
+      }
+    } else {
+      // Create new user
+      await db.insert(users).values({
+        id: user.id,
+        email: user.email,
+        role: user.role || null,
+      });
+    }
   }
 
   // Player Check-ins
