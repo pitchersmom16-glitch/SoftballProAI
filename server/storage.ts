@@ -290,12 +290,22 @@ export class DatabaseStorage implements IStorage {
         await this.updateUserRole(user.id, user.role);
       }
     } else {
-      // Create new user
-      await db.insert(users).values({
-        id: user.id,
-        email: user.email,
-        role: user.role || null,
-      });
+      // Check if email exists with different ID
+      const [existingByEmail] = await db.select().from(users).where(eq(users.email, user.email));
+      if (existingByEmail) {
+        // Email exists with different ID - update that user's ID instead
+        await db.update(users).set({ id: user.id }).where(eq(users.email, user.email));
+        if (user.role) {
+          await this.updateUserRole(user.id, user.role);
+        }
+      } else {
+        // Create new user
+        await db.insert(users).values({
+          id: user.id,
+          email: user.email,
+          role: user.role || null,
+        });
+      }
     }
   }
 
