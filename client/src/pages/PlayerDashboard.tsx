@@ -411,6 +411,40 @@ export default function PlayerDashboard() {
             )}
           </div>
         </Card>
+
+        {/* Quick Action Buttons */}
+        <Card className="p-6 bg-[#0a0a0a] border-gray-800">
+          <h2 className="text-lg font-bold text-white mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-3 gap-3">
+            <Button 
+              onClick={() => setLocation("/drills")}
+              variant="outline"
+              className="h-20 flex flex-col items-center justify-center gap-2"
+              data-testid="button-nav-drills"
+            >
+              <Dumbbell className="h-5 w-5 text-purple-400" />
+              <span className="text-xs">Drills</span>
+            </Button>
+            <Button 
+              onClick={() => setLocation("/goals")}
+              variant="outline"
+              className="h-20 flex flex-col items-center justify-center gap-2"
+              data-testid="button-nav-goals"
+            >
+              <Target className="h-5 w-5 text-pink-400" />
+              <span className="text-xs">My Goals</span>
+            </Button>
+            <Button 
+              onClick={() => setLocation("/stats-import")}
+              variant="outline"
+              className="h-20 flex flex-col items-center justify-center gap-2"
+              data-testid="button-nav-stats"
+            >
+              <BarChart3 className="h-5 w-5 text-green-400" />
+              <span className="text-xs">Stats</span>
+            </Button>
+          </div>
+        </Card>
       </div>
 
       {/* Video Upload Dialog */}

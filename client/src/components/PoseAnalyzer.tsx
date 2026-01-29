@@ -13,6 +13,8 @@ interface BiomechanicsMetrics {
 interface PoseAnalyzerProps {
   videoUrl: string;
   onMetricsUpdate?: (metrics: BiomechanicsMetrics) => void;
+  assessmentId?: number; // Optional: If provided, will save metrics to database
+  autoSave?: boolean; // If true, automatically saves metrics every 5 seconds
 }
 
 const LANDMARK_INDICES = {
@@ -61,7 +63,7 @@ function chooseDominantSide(landmarks: NormalizedLandmark[]): 'left' | 'right' {
   return rightScore >= leftScore ? 'right' : 'left';
 }
 
-export default function PoseAnalyzer({ videoUrl, onMetricsUpdate }: PoseAnalyzerProps) {
+export default function PoseAnalyzer({ videoUrl, onMetricsUpdate, assessmentId, autoSave = false }: PoseAnalyzerProps) {
   console.log('POSE MODEL INITIALIZING');
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -69,6 +71,7 @@ export default function PoseAnalyzer({ videoUrl, onMetricsUpdate }: PoseAnalyzer
   const animationFrameRef = useRef<number | null>(null);
   const lastMetricsUpdate = useRef<number>(0);
   const isProcessingRef = useRef<boolean>(false);
+  const lastSaveTime = useRef<number>(0);
 
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -187,6 +190,12 @@ export default function PoseAnalyzer({ videoUrl, onMetricsUpdate }: PoseAnalyzer
         if (newMetrics) {
           setMetrics(newMetrics);
           onMetricsUpdate?.(newMetrics);
+          
+          // Auto-save to database if enabled and assessment ID provided
+          if (autoSave && assessmentId && now - lastSaveTime.current > 5000) {
+            saveBiomechanicsToDatabase(assessmentId, newMetrics);
+            lastSaveTime.current = now;
+          }
         }
         lastMetricsUpdate.current = now;
       }
@@ -271,6 +280,25 @@ export default function PoseAnalyzer({ videoUrl, onMetricsUpdate }: PoseAnalyzer
       animationFrameRef.current = null;
     }
   }, []);
+
+  // Save biomechanics to database
+  const saveBiomechanicsToDatabase = async (assessmentId: number, metrics: BiomechanicsMetrics) => {
+    try {
+      await fetch('/api/analysis/biomechanics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          assessmentId,
+          armSlotAngle: metrics.armSlotAngle,
+          kneeFlexion: metrics.kneeFlexion,
+          torqueSeparation: metrics.torqueSeparation,
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to save biomechanics:', error);
+    }
+  };
 
   const handlePlay = useCallback(() => {
     setIsPlaying(true);

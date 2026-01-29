@@ -21,7 +21,8 @@ import {
   Loader2,
   Eye,
   Video,
-  MapPin
+  MapPin,
+  Gauge
 } from "lucide-react";
 import {
   Dialog,
@@ -496,19 +497,66 @@ export default function SpecialistRoster() {
                   />
                 </div>
 
-                <Button
-                  onClick={() => selectedStudent && approveMutation.mutate(selectedStudent.playerId)}
-                  disabled={approveMutation.isPending}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600"
-                  data-testid="button-create-roadmap"
-                >
-                  {approveMutation.isPending ? (
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  ) : (
-                    <CheckCircle2 className="w-4 h-4 mr-2" />
-                  )}
-                  Create Roadmap & Unlock Dashboard
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={async () => {
+                      if (!selectedStudent) return;
+                      
+                      // Trigger AI analysis for all baseline videos
+                      toast({
+                        title: "Analyzing Videos",
+                        description: "Processing baseline videos with AI Brain...",
+                      });
+                      
+                      try {
+                        for (const video of selectedStudent.baselineVideos || []) {
+                          if (video.videoUrl) {
+                            await apiRequest('POST', '/api/analysis/process', {
+                              assessmentId: video.assessmentId || 0,
+                              videoUrl: video.videoUrl,
+                              skillType: video.skillType || 'PITCHING',
+                              athleteId: selectedStudent.id,
+                              videoCategory: video.videoCategory || 'fastball',
+                            });
+                          }
+                        }
+                        
+                        toast({
+                          title: "Analysis Complete!",
+                          description: "AI has analyzed all videos and generated recommendations.",
+                        });
+                        
+                        queryClient.invalidateQueries({ queryKey: ["/api/specialist/baseline-queue"] });
+                      } catch (error) {
+                        toast({
+                          title: "Analysis Failed",
+                          description: "Could not complete video analysis. Please try again.",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
+                    disabled={!selectedStudent || !selectedStudent.baselineVideos?.length}
+                    variant="secondary"
+                    className="flex-1"
+                    data-testid="button-analyze-videos"
+                  >
+                    <Gauge className="w-4 h-4 mr-2" />
+                    Analyze with AI Brain
+                  </Button>
+                  <Button
+                    onClick={() => selectedStudent && approveMutation.mutate(selectedStudent.playerId)}
+                    disabled={approveMutation.isPending}
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600"
+                    data-testid="button-create-roadmap"
+                  >
+                    {approveMutation.isPending ? (
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4 mr-2" />
+                    )}
+                    Create Roadmap & Unlock Dashboard
+                  </Button>
+                </div>
               </div>
             )}
           </DialogContent>

@@ -2,18 +2,18 @@ import { db } from "./db";
 import { 
   coaches, teams, athletes, drills, assessments, assessmentFeedback, mentalEdge, playerCheckins,
   practicePlans, coachStudents, homeworkAssignments, playerCoachRelationships, coachInvites, playerSettings,
-  studentInvites, baselineVideos, playerOnboarding, notifications, gameChangerStats, skeletalAnalysis,
+  studentInvites, baselineVideos, playerOnboarding, notifications, gameChangerStats, skeletalAnalysis, playerGoals,
   teamStats, userSubscriptions,
   type Coach, type Team, type Athlete, type Drill, type Assessment, type Feedback, type MentalEdge, type PlayerCheckin,
   type PracticePlan, type CoachStudent, type HomeworkAssignment, type PlayerCoachRelationship, type CoachInvite, type PlayerSettings,
-  type StudentInvite, type BaselineVideo, type PlayerOnboarding, type Notification, type GameChangerStats, type SkeletalAnalysis,
+  type StudentInvite, type BaselineVideo, type PlayerOnboarding, type Notification, type GameChangerStats, type SkeletalAnalysis, type PlayerGoal,
   type TeamStats, type UserSubscription,
   type CreateCoachRequest, type CreateTeamRequest, type CreateAthleteRequest, 
   type CreateDrillRequest, type CreateMentalEdgeRequest, type CreateAssessmentRequest, type CreateFeedbackRequest,
   type CreatePlayerCheckinRequest, type UpdateAthleteRequest, type UpdateAssessmentRequest,
   type CreatePlayerCoachRelationshipRequest, type CreateCoachInviteRequest, type CreatePlayerSettingsRequest,
   type CreateStudentInviteRequest, type CreateBaselineVideoRequest, type CreatePlayerOnboardingRequest,
-  type CreateNotificationRequest, type CreateGameChangerStatsRequest, type CreateSkeletalAnalysisRequest,
+  type CreateNotificationRequest, type CreateGameChangerStatsRequest, type CreateSkeletalAnalysisRequest, type CreatePlayerGoalRequest,
   type CreateTeamStatsRequest, type CreateUserSubscriptionRequest
 } from "@shared/schema";
 import { users, type UserRole } from "@shared/models/auth";
@@ -145,6 +145,11 @@ export interface IStorage {
   createSkeletalAnalysis(analysis: CreateSkeletalAnalysisRequest): Promise<SkeletalAnalysis>;
   getSkeletalAnalysisByAthleteId(athleteId: number): Promise<SkeletalAnalysis | undefined>;
   getSkeletalAnalysisByUserId(userId: string): Promise<SkeletalAnalysis | undefined>;
+
+  // === PLAYER GOALS ===
+  getPlayerGoals(userId: string): Promise<PlayerGoal[]>;
+  createPlayerGoal(goal: CreatePlayerGoalRequest): Promise<PlayerGoal>;
+  updatePlayerGoal(id: number, update: Partial<PlayerGoal>): Promise<PlayerGoal>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -618,6 +623,26 @@ export class DatabaseStorage implements IStorage {
       .where(eq(skeletalAnalysis.userId, userId))
       .orderBy(desc(skeletalAnalysis.createdAt));
     return analysis;
+  }
+
+  // === PLAYER GOALS ===
+  async getPlayerGoals(userId: string): Promise<PlayerGoal[]> {
+    return db.select().from(playerGoals)
+      .where(eq(playerGoals.userId, userId))
+      .orderBy(playerGoals.createdAt);
+  }
+
+  async createPlayerGoal(goal: CreatePlayerGoalRequest): Promise<PlayerGoal> {
+    const [newGoal] = await db.insert(playerGoals).values(goal).returning();
+    return newGoal;
+  }
+
+  async updatePlayerGoal(id: number, update: Partial<PlayerGoal>): Promise<PlayerGoal> {
+    const [updated] = await db.update(playerGoals)
+      .set({ ...update, updatedAt: new Date() })
+      .where(eq(playerGoals.id, id))
+      .returning();
+    return updated;
   }
 
   // === TEAM STATS ===

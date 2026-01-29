@@ -27,6 +27,7 @@ import BiometricOnboarding from "@/pages/BiometricOnboarding";
 import StatsImport from "@/pages/StatsImport";
 import PublicProfile from "@/pages/PublicProfile";
 import Pricing from "@/pages/Pricing";
+import PlayerGoals from "@/pages/PlayerGoals";
 import { OnboardingGate } from "@/components/OnboardingGate";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -112,6 +113,9 @@ function Router() {
           <Route path="/profile/:id" component={PublicProfile} />
           <Route path="/stats-import">
             <OnboardingGate><StatsImport /></OnboardingGate>
+          </Route>
+          <Route path="/goals">
+            <OnboardingGate><PlayerGoals /></OnboardingGate>
           </Route>
           {/* Safety Net: Redirect all unknown routes to dashboard */}
           <Route path="*">

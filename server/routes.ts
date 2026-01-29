@@ -772,6 +772,73 @@ export async function registerRoutes(
     }
   });
 
+  // === VIDEO ANALYSIS API (AUTOMATED PIPELINE) ===
+  
+  // Trigger automated video analysis
+  app.post("/api/analysis/process", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      
+      const schema = z.object({
+        assessmentId: z.number(),
+        videoUrl: z.string().url(),
+        skillType: z.string(),
+        athleteId: z.number(),
+        athleteLevel: z.string().optional(),
+        videoCategory: z.string(),
+      });
+      
+      const data = schema.parse(req.body);
+      
+      // Import analysis service
+      const { processVideoAnalysis } = await import('./services/videoAnalysisService');
+      
+      // Process video with AI Brain
+      const result = await processVideoAnalysis(data);
+      
+      res.json(result);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      console.error("Video analysis error:", err);
+      res.status(500).json({ message: "Analysis failed" });
+    }
+  });
+
+  // Store biomechanics data from client-side MediaPipe
+  app.post("/api/analysis/biomechanics", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      
+      const schema = z.object({
+        assessmentId: z.number(),
+        armSlotAngle: z.number().nullable(),
+        kneeFlexion: z.number().nullable(),
+        torqueSeparation: z.number().nullable(),
+      });
+      
+      const data = schema.parse(req.body);
+      
+      // Import analysis service
+      const { storeBiomechanicsData } = await import('./services/videoAnalysisService');
+      
+      await storeBiomechanicsData(data.assessmentId, {
+        armSlotAngle: data.armSlotAngle,
+        kneeFlexion: data.kneeFlexion,
+        torqueSeparation: data.torqueSeparation,
+      });
+      
+      res.json({ success: true });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      console.error("Biomechanics storage error:", err);
+      res.status(500).json({ message: "Failed to store biomechanics" });
+    }
+  });
+
   // === BRAIN API ROUTES ===
   
   // Analyze mechanics and get drill recommendations
@@ -2250,6 +2317,27 @@ export async function registerRoutes(
     }
   });
 
+  // Get player's personal goals
+  app.get("/api/player/goals", async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+
+      // Get athlete and their goals
+      const athlete = await storage.getAthleteByUserId(userId);
+      if (!athlete) {
+        return res.json([]);
+      }
+
+      // Get goals from player_goals table (will create this)
+      const goals = await storage.getPlayerGoals(userId);
+      res.json(goals);
+    } catch (err) {
+      console.error("Get goals error:", err);
+      res.status(500).json({ message: "Failed to fetch goals" });
+    }
+  });
+
   // Get public goals by athlete ID
   app.get("/api/goals/public/:id", async (req, res) => {
     try {
@@ -2257,7 +2345,17 @@ export async function registerRoutes(
       if (isNaN(athleteId)) {
         return res.status(400).json({ message: "Invalid athlete ID" });
       }
-      
+
+      // Get goals for this athlete
+      const athlete = await storage.getAthlete(athleteId);
+      if (!athlete || !athlete.userId) {
+        return res.json([]);
+      }
+
+      const goals = await storage.getPlayerGoals(athlete.userId);
+      res.json(goals);
+    } catch (err) {
+      console.error("Get public goals error:", err);
       // For now return demo goals - will integrate with actual goal storage later
       res.json([
         { metric: "velocity", metricLabel: "Increase Velocity", target: 5, unit: "mph", currentBaseline: 58, progress: 60 },

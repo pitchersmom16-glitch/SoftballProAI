@@ -478,13 +478,35 @@ export const skeletalAnalysis = pgTable("skeletal_analysis", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Player SMART Goals - AI-generated from baseline video analysis
+export const playerGoals = pgTable("player_goals", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id),
+  athleteId: integer("athlete_id").references(() => athletes.id),
+  metric: text("metric").notNull(), // e.g., "velocity", "spin_rate", "exit_velocity"
+  metricLabel: text("metric_label").notNull(), // Human-readable label
+  currentValue: numeric("current_value"), // Baseline value
+  targetValue: numeric("target_value").notNull(), // Goal target
+  unit: text("unit").notNull(), // "mph", "rpm", "%", "degrees"
+  targetDate: text("target_date").notNull(), // ISO date string
+  description: text("description"), // Why this goal matters
+  progress: integer("progress").default(0), // 0-100%
+  status: text("status").default("active"), // "active", "achieved", "abandoned"
+  generatedBy: text("generated_by").default("ai"), // "ai" or "manual"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertGameChangerStatsSchema = createInsertSchema(gameChangerStats).omit({ id: true, createdAt: true, importedAt: true });
 export const insertSkeletalAnalysisSchema = createInsertSchema(skeletalAnalysis).omit({ id: true, createdAt: true });
+export const insertPlayerGoalSchema = createInsertSchema(playerGoals).omit({ id: true, createdAt: true, updatedAt: true });
 
 export type GameChangerStats = typeof gameChangerStats.$inferSelect;
 export type SkeletalAnalysis = typeof skeletalAnalysis.$inferSelect;
+export type PlayerGoal = typeof playerGoals.$inferSelect;
 export type CreateGameChangerStatsRequest = z.infer<typeof insertGameChangerStatsSchema>;
 export type CreateSkeletalAnalysisRequest = z.infer<typeof insertSkeletalAnalysisSchema>;
+export type CreatePlayerGoalRequest = z.infer<typeof insertPlayerGoalSchema>;
 
 export type UpdateAthleteRequest = Partial<CreateAthleteRequest>;
 export type UpdateAssessmentRequest = Partial<CreateAssessmentRequest> & { status?: string, metrics?: any };
