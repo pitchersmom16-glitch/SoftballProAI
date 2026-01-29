@@ -2356,14 +2356,7 @@ export async function registerRoutes(
       res.json(goals);
     } catch (err) {
       console.error("Get public goals error:", err);
-      // For now return demo goals - will integrate with actual goal storage later
-      res.json([
-        { metric: "velocity", metricLabel: "Increase Velocity", target: 5, unit: "mph", currentBaseline: 58, progress: 60 },
-        { metric: "spin_rate", metricLabel: "Improve Spin Rate", target: 200, unit: "rpm", currentBaseline: 1800, progress: 45 },
-        { metric: "strike_zone", metricLabel: "Strike Zone %", target: 70, unit: "%", currentBaseline: 62, progress: 75 },
-      ]);
-    } catch (err) {
-      throw err;
+      res.status(500).json({ message: "Failed to fetch goals" });
     }
   });
 
