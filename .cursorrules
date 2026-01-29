@@ -1,0 +1,286 @@
+# AI Softball Pro - Project Rules
+
+## Project Context
+Multi-stack athlete management software for softball players and coaches.
+Focus: Player development, stats tracking, video analysis, and team management.
+
+## Tech Stack
+- Frontend: React + TypeScript + Wouter + Radix UI
+- Backend: Node.js + Express + tsx
+- Database: PostgreSQL (Supabase) + Drizzle ORM
+- Styling: Tailwind CSS (dark theme with neon accents)
+- State: @tanstack/react-query + React hooks
+- Forms: React Hook Form + Zod
+- Auth: Passport.js (local strategy)
+- AI/Video: MediaPipe + OpenAI API
+- Storage: Uppy + AWS S3
+
+## Before Writing Code - ALWAYS ASK:
+
+### Data & State Questions:
+1. "Should this data come from the database or is it local/derived state?"
+2. "Does this need React Query caching or just useState?"
+3. "What's the Drizzle schema for this data? Should I check existing tables first?"
+4. "Is this real-time data or can it be stale for 5 minutes?"
+
+### User Role Questions:
+5. "Is this feature for coaches, players, or both?"
+6. "What permissions/auth checks are needed?"
+7. "Should assistant coaches have different access than head coaches?"
+
+### UI/UX Questions:
+8. "Does this need to work offline (at the ballpark)?"
+9. "Is this mobile-first or desktop-first?"
+10. "Should this use an existing Radix component or custom build?"
+
+### Integration Questions:
+11. "Does this involve video upload/analysis (MediaPipe/S3)?"
+12. "Should AI analysis happen client-side or server-side?"
+13. "Will this impact performance with 20+ players?"
+
+## Drizzle ORM Patterns
+
+### Before Creating Tables:
+- Check `db/schema.ts` for existing tables
+- Use snake_case for column names (PostgreSQL convention)
+- Always include `created_at` and `updated_at` timestamps
+- Use proper foreign key relationships
+
+### Query Patterns:
+```typescript
+// ✅ DO: Use Drizzle's type-safe queries
+const players = await db.select().from(playersTable).where(eq(playersTable.teamId, teamId));
+
+// ❌ DON'T: Use raw SQL unless absolutely necessary
+```
+
+## React Query Patterns
+
+### Server State (Use React Query):
+- API data fetching
+- Player stats, team rosters, video analysis results
+- Cache time: 5 minutes for stats, 1 hour for rosters
+
+### Local State (Use useState/useReducer):
+- Form inputs, UI toggles, temporary filters
+- Modal open/closed states
+- Current tab selection
+
+### Example:
+```typescript
+// ✅ DO: Server data with React Query
+const { data: players } = useQuery({
+  queryKey: ['players', teamId],
+  queryFn: () => fetchPlayers(teamId),
+  staleTime: 5 * 60 * 1000, // 5 minutes
+});
+
+// ✅ DO: Local UI state with useState
+const [isModalOpen, setIsModalOpen] = useState(false);
+```
+
+## Form Handling with React Hook Form + Zod
+
+### Always:
+1. Define Zod schema FIRST
+2. Use TypeScript inference from Zod: `type FormData = z.infer<typeof schema>`
+3. Validate on blur for better UX
+4. Show field-level errors, not just form-level
+
+### Example Pattern:
+```typescript
+// 1. Define schema
+const playerSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  jerseyNumber: z.number().min(0).max(99),
+  position: z.enum(["P", "C", "1B", "2B", "3B", "SS", "OF"]),
+});
+
+// 2. Infer type
+type PlayerFormData = z.infer<typeof playerSchema>;
+
+// 3. Use in form
+const { register, handleSubmit, formState: { errors } } = useForm<PlayerFormData>({
+  resolver: zodResolver(playerSchema),
+});
+```
+
+## Routing with Wouter
+
+- Use `/` for home/dashboard
+- Use `/team/:teamId/player/:playerId` for nested resources
+- Keep routes flat when possible (avoid deep nesting)
+- Use `useRoute` hook for dynamic params
+
+## Styling with Tailwind
+
+### Theme:
+- Primary: Neon accent colors (check `tailwind.config.ts`)
+- Dark mode by default
+- Use `bg-background`, `text-foreground` for theme consistency
+
+### Component Patterns:
+```typescript
+// ✅ DO: Use CSS variables from theme
+className="bg-background text-foreground border-border"
+
+// ❌ DON'T: Hard-code colors
+className="bg-black text-white border-gray-800"
+```
+
+### Responsive:
+- Mobile-first: base styles = mobile
+- Breakpoints: `sm:` (640px), `md:` (768px), `lg:` (1024px)
+- Coaches use phones at practice - prioritize mobile UX
+
+## Video & AI Integration
+
+### MediaPipe (Client-Side):
+- Pose detection for batting/pitching mechanics
+- Run in Web Worker to avoid blocking UI
+- Show loading states during analysis
+
+### OpenAI API (Server-Side):
+- Technique feedback generation
+- Training plan recommendations
+- Keep prompts in `server/prompts/` folder for versioning
+
+### Uppy + S3:
+- Chunked uploads for large video files
+- Show upload progress
+- Store S3 URLs in database, not files themselves
+
+## Database Schema Patterns
+
+### Relationships:
+```
+teams (1) ──→ (many) players
+teams (1) ──→ (many) coaches
+players (1) ──→ (many) stats_entries
+players (1) ──→ (many) videos
+```
+
+### Common Tables to Check Before Creating:
+- `users` (auth)
+- `teams`
+- `players`
+- `stats` / `batting_stats` / `pitching_stats`
+- `videos`
+- `practice_plans`
+
+## Authentication Flow
+
+- Passport.js local strategy (username/password)
+- Middleware: `requireAuth` for protected routes
+- Check user role: `req.user.role` ('coach' | 'player' | 'admin')
+- Session-based auth (not JWT for now)
+
+## Performance Optimization
+
+### React Query:
+- Use `staleTime` to prevent unnecessary refetches
+- Prefetch on hover for better UX: `queryClient.prefetchQuery()`
+
+### Images/Video:
+- Lazy load video thumbnails
+- Use `loading="lazy"` on img tags
+- Compress videos server-side before S3 upload
+
+### Bundle Size:
+- Import Radix components individually: `import { Dialog } from '@radix-ui/react-dialog'`
+- Tree-shake Lucide icons: `import { User, Settings } from 'lucide-react'`
+
+## Error Handling
+
+### Client-Side:
+```typescript
+// ✅ DO: User-friendly messages
+"Couldn't load player stats. Check your connection and try again."
+
+// ❌ DON'T: Technical jargon
+"Error 500: Internal Server Error at /api/players"
+```
+
+### Server-Side:
+```typescript
+// Always log full error
+console.error('Database error:', error);
+
+// Return sanitized message to client
+res.status(500).json({ error: 'Failed to fetch players' });
+```
+
+## Stop and Ask If:
+
+### You're About To:
+- Create a new table (check schema first)
+- Add a new npm package (might already have it)
+- Build a component that sounds generic (Modal, Card, Button - probably exists)
+- Write raw SQL (Drizzle probably has a method)
+- Use localStorage (consider React Query cache instead)
+
+### You're Unsure About:
+- Whether data should be cached or always fresh
+- If a feature needs real-time updates (WebSockets?)
+- How to structure a complex form (nested data, arrays)
+- Video processing location (client vs server vs worker)
+
+## File Structure
+```
+client/src/
+  ├── components/     # Reusable UI components
+  ├── pages/          # Route components
+  ├── hooks/          # Custom React hooks
+  ├── lib/            # Utilities, API clients
+  └── types/          # TypeScript types
+
+server/
+  ├── routes/         # Express routes
+  ├── db/             # Drizzle schema & migrations
+  ├── middleware/     # Auth, validation
+  └── services/       # Business logic (AI, video processing)
+```
+
+## Testing Scenarios
+
+Always consider:
+- Empty state (new coach, no players yet)
+- Offline mode (at field with no WiFi)
+- Slow 3G connection (video uploads)
+- Multiple teams per coach
+- Player switching teams mid-season
+- Different devices (phone, tablet, desktop)
+
+## Softball Domain Terms
+
+Use correct terminology:
+- **At-bat (AB)**: Plate appearance that counts
+- **ERA**: Earned Run Average (pitching stat)
+- **OBP**: On-Base Percentage
+- **Fielding %**: (Putouts + Assists) / (Putouts + Assists + Errors)
+- **Positions**: P, C, 1B, 2B, 3B, SS, LF, CF, RF
+
+## Code Review Checklist
+
+Before submitting code, verify:
+- [ ] TypeScript types defined (no `any`)
+- [ ] Zod validation on all form inputs
+- [ ] Error states handled (loading, error, empty)
+- [ ] Mobile responsive (test at 375px width)
+- [ ] React Query cache invalidation after mutations
+- [ ] Drizzle schema updated if DB changes
+- [ ] Auth checks on protected routes
+- [ ] Console.logs removed (except intentional debugging)
+
+## When You're Stuck (Anti-Loop Protocol)
+
+If you've tried the same fix 3 times:
+1. STOP coding
+2. Explain what you've tried
+3. Ask: "Should we take a different approach?"
+4. Suggest 2-3 alternative solutions
+5. Wait for human decision
+
+---
+
+**Remember**: ASK before assuming. Coaches and players have different mental models than developers. Clarify the USER NEED before building the TECHNICAL SOLUTION.
