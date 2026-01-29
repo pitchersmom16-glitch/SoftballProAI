@@ -93,13 +93,14 @@ export async function setupAuth(app: Express) {
   passport.serializeUser((user: any, cb) => cb(null, user));
   passport.deserializeUser((user: any, cb) => cb(null, user));
 
-  // SECURITY: Rate limiting for authentication endpoints
+  // SECURITY: Rate limiting for authentication endpoints (POST only, not auto-login GET)
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // 5 attempts per window
+    max: 10, // 10 attempts per window (more lenient for dev)
     message: "Too many login attempts. Please try again in 15 minutes.",
     standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
     legacyHeaders: false, // Disable `X-RateLimit-*` headers
+    skip: (req) => req.method === 'GET', // Don't rate limit auto-login
   });
 
   // Login route
