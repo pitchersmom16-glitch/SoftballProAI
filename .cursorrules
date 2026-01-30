@@ -22,6 +22,7 @@ Focus: Player development, stats tracking, video analysis, and team management.
 2. "Does this need React Query caching or just useState?"
 3. "What's the Drizzle schema for this data? Should I check existing tables first?"
 4. "Is this real-time data or can it be stale for 5 minutes?"
+5. "Will this code or workflow change require a **Live Update** entry in `workflows.md`? If yes, add an entry with date, summary, and commit hash before committing code."
 
 ### User Role Questions:
 5. "Is this feature for coaches, players, or both?"
