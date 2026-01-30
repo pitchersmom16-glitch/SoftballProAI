@@ -7,7 +7,9 @@
 
 ## 🔁 Live Updates (canonical change log)
 Keep this section current. Whenever code, routes, or user flows are changed, add a short entry with: **date**, **one-line summary**, **commit hash**, and **author**. This is the single source of truth for other agents (e.g., Claude) and collaborators.
-- 2026-01-30 — chore: remove tracked build artifacts (dist-temp); add to .gitignore (commit: `9780421`) — author: pitchersmom16-glitch
+- 2026-01-30 — chore(security): enforce SESSION_SECRET in production; gate dev auth; add Live Update check and CI; ignore dist-temp (commit: `c5b5a0c`) — author: pitchersmom16-glitch
+
+ 2026-01-30 — chore: remove tracked build artifacts (dist-temp); add to .gitignore (commit: `9780421`) — author: pitchersmom16-glitch
 
  2026-01-30 — chore(workflows): remove duplicate Claude workflows.md; add pointer README and update Claude rules (commit: `d1b09b4`) — author: pitchersmom16-glitch
 
