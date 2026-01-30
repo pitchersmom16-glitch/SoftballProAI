@@ -12,7 +12,9 @@
     "db:push": "drizzle-kit push",
     "clean:dev": "tsx scripts/clean-dev-users.ts",
     "setup-githooks": "git config core.hooksPath .githooks",
-    "sync-workflows": "node scripts/add-workflow-entry.cjs"
+    "prepare": "npm run setup-githooks",
+    "sync-workflows": "node scripts/add-workflow-entry.cjs",
+    "check-live-update": "node scripts/check-live-update.cjs"
   },
   "dependencies": {
     "@google-cloud/storage": "^7.18.0",

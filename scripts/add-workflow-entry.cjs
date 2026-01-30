@@ -70,9 +70,11 @@ try {
   const shortSummary = msg.length > 60 ? msg.slice(0, 57) + '...' : msg;
   run(`git commit -m "docs(workflows): add live update — ${shortSummary} (commit: ${hash})" -- ${updatedFiles.map(f => '"' + f + '"').join(' ')}`);
 
-  // Optionally push
+  // Optionally push to the current branch instead of hardcoding 'main'
   try {
-    run('git push origin main');
+    const branch = run('git rev-parse --abbrev-ref HEAD');
+    const pushTarget = branch && branch !== 'HEAD' ? branch : 'main';
+    run(`git push origin ${pushTarget}`);
   } catch (e) {
     console.log('Could not push workflows update (remote may require auth or diverged).');
   }

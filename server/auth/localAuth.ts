@@ -12,9 +12,13 @@ export function getSession() {
   // SECURITY: Require SESSION_SECRET in production
   const sessionSecret = process.env.SESSION_SECRET;
   if (!sessionSecret) {
-    // Generate a random secret if not provided (dev only)
+    if (process.env.NODE_ENV === 'production') {
+      console.error('[Security] SESSION_SECRET is required in production. Aborting startup.');
+      process.exit(1);
+    }
+    // Generate a random secret for development (do not log the secret).
     const randomSecret = crypto.randomBytes(32).toString('hex');
-    console.warn("[Security] SESSION_SECRET not set! Using random secret (DEV ONLY):", randomSecret.substring(0, 10) + "...");
+    console.warn('[Security] SESSION_SECRET not set; using a randomly generated secret for development only.');
     process.env.SESSION_SECRET = randomSecret;
   }
   
@@ -49,46 +53,52 @@ export async function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Local strategy for development
-  passport.use(
-    new LocalStrategy(
-      {
-        usernameField: "email",
-        passwordField: "password",
-      },
-      async (email, password, done) => {
-        try {
-          // For development, accept any email/password
-          // In production, you'd verify credentials here
-          const userId = email; // Use email as userId for simplicity
-          
-          // Ensure user exists in database
-          await storage.upsertUser({
-            id: userId,
-            email,
-            firstName: "Dev",
-            lastName: "User",
-          });
-          
-          // Create user object compatible with Replit auth format
-          const user = {
-            claims: {
-              sub: userId,
+  // Local strategy - gated to non-production or when DEV_AUTH=true
+  const enableDevAuth = process.env.NODE_ENV !== 'production' || process.env.DEV_AUTH === 'true';
+
+  if (enableDevAuth) {
+    passport.use(
+      new LocalStrategy(
+        {
+          usernameField: "email",
+          passwordField: "password",
+        },
+        async (email, password, done) => {
+          try {
+            // For development, accept any email/password
+            // In production you'd use real credential checks
+            const userId = email; // Use email as userId for simplicity
+
+            // Ensure user exists in database
+            await storage.upsertUser({
+              id: userId,
               email,
-              given_name: "Dev",
-              family_name: "User",
-              first_name: "Dev",
-              last_name: "User",
-            },
-          };
-          
-          return done(null, user);
-        } catch (error) {
-          return done(error);
+              firstName: "Dev",
+              lastName: "User",
+            });
+
+            // Create user object compatible with Replit auth format
+            const user = {
+              claims: {
+                sub: userId,
+                email,
+                given_name: "Dev",
+                family_name: "User",
+                first_name: "Dev",
+                last_name: "User",
+              },
+            };
+
+            return done(null, user);
+          } catch (error) {
+            return done(error);
+          }
         }
-      }
-    )
-  );
+      )
+    );
+  } else {
+    // In production, do not register permissive local auth
+  }
 
   passport.serializeUser((user: any, cb) => cb(null, user));
   passport.deserializeUser((user: any, cb) => cb(null, user));
@@ -116,27 +126,29 @@ export async function setupAuth(app: Express) {
     })(req, res, next);
   });
 
-  // Auto-login route for development
-  app.get("/api/login", (req, res) => {
-    if (req.isAuthenticated()) {
-      return res.redirect("/");
-    }
-    
-    // Auto-login as FIXED dev user (not timestamp-based)
-    const userId = "dev-user-local";
-    
-    req.logIn({ claims: { sub: userId, email: "dev@softballproai.com", given_name: "Dev", family_name: "User", first_name: "Dev", last_name: "User" } }, async (err) => {
-      if (err) return res.status(500).json({ message: "Auto-login failed" });
+  // Auto-login route for development (disabled in production)
+  if (enableDevAuth) {
+    app.get("/api/login", (req, res) => {
+      if (req.isAuthenticated()) {
+        return res.redirect("/");
+      }
       
-      // Ensure user exists in database
-      await storage.upsertUser({
-        id: userId,
-        email: "dev@softballproai.com",
+      // Auto-login as FIXED dev user (not timestamp-based)
+      const userId = "dev-user-local";
+      
+      req.logIn({ claims: { sub: userId, email: "dev@softballproai.com", given_name: "Dev", family_name: "User", first_name: "Dev", last_name: "User" } }, async (err) => {
+        if (err) return res.status(500).json({ message: "Auto-login failed" });
+        
+        // Ensure user exists in database
+        await storage.upsertUser({
+          id: userId,
+          email: "dev@softballproai.com",
+        });
+        
+        res.redirect("/");
       });
-      
-      res.redirect("/");
     });
-  });
+  }
 
   // Logout route
   app.get("/api/logout", (req, res) => {
