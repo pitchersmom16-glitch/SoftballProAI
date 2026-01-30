@@ -8,6 +8,8 @@
 ## 🔁 Live Updates (canonical change log)
 Keep this section current. Whenever code, routes, or user flows are changed, add a short entry with: **date**, **one-line summary**, **commit hash**, and **author**. This is the single source of truth for other agents (e.g., Claude) and collaborators.
 
+- 2026-01-30 — chore(workflows): auto-sync root and Claude workflows; update rules (commit: `b15186a`) — author: pitchersmom16-glitch
+- 2026-01-30 — chore(workflows): use .cjs helper so script runs in repo with type=module (commit: `0671793`) — author: pitchersmom16-glitch
 - 2026-01-30 — Removed `READY_TO_TEST.md` and `FIXES_FOR_TOMORROW.md` (commit: `7dd0c97`) — Commit message: "chore: remove READY_TO_TEST.md and FIXES_FOR_TOMORROW.md — workflows.md is canonical" — author: GitHub Copilot
 
 **How to add an entry:**
