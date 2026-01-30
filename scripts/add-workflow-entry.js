@@ -9,9 +9,15 @@ function run(cmd) {
 
 try {
   const root = run('git rev-parse --show-toplevel');
-  const workflowsPath = path.join(root, 'workflows.md');
-  if (!fs.existsSync(workflowsPath)) {
-    console.log('workflows.md not found — skipping live update.');
+  // Support syncing multiple workflows files (root + Claude folder)
+  const possiblePaths = [
+    path.join(root, 'workflows.md'),
+    path.join(root, 'Claude', 'Claude Rules and Project Specifications', 'workflows.md'),
+  ];
+
+  const workflowsPaths = possiblePaths.filter(p => fs.existsSync(p));
+  if (workflowsPaths.length === 0) {
+    console.log('No workflows.md found — skipping live update.');
     process.exit(0);
   }
 
@@ -29,47 +35,49 @@ try {
   const date = new Date().toISOString().slice(0, 10);
   const entry = `- ${date} — ${msg} (commit: \`${hash}\`) — author: ${author}\n\n`;
 
-  const content = fs.readFileSync(workflowsPath, 'utf8');
+  // Update each workflows file as-needed, collecting which files were changed
+  const updatedFiles = [];
 
-  // If the entry is already present, skip
-  if (content.includes(`(${hash})`)) {
-    console.log('Entry for this commit already exists in workflows.md — skipping.');
+  const headerRegex = /(## 🔁 Live Updates[\s\S]*?\n)(?:-|$)/m;
+
+  for (const wpath of workflowsPaths) {
+    const content = fs.readFileSync(wpath, 'utf8');
+
+    // If the entry is already present for this commit, skip
+    if (content.includes(`(${hash})`)) {
+      console.log(`Entry for this commit already exists in ${wpath} — skipping.`);
+      continue;
+    }
+
+    if (headerRegex.test(content)) {
+      const updated = content.replace(headerRegex, (m, p1) => `${p1}${entry}`);
+      fs.writeFileSync(wpath, updated, 'utf8');
+      updatedFiles.push(wpath);
+    } else {
+      const liveHeader = `\n## 🔁 Live Updates (canonical change log)\n\n${entry}\n`;
+      fs.writeFileSync(wpath, liveHeader + content, 'utf8');
+      updatedFiles.push(wpath);
+    }
+  }
+
+  if (updatedFiles.length === 0) {
+    console.log('No workflows file updated.');
     process.exit(0);
   }
 
-  // Insert the entry right after the Live Updates header
-  const headerRegex = /(## 🔁 Live Updates[\s\S]*?\n)(?:-\s|$)/m;
-  if (headerRegex.test(content)) {
-    // place entry immediately after header block (before existing list)
-    const updated = content.replace(headerRegex, (m, p1) => `${p1}${entry}`);
-    fs.writeFileSync(workflowsPath, updated, 'utf8');
+  // Stage and commit all updated workflows files together
+  run(`git add ${updatedFiles.map(f => '"' + f + '"').join(' ')}`);
+  const shortSummary = msg.length > 60 ? msg.slice(0, 57) + '...' : msg;
+  run(`git commit -m "docs(workflows): add live update — ${shortSummary} (commit: ${hash})" -- ${updatedFiles.map(f => '"' + f + '"').join(' ')}`);
 
-    // Stage and commit the change
-    run(`git add "${workflowsPath}"`);
-    const shortSummary = msg.length > 60 ? msg.slice(0, 57) + '...' : msg;
-    run(`git commit -m "docs(workflows): add live update — ${shortSummary} (commit: ${hash})" -- "${workflowsPath}"`);
-
-    // Optionally push
-    try {
-      run('git push origin main');
-    } catch (e) {
-      console.log('Could not push workflows update (remote may require auth or diverged).');
-    }
-
-    console.log('Live update entry added to workflows.md.');
-  } else {
-    // No header found — append a small Live Updates section
-    const liveHeader = `\n## 🔁 Live Updates (canonical change log)\n\n${entry}\n`;
-    fs.writeFileSync(workflowsPath, liveHeader + content, 'utf8');
-    run(`git add "${workflowsPath}"`);
-    run(`git commit -m "docs(workflows): add initial live update for ${hash}" -- "${workflowsPath}"`);
-    try {
-      run('git push origin main');
-    } catch (e) {
-      console.log('Could not push workflows update.');
-    }
-    console.log('Live Updates section created and entry added.');
+  // Optionally push
+  try {
+    run('git push origin main');
+  } catch (e) {
+    console.log('Could not push workflows update (remote may require auth or diverged).');
   }
+
+  console.log('Live update entry added to:', updatedFiles.join(', '));
 } catch (err) {
   console.error('Failed to run add-workflow-entry:', err.message);
   process.exit(1);
