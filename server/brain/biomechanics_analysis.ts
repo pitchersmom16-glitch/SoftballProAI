@@ -1,11 +1,71 @@
 /**
  * ADVANCED BIOMECHANICS ANALYSIS ENGINE
- * SoftballProAI Brain - Deep Biomechanical Analysis for Video Coaching
- * 
+ *
  * This module provides detailed biomechanical analysis frameworks that work
  * with MediaPipe pose detection to deliver expert-level coaching insights.
  * Based on sports science research and biomechanics literature (2025-2026).
  */
+
+import fs from "fs";
+import path from "path";
+import { llm } from "../utils/llm"; // adjust this import to match your project structure
+
+/**
+ * analyzeMechanics
+ * ----------------
+ * This function sends biomechanics metrics to the LLM using:
+ * - A global system prompt (identity + rules)
+ * - A task-specific prompt (ROLE / TASK / FORMAT)
+ * - A strict JSON output contract
+ * - A rule-based-first hybrid approach
+ */
+
+export async function analyzeMechanics(metrics: any) {
+  // Load the global system prompt (the "constitution")
+  const systemPrompt = fs.readFileSync(
+    path.join(__dirname, "system_prompts/base_system_prompt.md"),
+    "utf8"
+  );
+
+  // Task-specific instructions for mechanics analysis
+  const analysisPrompt = `
+ROLE: Act as a biomechanics coach specializing in fastpitch softball.
+
+TASK: Analyze the provided metrics and return issues, strengths, and recommended drills.
+
+FORMAT:
+{
+  "issues": [...],
+  "strengths": [...],
+  "recommendedDrills": [...],
+  "priorityFocus": [...]
+}
+
+RULES:
+- Return your answer in valid JSON only.
+- Do not include commentary outside the JSON block.
+- If required information is missing, ask one clarifying question before continuing.
+- Apply rule-based logic first. Only use the LLM to expand or contextualize.
+- Never override rule-based results unless explicitly instructed.
+
+METRICS:
+${JSON.stringify(metrics, null, 2)}
+`;
+
+  // LLM call
+  const response = await llm.chat({
+    system: systemPrompt,
+    messages: [
+      {
+        role: "user",
+        content: analysisPrompt
+      }
+    ]
+  });
+
+  return response;
+}
+
 
 // ============================================================================
 // PITCHING BIOMECHANICS - Detailed Analysis Framework
@@ -459,7 +519,7 @@ export const HITTING_BIOMECHANICS = {
       ]
     },
     
-    pulling Off: {
+    pullingOff: {
       description: "Head and body pull away from plate",
       biomechanicalCause: "Fear, spinning open, poor balance",
       identifying: "Head moves toward dugout, weak contact to opposite field",
@@ -629,7 +689,7 @@ export const FIELDING_BIOMECHANICS = {
       catchingPosition: "Over throwing shoulder, two hands, momentum toward target"
     },
 
-    throwing Mechanics: {
+    throwingMechanics: {
       crowHop: {
         purpose: "Generate momentum for strong, accurate throw",
         technique: "Skip-step gathering momentum, back foot lands as arm reaches back",

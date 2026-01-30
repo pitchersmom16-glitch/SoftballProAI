@@ -91,7 +91,7 @@ export const NFHS_RULES = {
 
   substitutionRules: {
     reentry: "Starting player may be substituted and re-enter once",
-    courtesy Runner: "Allowed for pitcher and/or catcher - must be player not currently in lineup",
+    courtesyRunner: "Allowed for pitcher and/or catcher - must be player not currently in lineup",
     DPFlex: "Designated Player/Flex player option available",
     reporting: "Substitutes must be reported to umpire and scorer"
   }
@@ -401,7 +401,7 @@ export const RULES_EDUCATION = {
   commonMisunderstandings: {
     obstructionVsInterference: "Obstruction is defense on offense, interference is offense on defense",
     lookBackRule: "Runner must immediately proceed or return when pitcher has ball in circle",
-    infield FlyRule: "Rarely used in softball (less than two outs, runners on first and second or bases loaded)",
+    infieldFlyRule: "Rarely used in softball (less than two outs, runners on first and second or bases loaded)",
     leavingEarly: "Runner leaves base before pitch released - different from leading off",
     droppedThirdStrike: "Batter can attempt first base if not occupied or with 2 outs"
   },

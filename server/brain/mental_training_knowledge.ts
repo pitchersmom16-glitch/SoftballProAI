@@ -301,9 +301,9 @@ export const SPORTS_PSYCHOLOGY = {
     },
 
     focusCues: {
-      hitting: "See ball, hit ball" or "Quick hands, stay back",
-      pitching: "Hit target" or "One pitch at a time",
-      defense: "Ready position" or "Be the ball"
+      hitting: ["See ball, hit ball", "Quick hands, stay back"],
+      pitching: ["Hit target", "One pitch at a time"],
+      defense: ["Ready position", "Be the ball"]
     },
 
     pressureSituations: {

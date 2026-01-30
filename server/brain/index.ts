@@ -46,7 +46,7 @@ export {
 export type {
   VideoAnalysisRequest,
   AnalysisResult,
-  DrillRecommendation as EngineD rillRecommendation,
+  DrillRecommendation as EngineDrillRecommendation,
   MentalContentRequest
 } from './analysis_engine';
 
