@@ -7,7 +7,9 @@
 
 ## 🔁 Live Updates (canonical change log)
 Keep this section current. Whenever code, routes, or user flows are changed, add a short entry with: **date**, **one-line summary**, **commit hash**, and **author**. This is the single source of truth for other agents (e.g., Claude) and collaborators.
-- 2026-01-30 — chore(workflows): improve live-update check robustness and branch handling (commit: `df853d2`) — author: pitchersmom16-glitch
+- 2026-01-30 — fix(brain): normalize object keys and fix syntax typos in knowledge bases (commit: `5ccb7f8`) — author: pitchersmom16-glitch
+
+ 2026-01-30 — chore(workflows): improve live-update check robustness and branch handling (commit: `df853d2`) — author: pitchersmom16-glitch
 
  2026-01-30 — chore(security): enforce SESSION_SECRET in production; gate dev auth; add Live Update check and CI; ignore dist-temp (commit: `c5b5a0c`) — author: pitchersmom16-glitch
 
