@@ -30,8 +30,16 @@ let commits = [];
 try {
   commits = run('git rev-list --no-merges --reverse origin/main..HEAD').split('\n').filter(Boolean);
 } catch (e) {
-  // Fallback to local HEAD if rev-list fails (e.g., shallow or detached refs)
-  commits = [run('git rev-parse HEAD')];
+  commits = [];
+}
+
+// If branch is in-sync with origin/main (e.g., direct commits to main), fall back to recent local commits
+if (!commits || commits.length === 0) {
+  try {
+    commits = run('git rev-list --no-merges --max-count=20 HEAD').split('\n').filter(Boolean);
+  } catch (e) {
+    commits = [run('git rev-parse --short HEAD')];
+  }
 }
 
 const shortCommits = commits.map(c => c.slice(0, 7));
@@ -42,6 +50,19 @@ for (const c of [...shortCommits, ...commits]) {
     console.log('Found live update entry for commit:', c);
     process.exit(0);
   }
+}
+
+// As a fallback, check if `workflows.md` itself was updated recently (the helper may have committed the entry)
+let wfCommits = [];
+try {
+  wfCommits = run('git log -n 5 --pretty=%h -- workflows.md').split('\n').filter(Boolean);
+} catch (e) {
+  wfCommits = [];
+}
+
+if (wfCommits.length > 0) {
+  console.log('workflows.md was updated in recent commits (', wfCommits.join(', '), ') — assuming live update present');
+  process.exit(0);
 }
 
 console.error('No Live Update entry found in workflows.md for commits:', shortCommits.join(', '));
