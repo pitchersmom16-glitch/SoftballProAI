@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -68,6 +68,17 @@ export default function PlayerOnboarding() {
     queryKey: ["/api/player/onboarding"],
   });
 
+  // Auto-redirect to home when onboarding is complete
+  useEffect(() => {
+    if (onboarding && (onboarding.dashboardUnlocked || onboarding.baselineComplete)) {
+      // Redirect to home after a brief delay to show success message
+      const timer = setTimeout(() => {
+        setLocation("/");
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [onboarding, setLocation]);
+
   const uploadMutation = useMutation({
     mutationFn: async (data: { videoUrl: string; videoNumber: number; videoCategory: string; durationSeconds?: number }) => {
       return apiRequest("POST", "/api/player/baseline-video", data);
@@ -80,7 +91,7 @@ export default function PlayerOnboarding() {
       if (response.baselineComplete) {
         toast({
           title: "All Videos Uploaded!",
-          description: "Your coach will review your videos and unlock your dashboard.",
+          description: "Taking you to your dashboard...",
         });
       } else {
         toast({

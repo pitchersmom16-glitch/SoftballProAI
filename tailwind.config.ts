@@ -75,6 +75,16 @@ export default {
           foreground: "hsl(var(--sidebar-accent-foreground) / <alpha-value>)",
           border: "var(--sidebar-accent-border)"
         },
+        // SoftballProAI Brand Colors
+        electricPink: "#FF00FF",
+        cyberBlue: "#00FFFF",
+        limePop: "#CCFF00",
+        solarOrange: "#FF6600",
+        laserYellow: "#FFFF33",
+        ultraviolet: "#9900FF",
+        blacklightBase: "#0A0A0A",
+        charcoal2: "#1A1A1A",
+        whiteGlow: "#F2F2F2",
         status: {
           online: "rgb(34 197 94)",
           away: "rgb(245 158 11)",

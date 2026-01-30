@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Check, Zap, Crown, Users, Star, Sparkles } from "lucide-react";
+import { Check, Zap, Target, Users, Star, Sparkles } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -24,50 +24,51 @@ interface PricingTier {
 
 const PRICING_TIERS: PricingTier[] = [
   {
-    id: "basic",
-    name: "Basic",
+    id: "player",
+    name: "Player",
     price: 14.99,
-    description: "Essential AI biomechanics for individual players",
+    description: "Your personal AI coach - for individual athletes",
     features: [
       "AI Video Analysis",
-      "Biomechanics Breakdown",
-      "Goal Tracking",
-      "Basic Drill Library",
+      "Daily Vibe Check-In (Injury Prevention)",
+      "Championship Mindset Feed",
+      "Personalized Goal Tracking",
+      "Custom Drill Library",
       "Progress Dashboard"
     ],
     icon: Zap,
+    popular: true,
     color: "purple"
   },
   {
-    id: "elite",
-    name: "Elite",
-    price: 29.99,
-    description: "Advanced coaching with personalized roadmaps",
+    id: "pitching_coach",
+    name: "Private Instructor",
+    price: 49.99,
+    description: "For Pitching, Catching, or Hitting Coaches - remote training for your students",
     features: [
-      "Everything in Basic",
-      "AI Training Roadmap",
-      "GameChanger Integration",
-      "Public Recruiting Profile",
-      "Mental Edge Content",
-      "Priority Support"
+      "Everything in Player",
+      "Manage Up to 25 Students",
+      "Assign Homework Drills (Rep Counts)",
+      "Split-Screen Pro Model Comparison",
+      "Detailed Video Feedback Tools",
+      "Student Progress Tracking"
     ],
-    icon: Crown,
-    popular: true,
+    icon: Target,
     color: "pink"
   },
   {
-    id: "coach",
-    name: "Coach",
+    id: "team_coach",
+    name: "Team Coach",
     price: 99.00,
-    description: "Full platform for team and private coaching",
+    description: "Complete team management and practice planning",
     features: [
-      "Everything in Elite",
-      "Team Roster Management",
-      "Practice Architect",
-      "Student Lesson Roster",
-      "Team Stats Import",
-      "Unlimited Athletes",
-      "White-Label Ready"
+      "Everything in Private Instructor",
+      "Manage 12-15 Player Roster",
+      "Practice Architect (Auto-Generate Plans)",
+      "Roster Health Dashboard",
+      "Station-Based Practice Organization",
+      "GameChanger Integration",
+      "Team-Wide Analytics"
     ],
     icon: Users,
     color: "cyan"
@@ -168,6 +169,19 @@ export default function Pricing() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-purple-950/20 py-12 px-4">
       <div className="max-w-6xl mx-auto">
+        {/* Back to Home Link */}
+        {!user && (
+          <div className="mb-8">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate("/")}
+              className="text-muted-foreground hover:text-white"
+            >
+              ← Back to Home
+            </Button>
+          </div>
+        )}
+        
         <div className="text-center mb-12">
           <h1 
             className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent mb-4"

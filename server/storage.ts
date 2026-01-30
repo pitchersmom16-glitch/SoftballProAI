@@ -62,6 +62,7 @@ export interface IStorage {
   // User Role
   getUser(userId: string): Promise<{ id: string; role: UserRole | null } | undefined>;
   updateUserRole(userId: string, role: UserRole): Promise<void>;
+  updateUser(userId: string, user: { firstName?: string; lastName?: string; email?: string }): Promise<void>;
   upsertUser(user: { id: string; email: string; role?: UserRole }): Promise<void>;
   
   // Player Check-ins
@@ -164,7 +165,7 @@ export class DatabaseStorage implements IStorage {
     return coach;
   }
   async createCoach(coach: CreateCoachRequest): Promise<Coach> {
-    const [newCoach] = await db.insert(coaches).values(coach).returning();
+    const [newCoach] = await db.insert(coaches).values(coach as any).returning();
     return newCoach;
   }
 
@@ -177,7 +178,7 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(teams);
   }
   async createTeam(team: CreateTeamRequest): Promise<Team> {
-    const [newTeam] = await db.insert(teams).values(team).returning();
+    const [newTeam] = await db.insert(teams).values(team as any).returning();
     return newTeam;
   }
 
@@ -204,7 +205,7 @@ export class DatabaseStorage implements IStorage {
     return athlete;
   }
   async createAthlete(athlete: CreateAthleteRequest): Promise<Athlete> {
-    const [newAthlete] = await db.insert(athletes).values(athlete).returning();
+    const [newAthlete] = await db.insert(athletes).values(athlete as any).returning();
     return newAthlete;
   }
   async updateAthlete(id: number, update: UpdateAthleteRequest): Promise<Athlete> {
@@ -224,7 +225,7 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(drills);
   }
   async createDrill(drill: CreateDrillRequest): Promise<Drill> {
-    const [newDrill] = await db.insert(drills).values(drill).returning();
+    const [newDrill] = await db.insert(drills).values(drill as any).returning();
     return newDrill;
   }
   async deleteDrill(id: number): Promise<void> {
@@ -236,7 +237,7 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(mentalEdge);
   }
   async createMentalEdge(content: CreateMentalEdgeRequest): Promise<MentalEdge> {
-    const [newContent] = await db.insert(mentalEdge).values(content).returning();
+    const [newContent] = await db.insert(mentalEdge).values(content as any).returning();
     return newContent;
   }
   async deleteMentalEdge(id: number): Promise<void> {
@@ -255,7 +256,7 @@ export class DatabaseStorage implements IStorage {
     return assessment;
   }
   async createAssessment(assessment: CreateAssessmentRequest): Promise<Assessment> {
-    const [newAssessment] = await db.insert(assessments).values(assessment).returning();
+    const [newAssessment] = await db.insert(assessments).values(assessment as any).returning();
     return newAssessment;
   }
   async updateAssessment(id: number, update: UpdateAssessmentRequest): Promise<Assessment> {
@@ -268,7 +269,7 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(assessmentFeedback).where(eq(assessmentFeedback.assessmentId, assessmentId));
   }
   async createFeedback(feedback: CreateFeedbackRequest): Promise<Feedback> {
-    const [newFeedback] = await db.insert(assessmentFeedback).values(feedback).returning();
+    const [newFeedback] = await db.insert(assessmentFeedback).values(feedback as any).returning();
     return newFeedback;
   }
 
@@ -280,6 +281,10 @@ export class DatabaseStorage implements IStorage {
   
   async updateUserRole(userId: string, role: UserRole): Promise<void> {
     await db.update(users).set({ role }).where(eq(users.id, userId));
+  }
+
+  async updateUser(userId: string, user: { firstName?: string; lastName?: string; email?: string }): Promise<void> {
+    await db.update(users).set(user).where(eq(users.id, userId));
   }
 
   async upsertUser(user: { id: string; email: string; role?: UserRole }): Promise<void> {
@@ -317,7 +322,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPlayerCheckin(checkin: CreatePlayerCheckinRequest): Promise<PlayerCheckin> {
-    const [newCheckin] = await db.insert(playerCheckins).values(checkin).returning();
+    const [newCheckin] = await db.insert(playerCheckins).values(checkin as any).returning();
     return newCheckin;
   }
 
@@ -410,7 +415,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPlayerCoachRelationship(rel: CreatePlayerCoachRelationshipRequest): Promise<PlayerCoachRelationship> {
-    const [newRel] = await db.insert(playerCoachRelationships).values(rel).returning();
+    const [newRel] = await db.insert(playerCoachRelationships).values(rel as any).returning();
     return newRel;
   }
 
@@ -443,7 +448,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCoachInvite(invite: CreateCoachInviteRequest): Promise<CoachInvite> {
-    const [newInvite] = await db.insert(coachInvites).values(invite).returning();
+    const [newInvite] = await db.insert(coachInvites).values(invite as any).returning();
     return newInvite;
   }
 
@@ -460,7 +465,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPlayerSettings(settings: CreatePlayerSettingsRequest): Promise<PlayerSettings> {
-    const [newSettings] = await db.insert(playerSettings).values(settings).returning();
+    const [newSettings] = await db.insert(playerSettings).values(settings as any).returning();
     return newSettings;
   }
 
@@ -500,7 +505,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createStudentInvite(invite: CreateStudentInviteRequest): Promise<StudentInvite> {
-    const [newInvite] = await db.insert(studentInvites).values(invite).returning();
+    const [newInvite] = await db.insert(studentInvites).values(invite as any).returning();
     return newInvite;
   }
 
@@ -523,7 +528,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createBaselineVideo(video: CreateBaselineVideoRequest): Promise<BaselineVideo> {
-    const [newVideo] = await db.insert(baselineVideos).values(video).returning();
+    const [newVideo] = await db.insert(baselineVideos).values(video as any).returning();
     return newVideo;
   }
 
@@ -540,7 +545,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPlayerOnboarding(onboarding: CreatePlayerOnboardingRequest): Promise<PlayerOnboarding> {
-    const [newOnboarding] = await db.insert(playerOnboarding).values(onboarding).returning();
+    const [newOnboarding] = await db.insert(playerOnboarding).values(onboarding as any).returning();
     return newOnboarding;
   }
 
@@ -595,7 +600,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createNotification(notification: CreateNotificationRequest): Promise<Notification> {
-    const [newNotification] = await db.insert(notifications).values(notification).returning();
+    const [newNotification] = await db.insert(notifications).values(notification as any).returning();
     return newNotification;
   }
 
@@ -615,7 +620,7 @@ export class DatabaseStorage implements IStorage {
 
   // === GAMECHANGER STATS ===
   async createGameChangerStats(stats: CreateGameChangerStatsRequest): Promise<GameChangerStats> {
-    const [newStats] = await db.insert(gameChangerStats).values(stats).returning();
+    const [newStats] = await db.insert(gameChangerStats).values(stats as any).returning();
     return newStats;
   }
 
@@ -635,7 +640,7 @@ export class DatabaseStorage implements IStorage {
 
   // === SKELETAL ANALYSIS ===
   async createSkeletalAnalysis(analysis: CreateSkeletalAnalysisRequest): Promise<SkeletalAnalysis> {
-    const [newAnalysis] = await db.insert(skeletalAnalysis).values(analysis).returning();
+    const [newAnalysis] = await db.insert(skeletalAnalysis).values(analysis as any).returning();
     return newAnalysis;
   }
 
@@ -661,7 +666,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPlayerGoal(goal: CreatePlayerGoalRequest): Promise<PlayerGoal> {
-    const [newGoal] = await db.insert(playerGoals).values(goal).returning();
+    const [newGoal] = await db.insert(playerGoals).values(goal as any).returning();
     return newGoal;
   }
 
@@ -675,7 +680,7 @@ export class DatabaseStorage implements IStorage {
 
   // === TEAM STATS ===
   async createTeamStats(stats: CreateTeamStatsRequest): Promise<TeamStats> {
-    const [newStats] = await db.insert(teamStats).values(stats).returning();
+    const [newStats] = await db.insert(teamStats).values(stats as any).returning();
     return newStats;
   }
 
@@ -700,7 +705,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUserSubscription(sub: CreateUserSubscriptionRequest): Promise<UserSubscription> {
-    const [newSub] = await db.insert(userSubscriptions).values(sub).returning();
+    const [newSub] = await db.insert(userSubscriptions).values(sub as any).returning();
     return newSub;
   }
 
@@ -713,11 +718,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUserSubscription(sub: CreateUserSubscriptionRequest): Promise<UserSubscription> {
-    const existing = await this.getUserSubscription(sub.userId);
+    const existing = await this.getUserSubscription((sub as any).userId);
     if (existing) {
-      return this.updateUserSubscription(sub.userId, sub);
+      return this.updateUserSubscription((sub as any).userId, sub as any);
     }
-    return this.createUserSubscription(sub);
+    return this.createUserSubscription(sub as any);
   }
 }
 

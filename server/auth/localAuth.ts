@@ -73,8 +73,6 @@ export async function setupAuth(app: Express) {
             await storage.upsertUser({
               id: userId,
               email,
-              firstName: "Dev",
-              lastName: "User",
             });
 
             // Create user object compatible with Replit auth format

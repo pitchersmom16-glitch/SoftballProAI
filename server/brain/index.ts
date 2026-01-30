@@ -11,19 +11,11 @@
  */
 
 // Core analysis engines
-export {
-  analyzeMechanics,
-  analyzePitching,
-  analyzeHitting,
-  analyzeCatching,
-  analyzeFielding,
-  analyzeMental,
-  getCorrectiveDrills,
-  getDrillsByTag,
-  getDrillsByExpert,
-  getDailyMindset,
-  getPreGameAudio
-} from './analyze_mechanics';
+import { analyzeMechanics, analyzePitching, analyzeHitting, analyzeCatching, analyzeFielding, analyzeMental, getCorrectiveDrills, getDrillsByTag, getDrillsByExpert, getDailyMindset, getPreGameAudio } from './analyze_mechanics';
+export { analyzeMechanics, analyzePitching, analyzeHitting, analyzeCatching, analyzeFielding, analyzeMental, getCorrectiveDrills, getDrillsByTag, getDrillsByExpert, getDailyMindset, getPreGameAudio } from './analyze_mechanics';
+
+import { analyzeVideo, getMentalContent, analyzeWindmillMechanics, analyzeSwingMechanics, analyzePopTime, analyzeFieldingMechanics } from './analysis_engine';
+export { analyzeVideo, getMentalContent, analyzeWindmillMechanics, analyzeSwingMechanics, analyzePopTime, analyzeFieldingMechanics } from './analysis_engine';
 
 export type {
   MechanicsAnalysisRequest,
@@ -233,7 +225,9 @@ export async function getChampionshipDailyContent() {
   
   const dailyThemes = await MentalTraining.daily();
   return {
-    championshipPrinciple: championship.keyPrinciples[Object.keys(championship.keyPrinciples)[Math.floor(Math.random() * Object.keys(championship.keyPrinciples).length)]],
+    const kpKeys = Object.keys(championship.keyPrinciples) as Array<keyof typeof championship.keyPrinciples>;
+    const kpKey = kpKeys[Math.floor(Math.random() * kpKeys.length)];
+    championshipPrinciple: championship.keyPrinciples[kpKey],
     dailyTheme: dailyThemes[today as keyof typeof dailyThemes],
     randomApplication: championship.dailyApplications.morningMindset[Math.floor(Math.random() * championship.dailyApplications.morningMindset.length)]
   };

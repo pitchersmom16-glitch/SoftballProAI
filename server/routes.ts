@@ -79,6 +79,142 @@ export async function registerRoutes(
     }
   });
 
+  // User Profile Management - Parent-First Flow
+  app.post("/api/user/profile", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any).claims.sub;
+
+      const profileSchema = z.object({
+        // Parent Information
+        parentFirstName: z.string().min(2, "Parent first name must be at least 2 characters"),
+        parentLastName: z.string().min(2, "Parent last name must be at least 2 characters"),
+        parentEmail: z.string().email("Please enter a valid email address"),
+        parentPhone: z.string().min(10, "Please enter a valid phone number"),
+        
+        // Athlete Information
+        athleteFirstName: z.string().min(2, "Athlete first name must be at least 2 characters"),
+        athleteLastName: z.string().min(2, "Athlete last name must be at least 2 characters"),
+        athleteDateOfBirth: z.string().refine((date) => {
+          const birthDate = new Date(date);
+          const today = new Date();
+          const age = today.getFullYear() - birthDate.getFullYear();
+          return age >= 5 && age <= 25;
+        }, "Please enter a valid date of birth"),
+        athleteGrade: z.string().min(1, "Please select your athlete's grade"),
+        athleteSchool: z.string().min(2, "School name must be at least 2 characters"),
+      });
+
+      const profileData = profileSchema.parse(req.body);
+
+      // Update parent user information
+      await storage.updateUser(userId, {
+        firstName: profileData.parentFirstName,
+        lastName: profileData.parentLastName,
+        email: profileData.parentEmail,
+      });
+
+      // Check if athlete profile already exists for this parent
+      let athlete = await storage.getAthleteByUserId(userId);
+
+      if (athlete) {
+        // Update existing athlete profile
+        await storage.updateAthlete(athlete.id, {
+          firstName: profileData.athleteFirstName,
+          lastName: profileData.athleteLastName,
+          dob: new Date(profileData.athleteDateOfBirth),
+          school: profileData.athleteSchool,
+          parentEmail: profileData.parentEmail,
+          parentPhone: profileData.parentPhone,
+          graduationYear: profileData.athleteGrade === "college" ? new Date().getFullYear() + 4 :
+                         profileData.athleteGrade === "12" ? new Date().getFullYear() :
+                         profileData.athleteGrade === "11" ? new Date().getFullYear() + 1 :
+                         profileData.athleteGrade === "10" ? new Date().getFullYear() + 2 :
+                         profileData.athleteGrade === "9" ? new Date().getFullYear() + 3 :
+                         profileData.athleteGrade === "8" ? new Date().getFullYear() + 4 :
+                         profileData.athleteGrade === "7" ? new Date().getFullYear() + 5 :
+                         profileData.athleteGrade === "6" ? new Date().getFullYear() + 6 :
+                         profileData.athleteGrade === "5" ? new Date().getFullYear() + 7 :
+                         profileData.athleteGrade === "4" ? new Date().getFullYear() + 8 :
+                         profileData.athleteGrade === "3" ? new Date().getFullYear() + 9 : null,
+        });
+      } else {
+        // Create new athlete profile linked to parent
+        await storage.createAthlete({
+          userId, // Link athlete to parent user
+          firstName: profileData.athleteFirstName,
+          lastName: profileData.athleteLastName,
+          dob: new Date(profileData.athleteDateOfBirth),
+          school: profileData.athleteSchool,
+          parentEmail: profileData.parentEmail,
+          parentPhone: profileData.parentPhone,
+          graduationYear: profileData.athleteGrade === "college" ? new Date().getFullYear() + 4 :
+                         profileData.athleteGrade === "12" ? new Date().getFullYear() :
+                         profileData.athleteGrade === "11" ? new Date().getFullYear() + 1 :
+                         profileData.athleteGrade === "10" ? new Date().getFullYear() + 2 :
+                         profileData.athleteGrade === "9" ? new Date().getFullYear() + 3 :
+                         profileData.athleteGrade === "8" ? new Date().getFullYear() + 4 :
+                         profileData.athleteGrade === "7" ? new Date().getFullYear() + 5 :
+                         profileData.athleteGrade === "6" ? new Date().getFullYear() + 6 :
+                         profileData.athleteGrade === "5" ? new Date().getFullYear() + 7 :
+                         profileData.athleteGrade === "4" ? new Date().getFullYear() + 8 :
+                         profileData.athleteGrade === "3" ? new Date().getFullYear() + 9 : undefined,
+        });
+      }
+
+      res.json({ success: true, message: "Parent account and athlete profile created successfully" });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0].message });
+      }
+      throw err;
+    }
+  });
+
+  // Get athlete profile for current user (parent)
+  app.get("/api/player/athlete", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any).claims.sub;
+      const athlete = await storage.getAthleteByUserId(userId);
+      res.json(athlete);
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Get player onboarding status
+  app.get("/api/player/onboarding", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any).claims.sub;
+      const onboarding = await storage.getPlayerOnboarding(userId);
+      res.json({
+        dashboardUnlocked: onboarding?.dashboardUnlocked || false,
+        baselineComplete: onboarding?.baselineComplete || false,
+      });
+    } catch (err) {
+      throw err;
+    }
+  });
+
+  // Update athlete profile
+  app.put("/api/athletes/:id", isAuthenticated, async (req, res) => {
+    try {
+      const athleteId = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id, 10);
+      const userId = (req.user as any).claims.sub;
+
+      // Verify the athlete belongs to the current user
+      const athlete = await storage.getAthlete(athleteId);
+      if (!athlete || athlete.userId !== userId) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+
+      const updateData = req.body;
+      const updatedAthlete = await storage.updateAthlete(athleteId, updateData);
+      res.json(updatedAthlete);
+    } catch (err) {
+      throw err;
+    }
+  });
+
   // Player Check-ins
   app.get("/api/player/checkin/today", async (req, res) => {
     try {
@@ -273,7 +409,7 @@ export async function registerRoutes(
   });
 
   app.get(api.athletes.get.path, async (req, res) => {
-    const athlete = await storage.getAthlete(Number(req.params.id));
+    const athlete = await storage.getAthlete(Number(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id));
     if (!athlete) return res.status(404).json({ message: "Athlete not found" });
     res.json(athlete);
   });
@@ -443,7 +579,7 @@ export async function registerRoutes(
   // Delete team
   app.delete("/api/teams/:id", isAuthenticated, async (req, res) => {
     try {
-      const id = Number(req.params.id);
+      const id = Number(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id);
       const team = await storage.getTeam(id);
       if (!team) {
         return res.status(404).json({ message: "Team not found" });
@@ -794,8 +930,12 @@ export async function registerRoutes(
       // Import analysis service
       const { processVideoAnalysis } = await import('./services/videoAnalysisService');
       
+      // Normalize athleteLevel to allowed enum
+      const validLevels = ["Beginner","Intermediate","Advanced"] as const;
+      const athleteLevel = (data.athleteLevel && (validLevels.includes(data.athleteLevel as any) ? data.athleteLevel as any : undefined)) || undefined;
+
       // Process video with AI Brain
-      const result = await processVideoAnalysis(data);
+      const result = await processVideoAnalysis({ ...data, athleteLevel });
       
       res.json(result);
     } catch (err) {
@@ -1056,7 +1196,7 @@ export async function registerRoutes(
   // Delete a drill
   app.delete("/api/drills/:id", async (req, res) => {
     try {
-      await storage.deleteDrill(Number(req.params.id));
+      await storage.deleteDrill(Number(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id));
       res.json({ message: "Drill deleted" });
     } catch (err) {
       console.error("Delete drill error:", err);
@@ -1067,7 +1207,7 @@ export async function registerRoutes(
   // Delete Mental Edge content
   app.delete("/api/mental-edge/:id", async (req, res) => {
     try {
-      await storage.deleteMentalEdge(Number(req.params.id));
+      await storage.deleteMentalEdge(Number(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id));
       res.json({ message: "Mental edge content deleted" });
     } catch (err) {
       console.error("Delete mental edge error:", err);
@@ -1235,7 +1375,7 @@ export async function registerRoutes(
       });
       
       const { status } = actionSchema.parse(req.body);
-      const inviteId = Number(req.params.id);
+      const inviteId = Number(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id);
       
       // Update invite status
       const invite = await storage.updateCoachInvite(inviteId, { 
@@ -1282,7 +1422,7 @@ export async function registerRoutes(
   app.delete("/api/player/coaches/:id", async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
-      await storage.deletePlayerCoachRelationship(Number(req.params.id));
+      await storage.deletePlayerCoachRelationship(Number(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id));
       res.json({ message: "Coach removed from your team" });
     } catch (err) {
       throw err;
@@ -1363,7 +1503,7 @@ export async function registerRoutes(
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
-      const teamId = Number(req.params.teamId);
+      const teamId = Number(Array.isArray(req.params.teamId) ? req.params.teamId[0] : req.params.teamId);
       
       // Get team and verify ownership
       let team = await storage.getTeam(teamId);
@@ -1584,7 +1724,7 @@ export async function registerRoutes(
   app.post("/api/specialist/roster/:id/archive", requireRole("pitching_coach"), async (req, res) => {
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
-      const relationshipId = Number(req.params.id);
+      const relationshipId = Number(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id);
       
       await storage.updatePlayerCoachRelationship(relationshipId, { status: "inactive" });
       res.json({ message: "Student archived successfully" });
@@ -2066,7 +2206,7 @@ export async function registerRoutes(
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
-      const playerId = req.params.playerId;
+      const playerId = Array.isArray(req.params.playerId) ? req.params.playerId[0] : req.params.playerId;
       
       // Verify coach exists
       const coach = await storage.getCoachByUserId(userId);
@@ -2141,7 +2281,7 @@ export async function registerRoutes(
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
       
-      const notificationId = parseInt(req.params.id);
+      const notificationId = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id, 10);
       
       // Verify ownership by checking if notification belongs to this user
       const userNotifications = await storage.getNotifications(userId);
@@ -2235,7 +2375,7 @@ export async function registerRoutes(
   // Get public profile by athlete ID (no auth required)
   app.get("/api/profile/public/:id", async (req, res) => {
     try {
-      const athleteId = parseInt(req.params.id);
+      const athleteId = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id, 10);
       if (isNaN(athleteId)) {
         return res.status(400).json({ message: "Invalid athlete ID" });
       }
@@ -2272,7 +2412,7 @@ export async function registerRoutes(
   // Get public stats by athlete ID
   app.get("/api/stats/public/:id", async (req, res) => {
     try {
-      const athleteId = parseInt(req.params.id);
+      const athleteId = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id, 10);
       if (isNaN(athleteId)) {
         return res.status(400).json({ message: "Invalid athlete ID" });
       }
@@ -2308,7 +2448,7 @@ export async function registerRoutes(
   // Get public AI analysis by athlete ID
   app.get("/api/analysis/public/:id", async (req, res) => {
     try {
-      const athleteId = parseInt(req.params.id);
+      const athleteId = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id, 10);
       if (isNaN(athleteId)) {
         return res.status(400).json({ message: "Invalid athlete ID" });
       }
@@ -2358,7 +2498,7 @@ export async function registerRoutes(
   // Get public goals by athlete ID
   app.get("/api/goals/public/:id", async (req, res) => {
     try {
-      const athleteId = parseInt(req.params.id);
+      const athleteId = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id, 10);
       if (isNaN(athleteId)) {
         return res.status(400).json({ message: "Invalid athlete ID" });
       }
@@ -2520,6 +2660,76 @@ export async function registerRoutes(
     } catch (err) {
       console.error("Checkout error:", err);
       res.status(500).json({ message: "Failed to create checkout session" });
+    }
+  });
+
+  // Create subscription with payment method (for frontend payment forms)
+  app.post("/api/stripe/create-subscription", isAuthenticated, async (req, res) => {
+    try {
+      if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+      const userId = (req.user as any).claims.sub;
+      const userClaims = (req.user as any).claims;
+      const { paymentMethodId, priceId } = req.body;
+
+      if (!paymentMethodId || !priceId) {
+        return res.status(400).json({ message: "Payment method ID and price ID are required" });
+      }
+
+      const stripe = await getUncachableStripeClient();
+
+      // Get or create Stripe customer
+      let subscription = await storage.getUserSubscription(userId);
+      let customerId = subscription?.stripeCustomerId;
+
+      if (!customerId) {
+        const email = userClaims.email || `${userId}@example.com`;
+        const name = `${userClaims.first_name || ''} ${userClaims.last_name || ''}`.trim() || undefined;
+        const customer = await stripeService.createCustomer(email, userId, name);
+        customerId = customer.id;
+      }
+
+      // Attach payment method to customer
+      await stripe.paymentMethods.attach(paymentMethodId, {
+        customer: customerId,
+      });
+
+      // Set as default payment method
+      await stripe.customers.update(customerId, {
+        invoice_settings: {
+          default_payment_method: paymentMethodId,
+        },
+      });
+
+      // Create subscription with 14-day trial
+      const subscriptionData = await stripe.subscriptions.create({
+        customer: customerId,
+        items: [{ price: priceId }],
+        trial_period_days: 14,
+        default_payment_method: paymentMethodId,
+        metadata: { userId },
+      });
+
+      // Save subscription data
+      await storage.upsertUserSubscription({
+        userId,
+        stripeCustomerId: customerId,
+        stripeSubscriptionId: subscriptionData.id,
+        tier: "player", // Assuming this is for players
+        status: subscriptionData.status,
+        currentPeriodStart: new Date((subscriptionData as any).current_period_start * 1000),
+        currentPeriodEnd: new Date((subscriptionData as any).current_period_end * 1000),
+        trialEnd: subscriptionData.trial_end ? new Date(subscriptionData.trial_end * 1000) : null,
+      });
+
+      res.json({
+        success: true,
+        subscriptionId: subscriptionData.id,
+        status: subscriptionData.status,
+        trialEnd: subscriptionData.trial_end,
+      });
+    } catch (err) {
+      console.error("Create subscription error:", err);
+      res.status(500).json({ message: "Failed to create subscription" });
     }
   });
 

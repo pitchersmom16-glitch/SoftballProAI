@@ -1,0 +1,25 @@
+{
+  "colors": {
+    "electricPink": "#FF00FF",
+    "cyberBlue": "#00FFFF",
+    "limePop": "#CCFF00",
+    "solarOrange": "#FF6600",
+    "laserYellow": "#FFFF33",
+    "ultraviolet": "#9900FF",
+    "blacklightBase": "#0A0A0A",
+    "charcoal2": "#1A1A1A",
+    "whiteGlow": "#F2F2F2"
+  },
+  "gradients": {
+    "brand": ["#FF00FF", "#00FFFF", "#FFFF33"],
+    "circuit": ["#00FFFF", "#9900FF"],
+    "motion": ["#FF6600", "#FF00FF"]
+  },
+  "typography": {
+    "headingXL": { "fontSize": "96px", "fontWeight": "700" },
+    "headingL": { "fontSize": "64px", "fontWeight": "700" },
+    "subheading": { "fontSize": "32px", "fontWeight": "600" },
+    "body": { "fontSize": "18px", "fontWeight": "400" },
+    "label": { "fontSize": "14px", "fontWeight": "500" }
+  }
+}

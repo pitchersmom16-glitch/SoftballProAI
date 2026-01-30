@@ -14,7 +14,7 @@ export const sessions = pgTable(
 );
 
 // User roles for the three distinct modes
-export type UserRole = "player" | "team_coach" | "pitching_coach";
+export type UserRole = "player" | "parent" | "team_coach" | "pitching_coach";
 
 // User storage table.
 // (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.

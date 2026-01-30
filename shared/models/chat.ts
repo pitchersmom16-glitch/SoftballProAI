@@ -17,15 +17,15 @@ export const messages = pgTable("messages", {
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
-export const insertConversationSchema = createInsertSchema(conversations).omit({
-  id: true,
-  createdAt: true,
-});
+export const insertConversationSchema = (createInsertSchema(conversations).omit([
+  'id',
+  'createdAt',
+]) as any);
 
-export const insertMessageSchema = createInsertSchema(messages).omit({
-  id: true,
-  createdAt: true,
-});
+export const insertMessageSchema = (createInsertSchema(messages).omit([
+  'id',
+  'createdAt',
+]) as any);
 
 export type Conversation = typeof conversations.$inferSelect;
 export type InsertConversation = z.infer<typeof insertConversationSchema>;

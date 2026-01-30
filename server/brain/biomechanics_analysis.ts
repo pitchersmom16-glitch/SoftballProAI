@@ -8,7 +8,12 @@
 
 import fs from "fs";
 import path from "path";
-import { llm } from "../utils/llm"; // adjust this import to match your project structure
+import OpenAI from "openai";
+
+const llm = new OpenAI({
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+});
 
 /**
  * analyzeMechanics
@@ -52,15 +57,14 @@ METRICS:
 ${JSON.stringify(metrics, null, 2)}
 `;
 
-  // LLM call
-  const response = await llm.chat({
-    system: systemPrompt,
+  // LLM call (using OpenAI client)
+  const response = await llm.chat.completions.create({
+    model: process.env.DEFAULT_LLM_MODEL || "gpt-5.1",
     messages: [
-      {
-        role: "user",
-        content: analysisPrompt
-      }
-    ]
+      { role: "system", content: systemPrompt },
+      { role: "user", content: analysisPrompt }
+    ],
+    max_completion_tokens: 1500,
   });
 
   return response;

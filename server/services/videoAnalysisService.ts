@@ -11,7 +11,8 @@
  * Built for Shannon and every athlete who dreams of improving their game.
  */
 
-import { analyzeVideo, analyzeMechanics } from '../brain/analysis_engine';
+import { analyzeVideo } from '../brain/analysis_engine';
+import { analyzeMechanics } from '../brain/analyze_mechanics';
 import { storage } from '../storage';
 import type { BiomechanicsMetrics, DetectedIssue } from './types';
 
@@ -20,7 +21,7 @@ interface VideoAnalysisRequest {
   videoUrl: string;
   skillType: string;
   athleteId: number;
-  athleteLevel?: string;
+  athleteLevel?: "Beginner" | "Intermediate" | "Advanced";
   videoCategory: string;
 }
 

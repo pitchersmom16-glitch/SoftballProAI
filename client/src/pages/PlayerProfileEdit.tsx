@@ -45,10 +45,19 @@ const TRAINING_DAYS = [
 const profileSchema = api.athletes.update.input.extend({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
+  playerPhone: z.string().optional().or(z.literal("")),
+  parentPhone: z.string().optional().or(z.literal("")),
   parentEmail: z.string().email("Invalid email format").optional().or(z.literal("")),
+  goals: z.string().optional().or(z.literal("")),
+  preferredTrainingDays: z.array(z.string()).optional(),
   graduationYear: z.coerce.number().min(2020).max(2040).optional().nullable(),
+  school: z.string().optional().or(z.literal("")),
   heightInches: z.coerce.number().min(36).max(84).optional().nullable(),
   weightLbs: z.coerce.number().min(50).max(300).optional().nullable(),
+  bats: z.string().optional().or(z.literal("")),
+  throws: z.string().optional().or(z.literal("")),
+  primaryPosition: z.string().optional().or(z.literal("")),
+  photoUrl: z.string().optional().or(z.literal("")),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;

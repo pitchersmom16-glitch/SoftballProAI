@@ -16,7 +16,10 @@ export default function Landing() {
           <div className="flex items-center gap-4">
             <Link href="/auth" className="text-sm font-medium text-gray-400 hover:text-white transition-colors" data-testid="link-signin">Sign In</Link>
             <Link href="/pricing">
-              <button className="px-5 py-2.5 rounded-full btn-primary-glow text-sm" data-testid="button-get-started">
+              <button 
+                className="px-5 py-2.5 rounded-full btn-primary-glow text-sm" 
+                data-testid="button-get-started"
+              >
                 Get Started
               </button>
             </Link>
@@ -82,25 +85,18 @@ export default function Landing() {
               </li>
             </ul>
 
-            {/* Buttons */}
+            {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link href="/pricing">
-                <Button 
-                  className="h-14 px-8 text-lg bg-gradient-to-r from-brand-pink to-purple-600 transition-all shadow-[0_0_20px_rgba(236,72,153,0.3)]"
-                  data-testid="button-analyze-video"
-                >
+                <Button className="h-14 px-8 text-lg bg-gradient-to-r from-brand-pink to-brand-purple hover:opacity-90 transition-all shadow-[0_0_20px_rgba(236,72,153,0.3)]">
                   Start Free Trial
                 </Button>
               </Link>
-              <Link href="/pricing">
-                <Button 
-                  variant="outline" 
-                  className="h-14 px-8 text-lg border-white/20 text-white backdrop-blur-md"
-                  data-testid="button-for-teams"
-                >
-                  For Teams & Coaches
+              <a href="#features">
+                <Button variant="outline" className="h-14 px-8 text-lg border-white/20 text-white hover:bg-white/10 backdrop-blur-md">
+                  View Features
                 </Button>
-              </Link>
+              </a>
             </div>
           </div>
         </div>
@@ -155,16 +151,16 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA Section - Redirects to homepage */}
       <section className="py-24 relative">
         <div className="absolute inset-0 blur-3xl opacity-30" style={{ background: 'linear-gradient(90deg, rgba(139, 92, 246, 0.2), rgba(255, 16, 240, 0.1))' }} />
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
           <h2 className="text-4xl font-bold font-display text-white mb-6">Ready to dominate the circle?</h2>
           <p className="text-gray-400 text-lg mb-8">Join thousands of fastpitch coaches using AI to develop elite athletes.</p>
-          <Link href="/onboarding">
-            <button className="h-14 px-10 rounded-full btn-primary-glow text-lg" data-testid="button-start-trial">
-              Start Free Trial
-            </button>
+          <Link href="/pricing">
+            <Button className="h-14 px-8 text-lg bg-gradient-to-r from-brand-pink to-brand-purple hover:opacity-90 transition-all shadow-[0_0_20px_rgba(236,72,153,0.3)]">
+              Get Started Free
+            </Button>
           </Link>
         </div>
       </section>

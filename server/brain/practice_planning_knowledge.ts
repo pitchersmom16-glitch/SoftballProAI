@@ -281,7 +281,7 @@ export const SPECIALIZED_PRACTICES = {
 
   offensiveFocus: {
     duration: "2 hours",
-    emphasis: "Hitting, bunting, and base running",
+    summary: "Hitting, bunting, and base running",
     
     plan: {
       warmUp: "15 min",

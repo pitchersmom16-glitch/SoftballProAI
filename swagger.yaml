@@ -1,0 +1,17 @@
+openapi: 3.0.0
+info:
+  title: SoftballProAI API
+  version: 1.0.0
+paths:
+  /api/player/athlete:
+    get:
+      summary: Get athlete profile for current user
+      responses:
+        '200':
+          description: Success
+  /api/player/onboarding:
+    get:
+      summary: Get onboarding status for current user
+      responses:
+        '200':
+          description: Success

@@ -28,6 +28,8 @@ import StatsImport from "@/pages/StatsImport";
 import PublicProfile from "@/pages/PublicProfile";
 import Pricing from "@/pages/Pricing";
 import PlayerGoals from "@/pages/PlayerGoals";
+import ProfileSetup from "@/pages/ProfileSetup";
+import PositionSelection from "@/pages/PositionSelection";
 import { OnboardingGate } from "@/components/OnboardingGate";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -46,7 +48,6 @@ function Router() {
         <Switch>
           <Route path="/" component={Landing} />
           <Route path="/pricing" component={Pricing} />
-          <Route path="/onboarding" component={BiometricOnboarding} />
           <Route path="/register" component={Register} />
           <Route path="/profile/:id" component={PublicProfile} />
           <Route path="/auth">
@@ -54,6 +55,10 @@ function Router() {
               window.location.href = "/api/login";
               return null;
             }}
+          </Route>
+          {/* Redirect old routes to home */}
+          <Route path="/onboarding">
+            <Redirect to="/" />
           </Route>
           {/* Safety Net: Redirect all unknown routes to home */}
           <Route path="*">
@@ -68,10 +73,11 @@ function Router() {
   // ROLE SELECTION (Logged in but no role)
   // ============================================
   if (!user.role) {
-    // Allow /register route for team referral flow, otherwise show role selection
+    // User is logged in but hasn't selected a role yet
+    // Show RoleSelection for all routes - they must select a role first
     return (
       <Switch>
-        <Route path="/register" component={Register} />
+        <Route path="/" component={RoleSelection} />
         <Route path="*" component={RoleSelection} />
       </Switch>
     );
@@ -81,20 +87,53 @@ function Router() {
   const isCoach = user.role === "team_coach" || user.role === "pitching_coach" || user.role?.includes("coach");
 
   // ============================================
+  // PARENT MODE ROUTES
+  // ============================================
+  if (user.role === "parent") {
+    return (
+      <Layout>
+        <Switch>
+          {/* Parent onboarding routes */}
+          <Route path="/profile/setup" component={ProfileSetup} />
+          <Route path="/position/select" component={PositionSelection} />
+          <Route path="/register" component={Register} />
+          
+          {/* Parent dashboard - athlete management */}
+          <Route path="/" component={Athletes} />
+          <Route path="/dashboard" component={Athletes} />
+          <Route path="/athletes" component={Athletes} />
+          <Route path="/athletes/:id" component={AthleteDetail} />
+          <Route path="/assessments" component={Assessments} />
+          <Route path="/assessments/:id" component={AssessmentDetail} />
+          <Route path="/drills" component={Drills} />
+          <Route path="/profile/:id" component={PublicProfile} />
+          
+          {/* Safety Net: Redirect all unknown routes to athlete management */}
+          <Route path="*">
+            <Redirect to="/athletes" />
+          </Route>
+        </Switch>
+      </Layout>
+    );
+  }
+
+  // ============================================
   // PLAYER MODE ROUTES
   // ============================================
   if (user.role === "player") {
     return (
       <Layout>
         <Switch>
-          {/* Onboarding route is NOT gated - it's the gate destination */}
+          {/* Landing page is always accessible */}
+          <Route path="/" component={Landing} />
+          
+          {/* Onboarding routes are NOT gated - they're the gate destinations */}
+          <Route path="/profile/setup" component={ProfileSetup} />
+          <Route path="/position/select" component={PositionSelection} />
           <Route path="/player/onboarding" component={PlayerOnboarding} />
           <Route path="/register" component={Register} />
           
-          {/* All other player routes require dashboard to be unlocked */}
-          <Route path="/">
-            <OnboardingGate><PlayerDashboard /></OnboardingGate>
-          </Route>
+          {/* All other player routes require onboarding to be complete */}
           <Route path="/dashboard">
             <OnboardingGate><PlayerDashboard /></OnboardingGate>
           </Route>

@@ -7,6 +7,8 @@
 
 ## 🔁 Live Updates (canonical change log)
 Keep this section current. Whenever code, routes, or user flows are changed, add a short entry with: **date**, **one-line summary**, **commit hash**, and **author**. This is the single source of truth for other agents (e.g., Claude) and collaborators.
+- 2026-01-30 — fix(pricing): correct pricing tiers to match original 3-mode spec - Player $14.99, Private Instructor $49.99, Team Coach $99 (commit: pending) — author: GitHub Copilot
+- 2026-01-30 — feat(flow): implement industry standard signup flow - Landing → Pricing → Auth → Onboarding (commit: pending) — author: GitHub Copilot
 - 2026-01-30 — fix(brain): normalize object keys and fix syntax typos in knowledge bases (commit: `5ccb7f8`) — author: pitchersmom16-glitch
 
  2026-01-30 — chore(workflows): improve live-update check robustness and branch handling (commit: `df853d2`) — author: pitchersmom16-glitch
@@ -28,6 +30,73 @@ Keep this section current. Whenever code, routes, or user flows are changed, add
 1. Edit this file and prepend the latest entry to this list.  
 2. Include a short summary (1 sentence), the commit hash, and a link to the PR or commit when possible.  
 3. Commit with message: `docs(workflows): <short summary>` and push to `main`.
+
+---
+
+## 🚀 User Signup Flow (Industry Standard)
+
+### Complete User Journey (Updated Jan 30, 2026)
+
+```
+Landing Page (/) 
+  ↓ Click "Get Started"
+Pricing Page (/pricing) - PUBLIC, no auth required
+  ↓ Select a plan:
+    • Player: $14.99/mo (Individual athletes 8-16, parent-managed)
+    • Private Instructor: $49.99/mo (Pitching/Catching/Hitting coaches, up to 25 students)
+    • Team Coach: $99/mo (Full roster 12-15 players, practice planning)
+Authentication (/auth → /api/login) - Replit Auth
+  ↓ After successful login
+Role Selection - Choose mode matching your plan:
+    • Player - Your Virtual Pro Coach
+    • Private Instructor - Pitching | Catching | Hitting Coach
+    • Team Coach - Full Roster Management
+  ↓ Based on role selected
+Player Onboarding Flow:
+  → Profile Setup (parent + athlete info)
+  → Position Selection (Pitcher | Catcher | Infield | Outfield)
+  → Video Upload (4 position-specific videos)
+  → Dashboard (locked until videos reviewed)
+```
+
+**Key Routes:**
+- `/` - Landing page (public)
+- `/pricing` - Pricing tiers (public)
+- `/auth` - Redirects to Replit Auth
+- After login based on role:
+  - No role: `/` → RoleSelection component
+  - Player: OnboardingGate checks completion
+  - Coach: Direct to dashboard
+
+---
+
+## 🎯 The Three User Modes (Core Identity)
+
+**Mission:** Virtual Pro Coach for athletes ages 8-16 to learn elite fastpitch mechanics without expensive coaching.
+
+### Mode A: Player ($14.99/mo)
+**Focus:** Personal growth, gamification, and safety  
+**Features:**
+- Daily Vibe Check-in: "How are you feeling?" (Soreness tracker)
+- Injury Prevention: If "My arm hurts" → BLOCK pitching drills, show Recovery/Stretching videos
+- Championship Mindset Feed: Daily Kobe Bryant/Mamba Mentality quotes or College Softball highlights
+- 'Coach Me' Button: One-click video upload for instant mechanic feedback
+
+### Mode B: Team Coach ($99/mo)
+**Focus:** Managing a roster of 12-15 players  
+**Features:**
+- Practice Architect: Auto-generate practice plans (e.g., '2-Hour Defensive Focus')
+- Split team into stations: Infield, Outfield, Catcher
+- Roster Health Dashboard: Shows which players are Red/Injured or Green/Ready
+- Based on player check-in inputs
+
+### Mode C: Private Instructor ($49.99/mo)
+**Focus:** Pitching, Catching, or Hitting Coaches - Remote training for specific students  
+**Features:**
+- 'Stable' Management: Manage up to 25 students
+- Assign Homework Drills: "Do 20 K-Drills" to specific player's app
+- Split-Screen Analysis: Compare student's video side-by-side with Pro Model
+- Detailed feedback and markup tools
 
 ---
 

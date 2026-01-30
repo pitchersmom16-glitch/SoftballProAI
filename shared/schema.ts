@@ -384,24 +384,24 @@ export const assessmentFeedbackRelations = relations(assessmentFeedback, ({ one 
 
 // === BASE SCHEMAS ===
 
-export const insertCoachSchema = createInsertSchema(coaches).omit({ id: true, createdAt: true });
-export const insertTeamSchema = createInsertSchema(teams).omit({ id: true, createdAt: true });
-export const insertAthleteSchema = createInsertSchema(athletes).omit({ id: true, createdAt: true });
-export const insertDrillSchema = createInsertSchema(drills).omit({ id: true, createdAt: true });
-export const insertMentalEdgeSchema = createInsertSchema(mentalEdge).omit({ id: true, createdAt: true });
-export const insertAssessmentSchema = createInsertSchema(assessments).omit({ id: true, createdAt: true, status: true, metrics: true });
-export const insertFeedbackSchema = createInsertSchema(assessmentFeedback).omit({ id: true, createdAt: true });
-export const insertPlayerCheckinSchema = createInsertSchema(playerCheckins).omit({ id: true, createdAt: true });
-export const insertHomeworkSchema = createInsertSchema(homeworkAssignments).omit({ id: true, createdAt: true, completedAt: true });
-export const insertPracticePlanSchema = createInsertSchema(practicePlans).omit({ id: true, createdAt: true });
-export const insertCoachStudentSchema = createInsertSchema(coachStudents).omit({ id: true, createdAt: true });
-export const insertPlayerCoachRelationshipSchema = createInsertSchema(playerCoachRelationships).omit({ id: true, createdAt: true });
-export const insertCoachInviteSchema = createInsertSchema(coachInvites).omit({ id: true, createdAt: true });
-export const insertPlayerSettingsSchema = createInsertSchema(playerSettings).omit({ id: true, createdAt: true, updatedAt: true });
-export const insertStudentInviteSchema = createInsertSchema(studentInvites).omit({ id: true, createdAt: true });
-export const insertBaselineVideoSchema = createInsertSchema(baselineVideos).omit({ id: true, createdAt: true });
-export const insertPlayerOnboardingSchema = createInsertSchema(playerOnboarding).omit({ id: true, createdAt: true, updatedAt: true });
-export const insertNotificationSchema = createInsertSchema(notifications).omit({ id: true, createdAt: true });
+export const insertCoachSchema = (createInsertSchema(coaches).omit(['id', 'createdAt']) as any);
+export const insertTeamSchema = (createInsertSchema(teams).omit(['id', 'createdAt']) as any);
+export const insertAthleteSchema = (createInsertSchema(athletes).omit(['id', 'createdAt']) as any);
+export const insertDrillSchema = (createInsertSchema(drills).omit(['id', 'createdAt']) as any);
+export const insertMentalEdgeSchema = (createInsertSchema(mentalEdge).omit(['id', 'createdAt']) as any);
+export const insertAssessmentSchema = (createInsertSchema(assessments).omit(['id', 'createdAt', 'status', 'metrics']) as any);
+export const insertFeedbackSchema = (createInsertSchema(assessmentFeedback).omit(['id', 'createdAt']) as any);
+export const insertPlayerCheckinSchema = (createInsertSchema(playerCheckins).omit(['id', 'createdAt']) as any);
+export const insertHomeworkSchema = (createInsertSchema(homeworkAssignments).omit(['id', 'createdAt', 'completedAt']) as any);
+export const insertPracticePlanSchema = (createInsertSchema(practicePlans).omit(['id', 'createdAt']) as any);
+export const insertCoachStudentSchema = (createInsertSchema(coachStudents).omit(['id', 'createdAt']) as any);
+export const insertPlayerCoachRelationshipSchema = (createInsertSchema(playerCoachRelationships).omit(['id', 'createdAt']) as any);
+export const insertCoachInviteSchema = (createInsertSchema(coachInvites).omit(['id', 'createdAt']) as any);
+export const insertPlayerSettingsSchema = (createInsertSchema(playerSettings).omit(['id', 'createdAt', 'updatedAt']) as any);
+export const insertStudentInviteSchema = (createInsertSchema(studentInvites).omit(['id', 'createdAt']) as any);
+export const insertBaselineVideoSchema = (createInsertSchema(baselineVideos).omit(['id', 'createdAt']) as any);
+export const insertPlayerOnboardingSchema = (createInsertSchema(playerOnboarding).omit(['id', 'createdAt', 'updatedAt']) as any);
+export const insertNotificationSchema = (createInsertSchema(notifications).omit(['id', 'createdAt']) as any);
 
 // === EXPLICIT API CONTRACT TYPES ===
 
@@ -497,9 +497,9 @@ export const playerGoals = pgTable("player_goals", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertGameChangerStatsSchema = createInsertSchema(gameChangerStats).omit({ id: true, createdAt: true, importedAt: true });
-export const insertSkeletalAnalysisSchema = createInsertSchema(skeletalAnalysis).omit({ id: true, createdAt: true });
-export const insertPlayerGoalSchema = createInsertSchema(playerGoals).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertGameChangerStatsSchema = (createInsertSchema(gameChangerStats).omit(['id', 'createdAt', 'importedAt']) as any);
+export const insertSkeletalAnalysisSchema = (createInsertSchema(skeletalAnalysis).omit(['id', 'createdAt']) as any);
+export const insertPlayerGoalSchema = (createInsertSchema(playerGoals).omit(['id', 'createdAt', 'updatedAt']) as any);
 
 export type GameChangerStats = typeof gameChangerStats.$inferSelect;
 export type SkeletalAnalysis = typeof skeletalAnalysis.$inferSelect;
@@ -509,7 +509,7 @@ export type CreateSkeletalAnalysisRequest = z.infer<typeof insertSkeletalAnalysi
 export type CreatePlayerGoalRequest = z.infer<typeof insertPlayerGoalSchema>;
 
 export type UpdateAthleteRequest = Partial<CreateAthleteRequest>;
-export type UpdateAssessmentRequest = Partial<CreateAssessmentRequest> & { status?: string, metrics?: any };
+export type UpdateAssessmentRequest = Partial<CreateAssessmentRequest> & { status?: string, metrics?: any, notes?: string, overallScore?: number };
 export type UpdateHomeworkRequest = Partial<CreateHomeworkRequest> & { status?: string, completedAt?: Date };
 
 // Team Stats Import - Aggregated team-level statistics from GameChanger CSV
@@ -547,8 +547,8 @@ export const userSubscriptions = pgTable("user_subscriptions", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertTeamStatsSchema = createInsertSchema(teamStats).omit({ id: true, createdAt: true, importedAt: true });
-export const insertUserSubscriptionSchema = createInsertSchema(userSubscriptions).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertTeamStatsSchema = (createInsertSchema(teamStats).omit(['id', 'createdAt', 'importedAt']) as any);
+export const insertUserSubscriptionSchema = (createInsertSchema(userSubscriptions).omit(['id', 'createdAt', 'updatedAt']) as any);
 
 export type TeamStats = typeof teamStats.$inferSelect;
 export type UserSubscription = typeof userSubscriptions.$inferSelect;

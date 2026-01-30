@@ -4,56 +4,59 @@ import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Users, Target, Sparkles, Shield, Heart } from "lucide-react";
+import { Heart, User, Users, Target, Shield, Sparkles } from "lucide-react";
 
-type UserRole = "player" | "team_coach" | "pitching_coach";
+type UserRole = "player" | "parent" | "team_coach" | "pitching_coach";
 
 const roles = [
   {
     id: "player" as UserRole,
-    title: "Player Mode",
-    subtitle: "My Journey",
-    description: "Personal growth, daily check-ins, and AI coaching just for you",
+    title: "Player",
+    subtitle: "Individual Athlete (Ages 8-16)",
+    description: "Your Virtual Pro Coach - personal growth, daily check-ins, and instant AI feedback.",
     icon: User,
     color: "neon-green",
+    price: "$14.99/mo",
     features: [
       "Daily Vibe check-in with soreness tracking",
-      "Championship Mindset daily motivation",
-      "One-click video upload for instant feedback",
-      "Personalized Goal Tracking",
-      "Injury prevention alerts"
+      "Championship Mindset daily motivation (Mamba Feed)",
+      "'Coach Me' button - instant video analysis",
+      "Personalized goal tracking and drill library",
+      "Smart injury prevention (blocks drills if sore)"
     ],
     accentClass: "from-neon-green/20 to-neon-green/5 border-neon-green/30 hover:border-neon-green/60"
   },
   {
-    id: "team_coach" as UserRole,
-    title: "Team Coach Mode",
-    subtitle: "Coach View",
-    description: "Manage your roster, build practice plans, track player health",
-    icon: Users,
+    id: "pitching_coach" as UserRole,
+    title: "Private Instructor",
+    subtitle: "Pitching | Catching | Hitting Coach",
+    description: "Remote specialist training for your private students. Manage your 'stable' of athletes.",
+    icon: Target,
     color: "neon-pink",
+    price: "$49.99/mo",
     features: [
-      "Manage 12-15 players on your roster",
-      "Practice Architect for auto-generated plans",
-      "Roster Health dashboard (Red/Green status)",
-      "Station-based practice organization",
-      "Team-wide progress tracking"
+      "Manage up to 25 students in your roster",
+      "Assign homework drills with specific rep counts",
+      "Split-screen analysis vs Pro Model videos",
+      "Detailed video feedback and markup tools",
+      "Track individual student progress over time"
     ],
     accentClass: "from-neon-pink/20 to-neon-pink/5 border-neon-pink/30 hover:border-neon-pink/60"
   },
   {
-    id: "pitching_coach" as UserRole,
-    title: "Private Instructor Mode",
-    subtitle: "Instructor View",
-    description: "Remote training for Pitching, Hitting & Catching",
-    icon: Target,
+    id: "team_coach" as UserRole,
+    title: "Team Coach",
+    subtitle: "Full Roster Management",
+    description: "Manage your 12-15 player team roster, auto-generate practice plans, track health.",
+    icon: Users,
     color: "neon-yellow",
+    price: "$99/mo",
     features: [
-      "My Active Roster (up to 25 students)",
-      "Assign homework drills with rep counts",
-      "Split-screen Pro Model comparison",
-      "Video analysis with detailed feedback",
-      "Track student progress over time"
+      "Full team roster (12-15 players)",
+      "Practice Architect - auto-generate 2-hour plans",
+      "Roster Health dashboard (Red/Injured or Green/Ready)",
+      "Station-based practice splits (Infield/Outfield/Catcher)",
+      "Team-wide analytics and progress tracking"
     ],
     accentClass: "from-neon-yellow/20 to-neon-yellow/5 border-neon-yellow/30 hover:border-neon-yellow/60"
   }
@@ -146,6 +149,7 @@ export default function RoleSelection() {
                       {role.subtitle}
                     </p>
                     <h3 className="text-xl font-bold text-white mt-1">{role.title}</h3>
+                    <p className="text-lg font-bold text-neon-green mt-1">{role.price}</p>
                     <p className="text-gray-400 text-sm mt-2">{role.description}</p>
                   </div>
 
