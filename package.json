@@ -10,7 +10,9 @@
     "start": "cross-env NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
     "db:push": "drizzle-kit push",
-    "clean:dev": "tsx scripts/clean-dev-users.ts"
+    "clean:dev": "tsx scripts/clean-dev-users.ts",
+    "setup-githooks": "git config core.hooksPath .githooks",
+    "sync-workflows": "node scripts/add-workflow-entry.cjs"
   },
   "dependencies": {
     "@google-cloud/storage": "^7.18.0",
