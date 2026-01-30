@@ -9,8 +9,8 @@ if [ -z "$NODE" ]; then
 fi
 
 SCRIPT_DIR=$(git rev-parse --show-toplevel)/scripts
-if [ -x "$SCRIPT_DIR/add-workflow-entry.js" ] || [ -f "$SCRIPT_DIR/add-workflow-entry.js" ]; then
-  node "$SCRIPT_DIR/add-workflow-entry.js"
+if [ -x "$SCRIPT_DIR/add-workflow-entry.cjs" ] || [ -f "$SCRIPT_DIR/add-workflow-entry.cjs" ]; then
+  node "$SCRIPT_DIR/add-workflow-entry.cjs"
 else
-  echo "scripts/add-workflow-entry.js not found — skipping"
+  echo "scripts/add-workflow-entry.cjs not found — skipping"
 fi
