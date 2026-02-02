@@ -211,9 +211,9 @@ export default function PlayerDashboard() {
                 className="bg-neon-green hover:bg-neon-green/90 text-black font-bold"
               >
                 Start Check-in
-              </Button>
-            </div>
-          ) : showCheckin ? (
+                </Button>
+              </div>
+            ) : showCheckin ? (
             <div className="space-y-6">
               {/* Mood Selection */}
               <div>
@@ -438,7 +438,7 @@ export default function PlayerDashboard() {
               <span className="text-xs">My Goals</span>
             </Button>
             <Button 
-              onClick={() => setLocation("/stats-import")}
+              onClick={() => navigate("/stats-import")}
               variant="outline"
               className="h-20 flex flex-col items-center justify-center gap-2"
               data-testid="button-nav-stats"

@@ -1,0 +1,138 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - link "SoftballProAI" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img "SoftballProAI" [ref=e8]
+        - generic [ref=e9]:
+          - generic [ref=e10]: C
+          - generic [ref=e11]:
+            - paragraph
+            - paragraph [ref=e12]: Player
+      - navigation [ref=e13]:
+        - link "Dashboard" [ref=e14] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e15]:
+            - img [ref=e16]
+            - text: Dashboard
+        - link "My Profile" [ref=e21] [cursor=pointer]:
+          - /url: /profile
+          - generic [ref=e22]:
+            - img [ref=e23]
+            - text: My Profile
+        - link "Assessments" [ref=e26] [cursor=pointer]:
+          - /url: /assessments
+          - generic [ref=e27]:
+            - img [ref=e28]
+            - text: Assessments
+        - link "Drills" [ref=e31] [cursor=pointer]:
+          - /url: /drills
+          - generic [ref=e32]:
+            - img [ref=e33]
+            - text: Drills
+      - button "Sign Out" [ref=e40] [cursor=pointer]:
+        - img [ref=e41]
+        - text: Sign Out
+    - generic [ref=e44]:
+      - banner [ref=e45]:
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - img [ref=e48]
+            - generic [ref=e51]: player
+          - generic [ref=e52]:
+            - button [ref=e53] [cursor=pointer]:
+              - img
+            - button "Logout" [ref=e54] [cursor=pointer]:
+              - img
+              - text: Logout
+      - main [ref=e55]:
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - img [ref=e60]
+            - heading "Athlete Onboarding Checklist" [level=1] [ref=e64]
+            - paragraph [ref=e65]: Upload 4 videos showing your core skills. Your coach will analyze these to build your training roadmap.
+          - generic [ref=e66]:
+            - generic [ref=e67]:
+              - generic [ref=e68]: Progress
+              - generic [ref=e69]: 0 / 4 videos
+            - progressbar [ref=e70]
+          - generic [ref=e72]:
+            - img [ref=e73]
+            - generic [ref=e76]:
+              - paragraph [ref=e77]: Maximum 20 seconds per video
+              - paragraph [ref=e78]: Show 3-5 repetitions of your motion in each video for accurate analysis.
+          - generic [ref=e79]:
+            - generic [ref=e81]:
+              - generic [ref=e82]:
+                - img [ref=e84]
+                - generic [ref=e87]:
+                  - heading "Upload your Hitting video" [level=3] [ref=e88]
+                  - paragraph [ref=e89]: Record your swing from the side - show full stance through follow-through
+                  - generic [ref=e90]:
+                    - generic [ref=e91]: bat path
+                    - generic [ref=e92]: hip rotation
+                    - generic [ref=e93]: contact point
+              - button "Upload" [ref=e95] [cursor=pointer]:
+                - img
+                - text: Upload
+            - generic [ref=e97]:
+              - generic [ref=e98]:
+                - img [ref=e100]
+                - generic [ref=e103]:
+                  - heading "Upload your Throwing video" [level=3] [ref=e104]
+                  - paragraph [ref=e105]: Record your throwing motion from the side - show arm action and release
+                  - generic [ref=e106]:
+                    - generic [ref=e107]: arm slot
+                    - generic [ref=e108]: stride length
+                    - generic [ref=e109]: follow-through
+              - button "Upload" [ref=e111] [cursor=pointer]:
+                - img
+                - text: Upload
+            - generic [ref=e113]:
+              - generic [ref=e114]:
+                - img [ref=e116]
+                - generic [ref=e119]:
+                  - heading "Upload your Fielding video" [level=3] [ref=e120]
+                  - paragraph [ref=e121]: Record yourself fielding ground balls - show ready position and transfers
+                  - generic [ref=e122]:
+                    - generic [ref=e123]: glove position
+                    - generic [ref=e124]: footwork
+                    - generic [ref=e125]: transfer speed
+              - button "Upload" [ref=e127] [cursor=pointer]:
+                - img
+                - text: Upload
+            - generic [ref=e129]:
+              - generic [ref=e130]:
+                - img [ref=e132]
+                - generic [ref=e135]:
+                  - heading "Upload your Pitching or Catching video" [level=3] [ref=e136]
+                  - paragraph [ref=e137]: Record your pitch (if pitcher) OR a blocking/framing drill (if catcher)
+                  - generic [ref=e138]:
+                    - generic [ref=e139]: arm circle
+                    - generic [ref=e140]: leg drive
+                    - generic [ref=e141]: release point
+              - button "Upload" [ref=e143] [cursor=pointer]:
+                - img
+                - text: Upload
+          - generic [ref=e144]:
+            - heading "Tips for Great Videos:" [level=4] [ref=e145]
+            - list [ref=e146]:
+              - listitem [ref=e147]:
+                - img [ref=e148]
+                - text: Record in good lighting - outdoor or well-lit indoor space
+              - listitem [ref=e150]:
+                - img [ref=e151]
+                - text: Keep each video under 20 seconds
+              - listitem [ref=e153]:
+                - img [ref=e154]
+                - text: Show 3-5 repetitions of your motion
+              - listitem [ref=e156]:
+                - img [ref=e157]
+                - text: Make sure your full body is visible in frame
+```

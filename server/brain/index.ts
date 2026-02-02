@@ -43,10 +43,13 @@ export {
   analyzeFieldingMechanics
 } from './analysis_engine';
 
+import * as Analyze from './analyze_mechanics';
+import * as Engine from './analysis_engine';
+
 export type {
   VideoAnalysisRequest,
   AnalysisResult,
-  DrillRecommendation as EngineD rillRecommendation,
+  DrillRecommendation as EngineDrillRecommendation,
   MentalContentRequest
 } from './analysis_engine';
 
@@ -232,8 +235,10 @@ export async function getChampionshipDailyContent() {
   const today = days[new Date().getDay()];
   
   const dailyThemes = await MentalTraining.daily();
+  const principleKeys = Object.keys(championship.keyPrinciples) as Array<keyof typeof championship.keyPrinciples>;
+  const randKey = principleKeys[Math.floor(Math.random() * principleKeys.length)];
   return {
-    championshipPrinciple: championship.keyPrinciples[Object.keys(championship.keyPrinciples)[Math.floor(Math.random() * Object.keys(championship.keyPrinciples).length)]],
+    championshipPrinciple: (championship.keyPrinciples as any)[randKey],
     dailyTheme: dailyThemes[today as keyof typeof dailyThemes],
     randomApplication: championship.dailyApplications.morningMindset[Math.floor(Math.random() * championship.dailyApplications.morningMindset.length)]
   };
@@ -318,14 +323,14 @@ export async function generatePracticePlan(age: number, focus?: string) {
 
 // Default export for convenience
 export default {
-  // Core engines
-  analyzeMechanics,
-  analyzePitching,
-  analyzeHitting,
-  analyzeCatching,
-  analyzeFielding,
-  analyzeMental,
-  analyzeVideo,
+  // Core engines (bound to analysis modules)
+  analyzeMechanics: Analyze.analyzeMechanics,
+  analyzePitching: Analyze.analyzePitching,
+  analyzeHitting: Analyze.analyzeHitting,
+  analyzeCatching: Analyze.analyzeCatching,
+  analyzeFielding: Analyze.analyzeFielding,
+  analyzeMental: Analyze.analyzeMental,
+  analyzeVideo: Engine.analyzeVideo,
   
   // Knowledge bases
   SoftballKnowledge,

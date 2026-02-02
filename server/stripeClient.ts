@@ -48,7 +48,7 @@ export async function getUncachableStripeClient() {
   const { secretKey } = await getCredentials();
 
   return new Stripe(secretKey, {
-    apiVersion: '2025-11-17.clover',
+    apiVersion: '2026-01-28.clover',
   });
 }
 
@@ -67,7 +67,8 @@ let stripeSync: any = null;
 
 export async function getStripeSync() {
   if (!stripeSync) {
-    const { StripeSync } = await import('stripe-replit-sync');
+    // @ts-ignore - optional runtime-only module without types
+    const { StripeSync } = await import('stripe-replit-sync') as any;
     const secretKey = await getStripeSecretKey();
 
     stripeSync = new StripeSync({

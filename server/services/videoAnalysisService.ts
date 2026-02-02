@@ -11,7 +11,8 @@
  * Built for Shannon and every athlete who dreams of improving their game.
  */
 
-import { analyzeVideo, analyzeMechanics } from '../brain/analysis_engine';
+import { analyzeVideo } from '../brain/analysis_engine';
+import { analyzeMechanics } from '../brain/analyze_mechanics';
 import { storage } from '../storage';
 import type { BiomechanicsMetrics, DetectedIssue } from './types';
 
@@ -20,7 +21,7 @@ interface VideoAnalysisRequest {
   videoUrl: string;
   skillType: string;
   athleteId: number;
-  athleteLevel?: string;
+  athleteLevel?: "Beginner" | "Intermediate" | "Advanced";
   videoCategory: string;
 }
 
@@ -118,7 +119,6 @@ export async function processVideoAnalysis(request: VideoAnalysisRequest): Promi
     // Step 6: Update assessment with results
     await storage.updateAssessment(assessmentId, {
       status: "completed",
-      overallScore: calculateOverallScore(brainAnalysis.issuesDetected.length),
     });
 
     console.log(`[VideoAnalysis] Analysis complete for assessment ${assessmentId}`);

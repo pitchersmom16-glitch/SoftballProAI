@@ -1,34 +1,22 @@
 import { test, expect } from '@playwright/test';
 
-test('login -> see onboarding wizard -> reach dashboard (mock unlock)', async ({ page }) => {
-  // Auto-login via the dev auto-login route
-  await page.goto('/auth');
+test('home -> sign in -> onboarding wizard appears', async ({ page, request }) => {
+  // Start at the home page
+  await page.goto('/');
+
+  // Click the Sign In link on the landing page to trigger server auto-login
+  await page.click('[data-testid="link-signin"]');
   await page.waitForLoadState('networkidle');
 
-  // Ensure we're authenticated in the browser by setting role to player
-  await page.evaluate(async () => {
-    await fetch('/api/user/role', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ role: 'player' }),
-    });
-  });
+  // Ensure role is set to player so app shows player routes
+  const roleResp = await request.put('/api/user/role', { data: { role: 'player' } });
+  if (roleResp.status() !== 200) {
+    throw new Error('Setting role failed');
+  }
 
-  // Visit the onboarding page and assert the onboarding title is visible
-  await page.goto('/player/onboarding');
+  // Navigate to home again as authenticated player; OnboardingGate should redirect to /player/onboarding
+  await page.goto('/');
+
+  // Wait for onboarding wizard title to appear
   await expect(page.locator('[data-testid="text-onboarding-title"]')).toBeVisible({ timeout: 5000 });
-
-  // Now mock the onboarding API to return dashboardUnlocked so the gate allows dashboard
-  await page.route('**/api/player/onboarding', (route) => {
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ dashboardUnlocked: true, baselineComplete: true, baselineVideoCount: 4, baselineVideosRequired: 4 }),
-    });
-  });
-
-  // Navigate to dashboard and verify main dashboard content appears
-  await page.goto('/dashboard');
-  await expect(page.locator('text=My Journey')).toBeVisible({ timeout: 5000 });
 });

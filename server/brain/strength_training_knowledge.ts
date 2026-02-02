@@ -385,7 +385,7 @@ export const CROSSFIT_FOR_SOFTBALL = {
       {
         name: "Sumo Deadlift",
         purpose: "Posterior chain power (glutes, hamstrings)",
-        softball Application: "Hip drive for pitching and hitting, explosive power",
+        softballApplication: "Hip drive for pitching and hitting, explosive power",
         technique: "Wide stance, vertical torso, drive through heels",
         ageAppropriate: "12U+ with proper coaching"
       },
@@ -670,7 +670,7 @@ export const SOFTBALL_TRAINING_PRIORITIES = {
 
   decelerationTraining: {
     why: "Teach athletes to control force and change direction efficiently",
-    injury Prevention: "Reduces ACL and ankle injuries",
+    injuryPrevention: "Reduces ACL and ankle injuries",
     exercises: [
       "Landing mechanics from jumps (stick the landing)",
       "Deceleration runs (sprint and brake)",
@@ -738,7 +738,7 @@ export const INJURY_PREVENTION = {
       "Single-leg stability work",
       "Proper footwear and field conditions"
     ],
-    warning Signs: "Knee pain, instability, clicking - see medical professional immediately"
+    warningSigns: "Knee pain, instability, clicking - see medical professional immediately"
   },
 
   overuseProtection: {

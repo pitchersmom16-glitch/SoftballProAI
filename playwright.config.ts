@@ -12,6 +12,7 @@ export default defineConfig({
     reuseExistingServer: false,
     timeout: 180000,
   },
+      reuseExistingServer: true,
   use: {
     baseURL: 'http://127.0.0.1:5173',
     headless: true,
