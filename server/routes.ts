@@ -1121,6 +1121,64 @@ export async function registerRoutes(
     }
   });
 
+  // === BRAIN FEEDBACK ENDPOINT (Continuous Learning) ===
+  // Log user reactions to Brain recommendations for learning and adaptation
+  app.post("/api/brain/feedback", async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const userId = (req.user as any).claims.sub;
+      
+      // Validate input against schema
+      const { insertFeedbackEventSchema } = await import("@shared/schema");
+      const feedbackData = insertFeedbackEventSchema.parse({
+        ...req.body,
+        userId, // Ensure userId comes from auth, not request body
+      });
+
+      // Store feedback event
+      const event = await storage.createFeedbackEvent(feedbackData);
+
+      res.status(201).json({ 
+        message: "Feedback recorded", 
+        eventId: event.id 
+      });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Invalid feedback data", 
+          errors: err.errors 
+        });
+      }
+      console.error("Brain feedback error:", err);
+      res.status(500).json({ message: "Failed to record feedback" });
+    }
+  });
+
+  // Get feedback summary (for coaches/analytics)
+  app.get("/api/brain/feedback/summary", async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const { skillType, decisionType, limit = 50 } = req.query;
+      
+      const feedback = await storage.getFeedbackEvents({
+        skillType: skillType as string | undefined,
+        decisionType: decisionType as string | undefined,
+        limit: parseInt(limit as string),
+      });
+
+      res.json(feedback);
+    } catch (err) {
+      console.error("Get feedback summary error:", err);
+      res.status(500).json({ message: "Failed to fetch feedback" });
+    }
+  });
+
   // Bulk import drills from JSON (Knowledge Base Importer)
   app.post("/api/admin/import-drills", async (req, res) => {
     try {

@@ -121,6 +121,7 @@ export interface DrillRecommendation {
 }
 
 export interface MechanicsAnalysisResult {
+  brainDecisionId: string; // NEW: Unique ID for feedback tracking
   skillType: string;
   analyzedIssues: string[];
   recommendations: DrillRecommendation[];
@@ -264,7 +265,11 @@ export async function analyzeMechanics(request: MechanicsAnalysisRequest): Promi
     .sort((a, b) => b.relevanceScore - a.relevanceScore)
     .slice(0, limit);
 
+  // Generate unique decision ID for feedback tracking
+  const brainDecisionId = `brain_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
   return {
+    brainDecisionId, // NEW: Unique ID for feedback tracking
     skillType,
     analyzedIssues: detectedIssues,
     recommendations: topDrills,

@@ -3,18 +3,18 @@ import {
   coaches, teams, athletes, drills, assessments, assessmentFeedback, mentalEdge, playerCheckins,
   practicePlans, coachStudents, homeworkAssignments, playerCoachRelationships, coachInvites, playerSettings,
   studentInvites, baselineVideos, playerOnboarding, notifications, gameChangerStats, skeletalAnalysis, playerGoals,
-  teamStats, userSubscriptions,
+  teamStats, userSubscriptions, feedbackEvents,
   type Coach, type Team, type Athlete, type Drill, type Assessment, type Feedback, type MentalEdge, type PlayerCheckin,
   type PracticePlan, type CoachStudent, type HomeworkAssignment, type PlayerCoachRelationship, type CoachInvite, type PlayerSettings,
   type StudentInvite, type BaselineVideo, type PlayerOnboarding, type Notification, type GameChangerStats, type SkeletalAnalysis, type PlayerGoal,
-  type TeamStats, type UserSubscription,
+  type TeamStats, type UserSubscription, type FeedbackEvent,
   type CreateCoachRequest, type CreateTeamRequest, type CreateAthleteRequest, 
   type CreateDrillRequest, type CreateMentalEdgeRequest, type CreateAssessmentRequest, type CreateFeedbackRequest,
   type CreatePlayerCheckinRequest, type UpdateAthleteRequest, type UpdateAssessmentRequest,
   type CreatePlayerCoachRelationshipRequest, type CreateCoachInviteRequest, type CreatePlayerSettingsRequest,
   type CreateStudentInviteRequest, type CreateBaselineVideoRequest, type CreatePlayerOnboardingRequest,
   type CreateNotificationRequest, type CreateGameChangerStatsRequest, type CreateSkeletalAnalysisRequest, type CreatePlayerGoalRequest,
-  type CreateTeamStatsRequest, type CreateUserSubscriptionRequest
+  type CreateTeamStatsRequest, type CreateUserSubscriptionRequest, type CreateFeedbackEventRequest
 } from "@shared/schema";
 import { users, type UserRole } from "@shared/models/auth";
 import { eq, desc, and } from "drizzle-orm";
@@ -152,6 +152,16 @@ export interface IStorage {
   getPlayerGoals(userId: string): Promise<PlayerGoal[]>;
   createPlayerGoal(goal: CreatePlayerGoalRequest): Promise<PlayerGoal>;
   updatePlayerGoal(id: number, update: Partial<PlayerGoal>): Promise<PlayerGoal>;
+  
+  // === FEEDBACK EVENTS (Continuous Learning) ===
+  createFeedbackEvent(event: CreateFeedbackEventRequest): Promise<FeedbackEvent>;
+  getFeedbackEvents(filters?: {
+    skillType?: string;
+    decisionType?: string;
+    userId?: string;
+    limit?: number;
+  }): Promise<FeedbackEvent[]>;
+  getFeedbackEventsByDecisionId(brainDecisionId: string): Promise<FeedbackEvent[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -723,6 +733,52 @@ export class DatabaseStorage implements IStorage {
       return this.updateUserSubscription((sub as any).userId, sub as any);
     }
     return this.createUserSubscription(sub as any);
+  }
+
+  // === FEEDBACK EVENTS (Continuous Learning) ===
+  async createFeedbackEvent(event: CreateFeedbackEventRequest): Promise<FeedbackEvent> {
+    const [newEvent] = await db.insert(feedbackEvents).values(event).returning();
+    return newEvent;
+  }
+
+  async getFeedbackEvents(filters?: {
+    skillType?: string;
+    decisionType?: string;
+    userId?: string;
+    limit?: number;
+  }): Promise<FeedbackEvent[]> {
+    let query = db.select().from(feedbackEvents);
+    
+    const conditions = [];
+    if (filters?.skillType) {
+      conditions.push(eq(feedbackEvents.skillType, filters.skillType));
+    }
+    if (filters?.decisionType) {
+      conditions.push(eq(feedbackEvents.decisionType, filters.decisionType));
+    }
+    if (filters?.userId) {
+      conditions.push(eq(feedbackEvents.userId, filters.userId));
+    }
+    
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
+    }
+    
+    const events = await query
+      .orderBy(desc(feedbackEvents.createdAt))
+      .limit(filters?.limit || 50);
+    
+    return events;
+  }
+
+  async getFeedbackEventsByDecisionId(brainDecisionId: string): Promise<FeedbackEvent[]> {
+    const events = await db
+      .select()
+      .from(feedbackEvents)
+      .where(eq(feedbackEvents.brainDecisionId, brainDecisionId))
+      .orderBy(desc(feedbackEvents.createdAt));
+    
+    return events;
   }
 }
 
