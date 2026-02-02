@@ -204,6 +204,95 @@ curl "http://localhost:5000/api/brain/drills-by-expert?expert=Amanda%20Scarborou
 
 ---
 
+### 7. POST /api/brain/feedback (NEW - Continuous Learning)
+
+**Purpose:** Log user reactions to Brain recommendations for learning and adaptation
+
+**Authentication:** Required
+
+**Request Body:**
+```json
+{
+  "brainDecisionId": "brain_1738515234567_abc123def",
+  "role": "coach" | "player" | "parent" | "instructor" | "team_coach",
+  "decisionType": "drill" | "goal" | "plan" | "mental_content",
+  "decisionRefId": 42,  // Optional: drill_id, goal_id, etc.
+  "skillType": "PITCHING",
+  "athleteAge": 12,
+  "athleteLevel": "Intermediate",
+  "detectedIssues": ["hunched forward", "weak leg drive"],
+  "rating": 5,  // 1-5 stars, optional
+  "action": "accepted" | "rejected" | "edited" | "skipped" | "completed",
+  "pushbackText": "Optional feedback text",
+  "editedVersion": {}  // Optional: what user changed it to
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Feedback recorded",
+  "eventId": 1
+}
+```
+
+**Example curl:**
+```bash
+curl -X POST http://localhost:5000/api/brain/feedback \
+  -H "Content-Type: application/json" \
+  -H "Cookie: your_session_cookie" \
+  -d '{
+    "brainDecisionId": "brain_1738515234567_abc123def",
+    "role": "coach",
+    "decisionType": "drill",
+    "skillType": "PITCHING",
+    "athleteAge": 12,
+    "athleteLevel": "Intermediate",
+    "detectedIssues": ["hunched forward"],
+    "rating": 5,
+    "action": "accepted"
+  }'
+```
+
+---
+
+### 8. GET /api/brain/feedback/summary (NEW - Continuous Learning)
+
+**Purpose:** Query feedback events for analytics and learning
+
+**Authentication:** Required
+
+**Query Parameters:**
+- `skillType` (optional): Filter by PITCHING, HITTING, etc.
+- `decisionType` (optional): Filter by drill, goal, plan
+- `userId` (optional): Filter by specific user
+- `limit` (optional): Max results (default: 50)
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "userId": "user_123",
+    "role": "coach",
+    "brainDecisionId": "brain_1738515234567_abc123def",
+    "decisionType": "drill",
+    "skillType": "PITCHING",
+    "rating": 5,
+    "action": "accepted",
+    "createdAt": "2026-02-02T16:00:00Z"
+  }
+]
+```
+
+**Example curl:**
+```bash
+curl "http://localhost:5000/api/brain/feedback/summary?skillType=PITCHING&limit=10" \
+  -H "Cookie: your_session_cookie"
+```
+
+---
+
 ## Common Use Cases
 
 ### Use Case 1: Video Analysis Flow
@@ -235,7 +324,26 @@ const analysis = await fetch('/api/brain/analyze', {
 });
 
 // 4. Display recommendations to user
-const { recommendations } = await analysis.json();
+const { brainDecisionId, recommendations } = await analysis.json();
+
+// 5. NEW: Log user reaction to recommendation
+if (userAcceptedDrill) {
+  await fetch('/api/brain/feedback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      brainDecisionId,
+      role: 'coach',
+      decisionType: 'drill',
+      skillType: 'PITCHING',
+      athleteAge: 12,
+      athleteLevel: 'Intermediate',
+      detectedIssues: ['hunched forward', 'weak leg drive'],
+      rating: 5,
+      action: 'accepted'
+    })
+  });
+}
 ```
 
 ### Use Case 2: Quick Drill Lookup
