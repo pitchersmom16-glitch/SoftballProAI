@@ -795,7 +795,7 @@ export async function registerRoutes(
       const { processVideoAnalysis } = await import('./services/videoAnalysisService');
       
       // Process video with AI Brain
-      const result = await processVideoAnalysis(data);
+      const result = await processVideoAnalysis(data as any);
       
       res.json(result);
     } catch (err) {
@@ -2066,7 +2066,7 @@ export async function registerRoutes(
     try {
       if (!req.user) return res.status(401).json({ message: "Unauthorized" });
       const userId = (req.user as any).claims.sub;
-      const playerId = req.params.playerId;
+      const playerId = String(req.params.playerId);
       
       // Verify coach exists
       const coach = await storage.getCoachByUserId(userId);
