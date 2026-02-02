@@ -121,7 +121,7 @@ export async function registerRoutes(
         await storage.updateAthlete(athlete.id, {
           firstName: profileData.athleteFirstName,
           lastName: profileData.athleteLastName,
-          dob: new Date(profileData.athleteDateOfBirth),
+          dob: profileData.athleteDateOfBirth, // Already in YYYY-MM-DD format from form
           school: profileData.athleteSchool,
           parentEmail: profileData.parentEmail,
           parentPhone: profileData.parentPhone,
@@ -143,7 +143,7 @@ export async function registerRoutes(
           userId, // Link athlete to parent user
           firstName: profileData.athleteFirstName,
           lastName: profileData.athleteLastName,
-          dob: new Date(profileData.athleteDateOfBirth),
+          dob: profileData.athleteDateOfBirth, // Already in YYYY-MM-DD format from form
           school: profileData.athleteSchool,
           parentEmail: profileData.parentEmail,
           parentPhone: profileData.parentPhone,

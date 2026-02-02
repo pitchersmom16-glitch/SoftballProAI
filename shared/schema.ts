@@ -631,7 +631,9 @@ export const userSubscriptions = pgTable("user_subscriptions", {
   couponCode: text("coupon_code"), // Applied coupon code
   isFoundingMember: boolean("is_founding_member").default(false),
   status: text("status").default("inactive"), // "active", "inactive", "cancelled", "past_due"
+  currentPeriodStart: timestamp("current_period_start"),
   currentPeriodEnd: timestamp("current_period_end"),
+  trialEnd: timestamp("trial_end"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
