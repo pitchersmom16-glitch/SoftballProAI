@@ -438,7 +438,7 @@ export default function PlayerDashboard() {
               <span className="text-xs">My Goals</span>
             </Button>
             <Button 
-              onClick={() => setLocation("/stats-import")}
+              onClick={() => navigate("/stats-import")}
               variant="outline"
               className="h-20 flex flex-col items-center justify-center gap-2"
               data-testid="button-nav-stats"

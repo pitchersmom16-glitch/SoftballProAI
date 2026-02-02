@@ -238,8 +238,11 @@ export type MentalEdge = typeof mentalEdge.$inferSelect;
 export type Assessment = typeof assessments.$inferSelect;
 export type AssessmentFeedback = typeof assessmentFeedback.$inferSelect;
 
+export type CreateCoachRequest = z.infer<typeof api.coaches.create.input>;
+export type CreateTeamRequest = z.infer<typeof api.teams.create.input>;
 export type CreateAthleteRequest = z.infer<typeof api.athletes.create.input>;
 export type UpdateAthleteRequest = z.infer<typeof api.athletes.update.input>;
+export type CreateAssessmentRequest = z.infer<typeof api.assessments.create.input>;
 
 // ============================================
 // HELPER FUNCTIONS

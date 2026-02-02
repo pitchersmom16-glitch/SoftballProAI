@@ -46,6 +46,9 @@ interface BaselineVideo {
   videoNumber: number;
   videoUrl: string;
   aiAnalysis?: string;
+  assessmentId?: number;
+  skillType?: string;
+  videoCategory?: string;
 }
 
 interface Student {

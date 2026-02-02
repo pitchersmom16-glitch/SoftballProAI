@@ -26,15 +26,6 @@ export type {
   MentalAnalysisResult
 } from './analyze_mechanics';
 
-export {
-  analyzeVideo,
-  getMentalContent,
-  analyzeWindmillMechanics,
-  analyzeSwingMechanics,
-  analyzePopTime,
-  analyzeFieldingMechanics
-} from './analysis_engine';
-
 export type {
   VideoAnalysisRequest,
   AnalysisResult,

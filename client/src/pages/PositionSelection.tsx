@@ -37,7 +37,7 @@ export default function PositionSelection() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const { data: athlete } = useQuery({
+  const { data: athlete } = useQuery<{ id: number; primaryPosition?: string; secondaryPosition?: string }>({
     queryKey: ["/api/player/athlete"],
   });
 

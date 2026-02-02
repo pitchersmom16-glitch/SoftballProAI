@@ -72,7 +72,7 @@ app.use((req, res, next) => {
         const { setupVite } = await import("./vite");
         await setupVite(httpServer, app);
         log("Vite dev middleware set up successfully", "vite");
-      } catch (viteErr) {
+      } catch (viteErr: any) {
         log(`Vite middleware setup failed: ${viteErr?.stack || viteErr}`);
         throw viteErr;
       }
@@ -106,7 +106,7 @@ app.use((req, res, next) => {
         log(`serving on port ${port}`);
       },
     );
-  } catch (err) {
+  } catch (err: any) {
     log(`Fatal error during server startup: ${err?.stack || err}`);
     process.exit(1);
   }
