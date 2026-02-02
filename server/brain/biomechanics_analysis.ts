@@ -459,7 +459,7 @@ export const HITTING_BIOMECHANICS = {
       ]
     },
     
-    pulling Off: {
+    "pulling Off": {
       description: "Head and body pull away from plate",
       biomechanicalCause: "Fear, spinning open, poor balance",
       identifying: "Head moves toward dugout, weak contact to opposite field",
@@ -629,7 +629,7 @@ export const FIELDING_BIOMECHANICS = {
       catchingPosition: "Over throwing shoulder, two hands, momentum toward target"
     },
 
-    throwing Mechanics: {
+    throwingMechanics: {
       crowHop: {
         purpose: "Generate momentum for strong, accurate throw",
         technique: "Skip-step gathering momentum, back foot lands as arm reaches back",
