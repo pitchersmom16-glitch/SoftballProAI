@@ -1,0 +1,205 @@
+{
+  "info": {
+    "name": "SoftballProAI Brain API",
+    "description": "Test collection for Brain API endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Brain Analysis",
+      "item": [
+        {
+          "name": "Analyze Pitching Mechanics",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skillType\": \"PITCHING\",\n  \"detectedIssues\": [\"hunched forward\", \"weak leg drive\"],\n  \"athleteLevel\": \"Intermediate\",\n  \"limit\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/brain/analyze",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "brain", "analyze"]
+            },
+            "description": "Analyze pitching mechanics and get drill recommendations"
+          }
+        },
+        {
+          "name": "Analyze Hitting Mechanics",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skillType\": \"HITTING\",\n  \"detectedIssues\": [\"casting\", \"no hip rotation\"],\n  \"athleteLevel\": \"Advanced\",\n  \"limit\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/brain/analyze",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "brain", "analyze"]
+            },
+            "description": "Analyze hitting mechanics"
+          }
+        },
+        {
+          "name": "Analyze Catching",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skillType\": \"CATCHING\",\n  \"detectedIssues\": [\"late transfers\", \"poor framing\"],\n  \"athleteLevel\": \"Intermediate\",\n  \"limit\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/brain/analyze",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "brain", "analyze"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Drill Lookups",
+      "item": [
+        {
+          "name": "Get Corrective Drills",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/brain/corrective-drills?issues=hunched forward,weak leg drive",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "brain", "corrective-drills"],
+              "query": [
+                {
+                  "key": "issues",
+                  "value": "hunched forward,weak leg drive"
+                }
+              ]
+            },
+            "description": "Get drills for specific mechanical issues"
+          }
+        },
+        {
+          "name": "Get Drills by Tag",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/brain/drills-by-tag?tag=posture&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "brain", "drills-by-tag"],
+              "query": [
+                {
+                  "key": "tag",
+                  "value": "posture"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Find drills by mechanic tag"
+          }
+        },
+        {
+          "name": "Get Drills by Expert",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/brain/drills-by-expert?expert=Amanda Scarborough&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "brain", "drills-by-expert"],
+              "query": [
+                {
+                  "key": "expert",
+                  "value": "Amanda Scarborough"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Get all drills from a specific expert"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Training (Admin)",
+      "item": [
+        {
+          "name": "Add New Drill",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Drill\",\n  \"category\": \"PITCHING\",\n  \"difficulty\": \"Intermediate\",\n  \"description\": \"Test drill description\",\n  \"videoUrl\": \"https://youtube.com/...\",\n  \"mechanicTags\": [\"posture\", \"leg-drive\"],\n  \"expertSource\": \"Amanda Scarborough\",\n  \"equipment\": [\"ball\", \"net\"],\n  \"ageRange\": \"10U-18U\",\n  \"issueAddressed\": \"hunched forward\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/brain/train/drill",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "brain", "train", "drill"]
+            },
+            "description": "Add a new drill to the knowledge base"
+          }
+        },
+        {
+          "name": "Add Mental Edge Content",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Pre-Game Visualization\",\n  \"contentType\": \"principle\",\n  \"category\": \"Confidence\",\n  \"content\": \"Mental training content...\",\n  \"source\": \"Sports Psychology Research\",\n  \"tags\": [\"pre-game\", \"visualization\"],\n  \"usageContext\": \"before-game\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/brain/train/mental-edge",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "brain", "train", "mental-edge"]
+            },
+            "description": "Add mental training content"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ]
+}
