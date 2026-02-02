@@ -236,8 +236,10 @@ export async function getChampionshipDailyContent() {
   const today = days[new Date().getDay()];
   
   const dailyThemes = await MentalTraining.daily();
+  const principleKeys = Object.keys(championship.keyPrinciples) as Array<keyof typeof championship.keyPrinciples>;
+  const randomKey = principleKeys[Math.floor(Math.random() * principleKeys.length)];
   return {
-    championshipPrinciple: championship.keyPrinciples[Object.keys(championship.keyPrinciples)[Math.floor(Math.random() * Object.keys(championship.keyPrinciples).length)]],
+    championshipPrinciple: championship.keyPrinciples[randomKey],
     dailyTheme: dailyThemes[today as keyof typeof dailyThemes],
     randomApplication: championship.dailyApplications.morningMindset[Math.floor(Math.random() * championship.dailyApplications.morningMindset.length)]
   };
