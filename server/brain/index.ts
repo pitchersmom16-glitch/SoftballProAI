@@ -15,7 +15,13 @@ import { analyzeMechanics, analyzePitching, analyzeHitting, analyzeCatching, ana
 export { analyzeMechanics, analyzePitching, analyzeHitting, analyzeCatching, analyzeFielding, analyzeMental, getCorrectiveDrills, getDrillsByTag, getDrillsByExpert, getDailyMindset, getPreGameAudio } from './analyze_mechanics';
 
 import { analyzeVideo, getMentalContent, analyzeWindmillMechanics, analyzeSwingMechanics, analyzePopTime, analyzeFieldingMechanics } from './analysis_engine';
-export { analyzeVideo, getMentalContent, analyzeWindmillMechanics, analyzeSwingMechanics, analyzePopTime, analyzeFieldingMechanics } from './analysis_engine';
+/* analysis_engine value exports removed to avoid duplicate identifier errors */
+export type {
+  VideoAnalysisRequest,
+  AnalysisResult,
+  DrillRecommendation as EngineDrillRecommendation,
+  MentalContentRequest
+} from './analysis_engine';
 
 export type {
   MechanicsAnalysisRequest,
@@ -26,13 +32,12 @@ export type {
   MentalAnalysisResult
 } from './analyze_mechanics';
 
-export {
-  analyzeVideo,
-  getMentalContent,
-  analyzeWindmillMechanics,
-  analyzeSwingMechanics,
-  analyzePopTime,
-  analyzeFieldingMechanics
+/* analysis_engine value exports removed to avoid duplicate identifier errors */
+export type {
+  VideoAnalysisRequest,
+  AnalysisResult,
+  DrillRecommendation as EngineDrillRecommendation,
+  MentalContentRequest
 } from './analysis_engine';
 
 export type {
@@ -319,8 +324,7 @@ export default {
   analyzeCatching,
   analyzeFielding,
   analyzeMental,
-  analyzeVideo,
-  
+
   // Knowledge bases
   SoftballKnowledge,
   MentalTraining,
@@ -337,4 +341,5 @@ export default {
   getTournamentRules,
   generatePracticePlan
 };
+
 
