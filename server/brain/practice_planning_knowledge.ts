@@ -197,7 +197,7 @@ export const AGE_SPECIFIC_PLANS = {
       coolDown: "5 min - Stretching and huddle"
     },
 
-    "coaching Tips": [
+    coachingTips: [
       "Use positive reinforcement constantly",
       "Demonstrate everything - show don't just tell",
       "Keep lines short - maximum engagement",
@@ -306,7 +306,7 @@ export const SPECIALIZED_PRACTICES = {
     emphasis: "Battery development",
     
     pitchers: {
-      "mechanic Work": "30 min - Specific mechanical focus",
+    mechanicWork: "30 min - Specific mechanical focus",
       bullpen: "40 min - Pitches and sequencing",
       gameSimulation: "30 min - Live hitters",
       conditioning: "20 min - Pitcher-specific conditioning"

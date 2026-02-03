@@ -459,7 +459,7 @@ export const HITTING_BIOMECHANICS = {
       ]
     },
     
-    "pulling Off": {
+    pullingOff: {
       description: "Head and body pull away from plate",
       biomechanicalCause: "Fear, spinning open, poor balance",
       identifying: "Head moves toward dugout, weak contact to opposite field",
