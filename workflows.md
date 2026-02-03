@@ -7,7 +7,9 @@
 
 ## 🔁 Live Updates (canonical change log)
 Keep this section current. Whenever code, routes, or user flows are changed, add a short entry with: **date**, **one-line summary**, **commit hash**, and **author**. This is the single source of truth for other agents (e.g., Claude) and collaborators.
-- 2026-02-03 — fix(db): use named Pool import from pg to satisfy TypeScript types (commit: `ac4d0bc`) — author: pitchersmom16-glitch
+- 2026-02-03 — chore: remove tool-generated artifacts (Replit/Cursor/.local/dist) and update .gitignore (commit: `7da620b`) — author: pitchersmom16-glitch
+
+ 2026-02-03 — fix(db): use named Pool import from pg to satisfy TypeScript types (commit: `ac4d0bc`) — author: pitchersmom16-glitch
 
  2026-02-03 — chore(types): add local shims for Brain checks (@shared/schema) (commit: `3f7481a`) — author: pitchersmom16-glitch
 
