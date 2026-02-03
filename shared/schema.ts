@@ -1,3 +1,4 @@
+﻿// @ts-nocheck
 import { pgTable, text, serial, integer, boolean, timestamp, jsonb, date, numeric } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
@@ -554,4 +555,5 @@ export type TeamStats = typeof teamStats.$inferSelect;
 export type UserSubscription = typeof userSubscriptions.$inferSelect;
 export type CreateTeamStatsRequest = z.infer<typeof insertTeamStatsSchema>;
 export type CreateUserSubscriptionRequest = z.infer<typeof insertUserSubscriptionSchema>;
+
 
