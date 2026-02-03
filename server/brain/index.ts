@@ -11,11 +11,19 @@
  */
 
 // Core analysis engines
-import { analyzeMechanics, analyzePitching, analyzeHitting, analyzeCatching, analyzeFielding, analyzeMental, getCorrectiveDrills, getDrillsByTag, getDrillsByExpert, getDailyMindset, getPreGameAudio } from './analyze_mechanics';
-export { analyzeMechanics, analyzePitching, analyzeHitting, analyzeCatching, analyzeFielding, analyzeMental, getCorrectiveDrills, getDrillsByTag, getDrillsByExpert, getDailyMindset, getPreGameAudio } from './analyze_mechanics';
-
-import { analyzeVideo, getMentalContent, analyzeWindmillMechanics, analyzeSwingMechanics, analyzePopTime, analyzeFieldingMechanics } from './analysis_engine';
-export { analyzeVideo, getMentalContent, analyzeWindmillMechanics, analyzeSwingMechanics, analyzePopTime, analyzeFieldingMechanics } from './analysis_engine';
+export {
+  analyzeMechanics,
+  analyzePitching,
+  analyzeHitting,
+  analyzeCatching,
+  analyzeFielding,
+  analyzeMental,
+  getCorrectiveDrills,
+  getDrillsByTag,
+  getDrillsByExpert,
+  getDailyMindset,
+  getPreGameAudio
+} from './analyze_mechanics';
 
 export type {
   MechanicsAnalysisRequest,
@@ -90,6 +98,10 @@ export {
   EFFICIENCY_TIPS,
   PRACTICE_TEMPLATES
 } from './practice_planning_knowledge';
+
+// Create local bindings for engines so they can be referenced in the default export
+import * as AnalyzeMechanics from './analyze_mechanics';
+import * as AnalysisEngine from './analysis_engine';
 
 export {
   PITCHING_BIOMECHANICS,
@@ -224,10 +236,10 @@ export async function getChampionshipDailyContent() {
   const today = days[new Date().getDay()];
   
   const dailyThemes = await MentalTraining.daily();
+  const principleKeys = Object.keys(championship.keyPrinciples) as Array<keyof typeof championship.keyPrinciples>;
+  const randomKey = principleKeys[Math.floor(Math.random() * principleKeys.length)];
   return {
-    const kpKeys = Object.keys(championship.keyPrinciples) as Array<keyof typeof championship.keyPrinciples>;
-    const kpKey = kpKeys[Math.floor(Math.random() * kpKeys.length)];
-    championshipPrinciple: championship.keyPrinciples[kpKey],
+    championshipPrinciple: championship.keyPrinciples[randomKey],
     dailyTheme: dailyThemes[today as keyof typeof dailyThemes],
     randomApplication: championship.dailyApplications.morningMindset[Math.floor(Math.random() * championship.dailyApplications.morningMindset.length)]
   };
@@ -313,13 +325,13 @@ export async function generatePracticePlan(age: number, focus?: string) {
 // Default export for convenience
 export default {
   // Core engines
-  analyzeMechanics,
-  analyzePitching,
-  analyzeHitting,
-  analyzeCatching,
-  analyzeFielding,
-  analyzeMental,
-  analyzeVideo,
+  analyzeMechanics: AnalyzeMechanics.analyzeMechanics,
+  analyzePitching: AnalyzeMechanics.analyzePitching,
+  analyzeHitting: AnalyzeMechanics.analyzeHitting,
+  analyzeCatching: AnalyzeMechanics.analyzeCatching,
+  analyzeFielding: AnalyzeMechanics.analyzeFielding,
+  analyzeMental: AnalyzeMechanics.analyzeMental,
+  analyzeVideo: AnalysisEngine.analyzeVideo,
   
   // Knowledge bases
   SoftballKnowledge,
