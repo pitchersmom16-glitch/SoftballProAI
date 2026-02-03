@@ -11,7 +11,9 @@ const viteLogger = createLogger();
 export async function setupVite(server: Server, app: Express) {
   const serverOptions = {
     middlewareMode: true,
-    hmr: { server, path: "/vite-hmr" },
+    // Disable Vite's external HMR server to avoid environment-specific listen errors
+    // when running Vite as middleware inside a custom Node server.
+    hmr: false,
     allowedHosts: true as const,
   };
 
