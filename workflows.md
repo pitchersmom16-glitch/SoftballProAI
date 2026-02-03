@@ -7,7 +7,9 @@
 
 ## 🔁 Live Updates (canonical change log)
 Keep this section current. Whenever code, routes, or user flows are changed, add a short entry with: **date**, **one-line summary**, **commit hash**, and **author**. This is the single source of truth for other agents (e.g., Claude) and collaborators.
-- 2026-02-03 — chore(types): short-term disable type checks for shared/schema.ts (commit: `530c198`) — author: pitchersmom16-glitch
+- 2026-02-03 — fix(server): cast error to any when accessing .stack for logging (commit: `0d40d58`) — author: pitchersmom16-glitch
+
+ 2026-02-03 — chore(types): short-term disable type checks for shared/schema.ts (commit: `530c198`) — author: pitchersmom16-glitch
 
  2026-02-03 — chore(tests): import @testing-library/jest-dom for matcher types (commit: `6cebe7f`) — author: pitchersmom16-glitch
 
