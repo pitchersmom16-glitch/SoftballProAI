@@ -7,7 +7,9 @@
 
 ## 🔁 Live Updates (canonical change log)
 Keep this section current. Whenever code, routes, or user flows are changed, add a short entry with: **date**, **one-line summary**, **commit hash**, and **author**. This is the single source of truth for other agents (e.g., Claude) and collaborators.
-- 2026-02-03 — chore(types): add jest reference for test globals (commit: `1e65917`) — author: pitchersmom16-glitch
+- 2026-02-03 — chore(tests): import @testing-library/jest-dom for matcher types (commit: `6cebe7f`) — author: pitchersmom16-glitch
+
+ 2026-02-03 — chore(types): add jest reference for test globals (commit: `1e65917`) — author: pitchersmom16-glitch
 
  2026-02-03 — fix(types): add jest types & avoid duplicate analysis_engine value exports (commit: `b9d1b18`) — author: pitchersmom16-glitch
 
