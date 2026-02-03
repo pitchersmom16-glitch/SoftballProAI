@@ -7,7 +7,9 @@
 
 ## 🔁 Live Updates (canonical change log)
 Keep this section current. Whenever code, routes, or user flows are changed, add a short entry with: **date**, **one-line summary**, **commit hash**, and **author**. This is the single source of truth for other agents (e.g., Claude) and collaborators.
-- 2026-02-03 — fix(server): bind to localhost by default and disable Vite external HMR to avoid ENOTSUP on 0.0.0.0 (commit: `c54964f`) — author: pitchersmom16-glitch
+- 2026-02-03 — chore(types): temporary shims for @shared/schema to enable Brain-only type checks (commit: `f12dd88`) — author: pitchersmom16-glitch
+
+ 2026-02-03 — fix(server): bind to localhost by default and disable Vite external HMR to avoid ENOTSUP on 0.0.0.0 (commit: `c54964f`) — author: pitchersmom16-glitch
 
  2026-02-03 — fix(vite): disable external HMR server when used as middleware to avoid ENOTSUP on 0.0.0.0:5173 (commit: `ca59703`) — author: pitchersmom16-glitch
 
