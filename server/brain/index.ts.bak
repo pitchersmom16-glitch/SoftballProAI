@@ -16,7 +16,12 @@ export { analyzeMechanics, analyzePitching, analyzeHitting, analyzeCatching, ana
 
 import { analyzeVideo, getMentalContent, analyzeWindmillMechanics, analyzeSwingMechanics, analyzePopTime, analyzeFieldingMechanics } from './analysis_engine';
 /* analysis_engine value exports removed to avoid duplicate identifier errors */
-
+export type {
+  VideoAnalysisRequest,
+  AnalysisResult,
+  DrillRecommendation as EngineDrillRecommendation,
+  MentalContentRequest
+} from './analysis_engine';
 
 export type {
   MechanicsAnalysisRequest,
@@ -26,7 +31,8 @@ export type {
   MentalAnalysisRequest,
   MentalAnalysisResult
 } from './analyze_mechanics';
-// consolidated analysis_engine types (type-only)
+
+/* analysis_engine value exports removed to avoid duplicate identifier errors */
 export type {
   VideoAnalysisRequest,
   AnalysisResult,
@@ -34,10 +40,12 @@ export type {
   MentalContentRequest
 } from './analysis_engine';
 
-/* analysis_engine value exports removed to avoid duplicate identifier errors */
-
-
-
+export type {
+  VideoAnalysisRequest,
+  AnalysisResult,
+  DrillRecommendation as EngineDrillRecommendation,
+  MentalContentRequest
+} from './analysis_engine';
 
 // Comprehensive knowledge bases
 export {
@@ -333,6 +341,5 @@ export default {
   getTournamentRules,
   generatePracticePlan
 };
-
 
 
