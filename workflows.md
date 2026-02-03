@@ -7,7 +7,9 @@
 
 ## 🔁 Live Updates (canonical change log)
 Keep this section current. Whenever code, routes, or user flows are changed, add a short entry with: **date**, **one-line summary**, **commit hash**, and **author**. This is the single source of truth for other agents (e.g., Claude) and collaborators.
-- 2026-02-03 — chore(types): temporary shims for @shared/schema to enable Brain-only type checks (commit: `f12dd88`) — author: pitchersmom16-glitch
+- 2026-02-03 — chore(types): add local shims for Brain checks (@shared/schema) (commit: `3f7481a`) — author: pitchersmom16-glitch
+
+ 2026-02-03 — chore(types): temporary shims for @shared/schema to enable Brain-only type checks (commit: `f12dd88`) — author: pitchersmom16-glitch
 
  2026-02-03 — fix(server): bind to localhost by default and disable Vite external HMR to avoid ENOTSUP on 0.0.0.0 (commit: `c54964f`) — author: pitchersmom16-glitch
 
