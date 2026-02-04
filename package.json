@@ -16,6 +16,7 @@
     "sync-workflows": "node scripts/add-workflow-entry.cjs",
     "check-live-update": "node scripts/check-live-update.cjs",
     "lint": "eslint client/src server",
+    "test": "jest",
     "format": "prettier --write ."
   },
   "dependencies": {
