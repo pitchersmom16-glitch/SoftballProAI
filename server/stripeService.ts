@@ -13,14 +13,14 @@ export class StripeService {
   }
 
   async createCheckoutSession(
-    customerId: string, 
-    priceId: string, 
-    successUrl: string, 
+    customerId: string,
+    priceId: string,
+    successUrl: string,
     cancelUrl: string,
-    couponCode?: string
+    couponCode?: string,
   ) {
     const stripe = await getUncachableStripeClient();
-    
+
     const sessionConfig: any = {
       customer: customerId,
       payment_method_types: ['card'],
@@ -53,26 +53,26 @@ export class StripeService {
   async validateCoupon(code: string): Promise<any | null> {
     // Local coupon definitions for testing - bypass Stripe check
     const localCoupons: Record<string, any> = {
-      'DONOR100': {
+      DONOR100: {
         id: 'DONOR100',
         valid: true,
         percent_off: 100,
         amount_off: null,
         duration: 'forever',
-        metadata: { badge: 'founding_member' }
+        metadata: { badge: 'founding_member' },
       },
-      'FRIEND50': {
+      FRIEND50: {
         id: 'FRIEND50',
         valid: true,
         percent_off: 50,
         amount_off: null,
         duration: 'forever',
-        metadata: {}
-      }
+        metadata: {},
+      },
     };
 
     const upperCode = code.toUpperCase();
-    
+
     // Check local coupons first (bypass Stripe for testing)
     if (localCoupons[upperCode]) {
       return localCoupons[upperCode];
@@ -92,15 +92,13 @@ export class StripeService {
   }
 
   async getProduct(productId: string) {
-    const result = await db.execute(
-      sql`SELECT * FROM stripe.products WHERE id = ${productId}`
-    );
+    const result = await db.execute(sql`SELECT * FROM stripe.products WHERE id = ${productId}`);
     return result.rows[0] || null;
   }
 
   async listProducts(active = true, limit = 20, offset = 0) {
     const result = await db.execute(
-      sql`SELECT * FROM stripe.products WHERE active = ${active} LIMIT ${limit} OFFSET ${offset}`
+      sql`SELECT * FROM stripe.products WHERE active = ${active} LIMIT ${limit} OFFSET ${offset}`,
     );
     return result.rows;
   }
@@ -130,14 +128,14 @@ export class StripeService {
         FROM paginated_products p
         LEFT JOIN stripe.prices pr ON pr.product = p.id AND pr.active = true
         ORDER BY p.id, pr.unit_amount
-      `
+      `,
     );
     return result.rows;
   }
 
   async getSubscription(subscriptionId: string) {
     const result = await db.execute(
-      sql`SELECT * FROM stripe.subscriptions WHERE id = ${subscriptionId}`
+      sql`SELECT * FROM stripe.subscriptions WHERE id = ${subscriptionId}`,
     );
     return result.rows[0] || null;
   }

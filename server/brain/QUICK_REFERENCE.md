@@ -1,6 +1,7 @@
 # 🧠 SoftballProAI Brain - Quick Reference Guide
 
 ## File Structure
+
 ```
 server/brain/
 ├── README.md                          # Complete overview
@@ -24,6 +25,7 @@ server/brain/
 ## 🚀 Quick Start Examples
 
 ### Get Motivational Quote
+
 ```typescript
 import { getMotivationalQuote } from './server/brain';
 
@@ -32,26 +34,29 @@ const quote = await getMotivationalQuote('resilience');
 ```
 
 ### Analyze Video
+
 ```typescript
 import { analyzeVideo } from './server/brain';
 
 const result = await analyzeVideo({
-  videoUrl: "https://...",
-  skillType: "PITCHING",
-  athleteLevel: "Intermediate"
+  videoUrl: 'https://...',
+  skillType: 'PITCHING',
+  athleteLevel: 'Intermediate',
 });
 // { metrics, issuesDetected, strengths, recommendedDrills, coachingNotes }
 ```
 
 ### Generate Practice Plan
+
 ```typescript
 import { generatePracticePlan } from './server/brain';
 
-const plan = await generatePracticePlan(12, "defensive focus");
+const plan = await generatePracticePlan(12, 'defensive focus');
 // Complete 2-hour practice plan for 12-year-olds
 ```
 
 ### Get Tournament Rules
+
 ```typescript
 import { getTournamentRules } from './server/brain';
 
@@ -60,6 +65,7 @@ const rules = await getTournamentRules('PGF');
 ```
 
 ### Get Age-Appropriate Training
+
 ```typescript
 import { getAgeAppropriateGuidance } from './server/brain';
 
@@ -72,15 +78,16 @@ const guidance = await getAgeAppropriateGuidance(14);
 ## 📚 Knowledge Base Quick Reference
 
 ### Softball Knowledge (`softball_knowledge_base.ts`)
+
 ```typescript
-import { 
+import {
   PITCHING_KNOWLEDGE,
   HITTING_KNOWLEDGE,
   CATCHING_KNOWLEDGE,
   INFIELD_KNOWLEDGE,
   OUTFIELD_KNOWLEDGE,
   BIOMECHANICS_FRAMEWORK,
-  EXPERT_SOURCES 
+  EXPERT_SOURCES,
 } from './server/brain';
 
 // Example: Get velocity benchmarks
@@ -88,19 +95,18 @@ const velocityByAge = PITCHING_KNOWLEDGE.velocityGeneration.benchmarks;
 // { "10U": "42-50 mph", "12U": "42-50 mph", ... }
 
 // Example: Get expert insight
-const scarbrough = EXPERT_SOURCES.pitchingExperts.find(e => 
-  e.name === 'Amanda Scarborough'
-);
+const scarbrough = EXPERT_SOURCES.pitchingExperts.find((e) => e.name === 'Amanda Scarborough');
 ```
 
 ### Mental Training (`mental_training_knowledge.ts`)
+
 ```typescript
-import { 
+import {
   MAMBA_MENTALITY,
   MOTIVATIONAL_QUOTES,
   SPORTS_PSYCHOLOGY,
   DAILY_MINDSET_THEMES,
-  CONTEXTUAL_MENTAL_STRATEGIES 
+  CONTEXTUAL_MENTAL_STRATEGIES,
 } from './server/brain';
 
 // Example: Get Mamba principle
@@ -117,13 +123,14 @@ const mondayTheme = DAILY_MINDSET_THEMES.monday;
 ```
 
 ### Strength Training (`strength_training_knowledge.ts`)
+
 ```typescript
-import { 
+import {
   CROSSFIT_FOR_SOFTBALL,
   AGE_APPROPRIATE_TRAINING,
   SOFTBALL_TRAINING_PRIORITIES,
   INJURY_PREVENTION,
-  PERIODIZATION 
+  PERIODIZATION,
 } from './server/brain';
 
 // Example: Get exercises
@@ -140,15 +147,16 @@ const shoulderCare = INJURY_PREVENTION.shoulderCareProgram;
 ```
 
 ### Tournament Rules (`tournament_rules_knowledge.ts`)
+
 ```typescript
-import { 
+import {
   NFHS_RULES,
   PGF_RULES,
   USSSA_RULES,
   GSA_RULES,
   TITAN_RULES,
   INTERNATIONAL_TIEBREAKER,
-  RULE_COMPARISONS 
+  RULE_COMPARISONS,
 } from './server/brain';
 
 // Example: Get NFHS changes
@@ -165,15 +173,16 @@ const subRules = RULE_COMPARISONS.substitutions;
 ```
 
 ### Practice Planning (`practice_planning_knowledge.ts`)
+
 ```typescript
-import { 
+import {
   PRACTICE_FRAMEWORK,
   STATION_PLANS,
   AGE_SPECIFIC_PLANS,
   SPECIALIZED_PRACTICES,
   SEASONAL_PLANNING,
   EFFICIENCY_TIPS,
-  PRACTICE_TEMPLATES 
+  PRACTICE_TEMPLATES,
 } from './server/brain';
 
 // Example: Get 4-station plan
@@ -181,7 +190,7 @@ const fourStations = STATION_PLANS.fourStationRotation;
 // { description, totalTime, station1_Hitting, station2_Infield, ... }
 
 // Example: Get age-specific plan
-const plan12U = AGE_SPECIFIC_PLANS["12U-14U"];
+const plan12U = AGE_SPECIFIC_PLANS['12U-14U'];
 // { focus, intensity, samplePractice, coachingTips }
 
 // Example: Get defensive practice
@@ -190,14 +199,15 @@ const defensivePractice = SPECIALIZED_PRACTICES.defensiveFocus;
 ```
 
 ### Advanced Biomechanics (`biomechanics_analysis.ts`)
+
 ```typescript
-import { 
+import {
   PITCHING_BIOMECHANICS,
   HITTING_BIOMECHANICS,
   CATCHING_BIOMECHANICS,
   FIELDING_BIOMECHANICS,
   MEDIAPIPE_ANALYSIS_POINTS,
-  BIOMECHANICS_COACHING_CONTEXT 
+  BIOMECHANICS_COACHING_CONTEXT,
 } from './server/brain';
 
 // Example: Get kinetic chain sequence
@@ -222,6 +232,7 @@ const promptTemplate = BIOMECHANICS_COACHING_CONTEXT.promptTemplate;
 ## 🔧 Common Integration Patterns
 
 ### Pattern 1: Player Video Analysis
+
 ```typescript
 // 1. Upload video
 const videoUrl = await uploadToObjectStorage(file);
@@ -231,7 +242,7 @@ const assessment = await db.insert(assessments).values({
   athleteId: player.id,
   videoUrl,
   skillType: 'PITCHING',
-  status: 'analyzing'
+  status: 'analyzing',
 });
 
 // 3. Extract MediaPipe metrics
@@ -242,7 +253,7 @@ const metrics = calculateBiomechanics(poseData);
 const analysis = await analyzeVideo({
   videoUrl,
   skillType: 'PITCHING',
-  athleteLevel: player.skillLevel
+  athleteLevel: player.skillLevel,
 });
 
 // 5. Generate AI feedback with context
@@ -253,127 +264,130 @@ const prompt = BIOMECHANICS_COACHING_CONTEXT.promptTemplate
   .replace('{age}', player.age);
 
 const feedback = await openai.chat.completions.create({
-  model: "gpt-4",
-  messages: [{ role: "user", content: prompt }]
+  model: 'gpt-4',
+  messages: [{ role: 'user', content: prompt }],
 });
 
 // 6. Save feedback and drills
 await db.insert(assessmentFeedback).values({
   assessmentId: assessment.id,
   overallFeedback: feedback.choices[0].message.content,
-  recommendedDrills: analysis.recommendedDrills.map(d => d.id)
+  recommendedDrills: analysis.recommendedDrills.map((d) => d.id),
 });
 ```
 
 ### Pattern 2: Daily Player Dashboard
+
 ```typescript
 // Route: GET /api/player/dashboard
 import { getMambaDailyContent, getMotivationalQuote } from './server/brain';
 
 app.get('/api/player/dashboard', async (req, res) => {
   const player = req.user;
-  
+
   // Get daily motivation
   const mambaContent = await getMambaDailyContent();
   const randomQuote = await getMotivationalQuote();
-  
+
   // Check recent check-in for injury alerts
   const latestCheckIn = await db.query.playerCheckins.findFirst({
     where: eq(playerCheckins.athleteId, player.id),
-    orderBy: desc(playerCheckins.createdAt)
+    orderBy: desc(playerCheckins.createdAt),
   });
-  
+
   const blocked = latestCheckIn?.blockedActivities || [];
-  
+
   res.json({
     welcome: `Good morning, ${player.name}!`,
     mambaQuote: mambaContent.mambaPrinciple.quote,
     dailyTheme: mambaContent.dailyTheme,
     motivationalQuote: randomQuote,
     blockedActivities: blocked,
-    injuryAlert: blocked.length > 0
+    injuryAlert: blocked.length > 0,
   });
 });
 ```
 
 ### Pattern 3: Coach Practice Generator
+
 ```typescript
 // Route: POST /api/practice-plans/generate
 import { generatePracticePlan } from './server/brain';
 
 app.post('/api/practice-plans/generate', async (req, res) => {
   const { teamId, focus, duration } = req.body;
-  
+
   const team = await db.query.teams.findFirst({
     where: eq(teams.id, teamId),
-    with: { athletes: true }
+    with: { athletes: true },
   });
-  
+
   // Calculate average age
   const avgAge = Math.round(
-    team.athletes.reduce((sum, a) => sum + a.age, 0) / team.athletes.length
+    team.athletes.reduce((sum, a) => sum + a.age, 0) / team.athletes.length,
   );
-  
+
   // Generate plan
   const plan = await generatePracticePlan(avgAge, focus);
-  
+
   // Save to database
   await db.insert(practicePlans).values({
     teamId,
     title: `${focus || 'Standard'} Practice`,
     duration,
     structure: plan,
-    createdBy: req.user.id
+    createdBy: req.user.id,
   });
-  
+
   res.json({ plan });
 });
 ```
 
 ### Pattern 4: Injury Prevention Check-In
+
 ```typescript
 // Route: POST /api/player/check-in
 import { AGE_APPROPRIATE_TRAINING } from './server/brain';
 
 app.post('/api/player/check-in', async (req, res) => {
   const { athleteId, armSoreness, shoulderSoreness } = req.body;
-  
+
   const athlete = await db.query.athletes.findFirst({
-    where: eq(athletes.id, athleteId)
+    where: eq(athletes.id, athleteId),
   });
-  
+
   // Check for high soreness
   const highSoreness = armSoreness >= 7 || shoulderSoreness >= 7;
-  
+
   if (highSoreness) {
     // BLOCK risky activities
     const blockedActivities = ['PITCHING', 'THROWING'];
-    
+
     // Save check-in
     await db.insert(playerCheckins).values({
       athleteId,
       armSoreness,
       shoulderSoreness,
-      blockedActivities
+      blockedActivities,
     });
-    
+
     // Get age-appropriate guidance
     const guidance = await getAgeAppropriateGuidance(athlete.age);
-    
+
     // Alert coach
     await db.insert(notifications).values({
       userId: athlete.coachId,
       type: 'injury_alert',
       title: `${athlete.name} - High Arm Soreness`,
       message: 'Pitching activities have been blocked.',
-      priority: 'high'
+      priority: 'high',
     });
-    
+
     res.json({
       blocked: true,
       message: 'Your arm needs rest. Pitching drills blocked today.',
       allowedActivities: ['Hitting', 'Base running', 'Mental training'],
-      recoveryGuidance: guidance.avoid
+      recoveryGuidance: guidance.avoid,
     });
   }
 });
@@ -384,93 +398,105 @@ app.post('/api/player/check-in', async (req, res) => {
 ## 📊 Key Benchmarks Quick Reference
 
 ### Pitching Velocity by Age
-| Age | Average | Advanced | Elite |
-|-----|---------|----------|-------|
-| 10U | 38-44 mph | 45-50 mph | 51-55 mph |
-| 12U | 45-52 mph | 53-58 mph | 59-63 mph |
-| 14U | 52-58 mph | 59-63 mph | 64-67 mph |
-| 16U | 56-62 mph | 63-66 mph | 67-70 mph |
-| 18U | 58-64 mph | 65-68 mph | 69-72 mph |
+
+| Age     | Average   | Advanced  | Elite     |
+| ------- | --------- | --------- | --------- |
+| 10U     | 38-44 mph | 45-50 mph | 51-55 mph |
+| 12U     | 45-52 mph | 53-58 mph | 59-63 mph |
+| 14U     | 52-58 mph | 59-63 mph | 64-67 mph |
+| 16U     | 56-62 mph | 63-66 mph | 67-70 mph |
+| 18U     | 58-64 mph | 65-68 mph | 69-72 mph |
 | College | 62-67 mph | 68-71 mph | 72-77 mph |
 
 ### Exit Velocity by Age
-| Age | Range |
-|-----|-------|
+
+| Age     | Range     |
+| ------- | --------- |
 | 10U-12U | 45-55 mph |
-| 14U | 55-65 mph |
+| 14U     | 55-65 mph |
 | 16U-18U | 65-75 mph |
 | College | 75-85 mph |
 
 ### Pop Time by Age
-| Age | Range |
-|-----|-------|
-| 12U | 2.5-3.0s |
-| 14U | 2.3-2.6s |
+
+| Age     | Range    |
+| ------- | -------- |
+| 12U     | 2.5-3.0s |
+| 14U     | 2.3-2.6s |
 | 16U-18U | 2.0-2.3s |
 | College | 1.9-2.1s |
-| Elite | 1.8-2.0s |
+| Elite   | 1.8-2.0s |
 
 ### Pitch Counts by Age
-| Age | Max/Game | Max/Week |
-|-----|----------|----------|
-| 10U | 50-60 | 100 |
-| 12U | 60-75 | 125 |
-| 14U | 75-90 | 150 |
-| 16U+ | 90-110 | 175 |
+
+| Age  | Max/Game | Max/Week |
+| ---- | -------- | -------- |
+| 10U  | 50-60    | 100      |
+| 12U  | 60-75    | 125      |
+| 14U  | 75-90    | 150      |
+| 16U+ | 90-110   | 175      |
 
 ---
 
 ## 🎯 Most Common Use Cases
 
 ### 1. Get Daily Motivation
+
 ```typescript
 import { getMambaDailyContent } from './server/brain';
 const content = await getMambaDailyContent();
 ```
 
 ### 2. Analyze Pitching Video
+
 ```typescript
 import { analyzeVideo } from './server/brain';
-const analysis = await analyzeVideo({ videoUrl, skillType: "PITCHING" });
+const analysis = await analyzeVideo({ videoUrl, skillType: 'PITCHING' });
 ```
 
 ### 3. Get Corrective Drills
+
 ```typescript
 import { analyzeMechanics } from './server/brain';
-const drills = await analyzeMechanics({ 
-  skillType: "HITTING", 
-  detectedIssues: ["casting", "no hip rotation"] 
+const drills = await analyzeMechanics({
+  skillType: 'HITTING',
+  detectedIssues: ['casting', 'no hip rotation'],
 });
 ```
 
 ### 4. Generate Practice Plan
+
 ```typescript
 import { generatePracticePlan } from './server/brain';
-const plan = await generatePracticePlan(12, "defensive focus");
+const plan = await generatePracticePlan(12, 'defensive focus');
 ```
 
 ### 5. Get Tournament Rules
+
 ```typescript
 import { getTournamentRules } from './server/brain';
 const rules = await getTournamentRules('NFHS');
 ```
 
 ### 6. Get Mental Content for Context
+
 ```typescript
 import { analyzeMental } from './server/brain';
-const mental = await analyzeMental({ context: "after-strikeout" });
+const mental = await analyzeMental({ context: 'after-strikeout' });
 ```
 
 ### 7. Get Age-Appropriate Training
+
 ```typescript
 import { getAgeAppropriateGuidance } from './server/brain';
 const guidance = await getAgeAppropriateGuidance(14);
 ```
 
 ### 8. Check Biomechanical Benchmarks
+
 ```typescript
 import { PITCHING_BIOMECHANICS } from './server/brain';
-const velocityData = PITCHING_BIOMECHANICS.velocityByAge["14U"];
+const velocityData = PITCHING_BIOMECHANICS.velocityByAge['14U'];
 ```
 
 ---
@@ -494,4 +520,4 @@ const velocityData = PITCHING_BIOMECHANICS.velocityByAge["14U"];
 
 ---
 
-*"Hard work outweighs talent—every time."* - Kobe Bryant, Mamba Mentality
+_"Hard work outweighs talent—every time."_ - Kobe Bryant, Mamba Mentality

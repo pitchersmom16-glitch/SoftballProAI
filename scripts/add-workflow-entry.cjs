@@ -15,7 +15,7 @@ try {
     path.join(root, 'Claude', 'Claude Rules and Project Specifications', 'workflows.md'),
   ];
 
-  const workflowsPaths = possiblePaths.filter(p => fs.existsSync(p));
+  const workflowsPaths = possiblePaths.filter((p) => fs.existsSync(p));
   if (workflowsPaths.length === 0) {
     console.log('No workflows.md found — skipping live update.');
     process.exit(0);
@@ -66,9 +66,11 @@ try {
   }
 
   // Stage and commit all updated workflows files together
-  run(`git add ${updatedFiles.map(f => '"' + f + '"').join(' ')}`);
+  run(`git add ${updatedFiles.map((f) => '"' + f + '"').join(' ')}`);
   const shortSummary = msg.length > 60 ? msg.slice(0, 57) + '...' : msg;
-  run(`git commit -m "docs(workflows): add live update — ${shortSummary} (commit: ${hash})" -- ${updatedFiles.map(f => '"' + f + '"').join(' ')}`);
+  run(
+    `git commit -m "docs(workflows): add live update — ${shortSummary} (commit: ${hash})" -- ${updatedFiles.map((f) => '"' + f + '"').join(' ')}`,
+  );
 
   // Optionally push to the current branch instead of hardcoding 'main'
   try {

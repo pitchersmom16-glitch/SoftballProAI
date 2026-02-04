@@ -1,13 +1,13 @@
-import "dotenv/config";
-import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
-import { serveStatic } from "./static";
-import { createServer } from "http";
+import 'dotenv/config';
+import express, { type Request, Response, NextFunction } from 'express';
+import { registerRoutes } from './routes';
+import { serveStatic } from './static';
+import { createServer } from 'http';
 
 const app = express();
 const httpServer = createServer(app);
 
-declare module "http" {
+declare module 'http' {
   interface IncomingMessage {
     rawBody: unknown;
   }
@@ -23,11 +23,11 @@ app.use(
 
 app.use(express.urlencoded({ extended: false }));
 
-export function log(message: string, source = "express") {
-  const formattedTime = new Date().toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
+export function log(message: string, source = 'express') {
+  const formattedTime = new Date().toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
     hour12: true,
   });
 
@@ -45,9 +45,9 @@ app.use((req, res, next) => {
     return originalResJson.apply(res, [bodyJson, ...args]);
   };
 
-  res.on("finish", () => {
+  res.on('finish', () => {
     const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
+    if (path.startsWith('/api')) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
@@ -65,24 +65,24 @@ app.use((req, res, next) => {
     await registerRoutes(httpServer, app);
 
     // Vite middleware must be set up BEFORE any static/catch-all routes in development
-    if (process.env.NODE_ENV === "production") {
+    if (process.env.NODE_ENV === 'production') {
       serveStatic(app);
     } else {
       try {
-        const { setupVite } = await import("./vite");
+        const { setupVite } = await import('./vite');
         await setupVite(httpServer, app);
-        log("Vite dev middleware set up successfully", "vite");
+        log('Vite dev middleware set up successfully', 'vite');
       } catch (viteErr) {
-        log(`Vite middleware setup failed: ${viteErr?.stack || viteErr}`);
+        log(`Vite middleware setup failed: ${(viteErr as any)?.stack || viteErr}`);
         throw viteErr;
       }
     }
 
     app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
-      const message = err.message || "Internal Server Error";
+      const message = err.message || 'Internal Server Error';
 
-      console.error("Internal Server Error:", err);
+      console.error('Internal Server Error:', err);
 
       if (res.headersSent) {
         return next(err);
@@ -95,11 +95,11 @@ app.use((req, res, next) => {
     // Other ports are firewalled. Default to 5000 if not specified.
     // this serves both the API and the client.
     // It is the only port that is not firewalled.
-    const port = parseInt(process.env.PORT || "5000", 10);
+    const port = parseInt(process.env.PORT || '5000', 10);
     httpServer.listen(
       {
         port,
-        host: "0.0.0.0",
+        host: '0.0.0.0',
         reusePort: true,
       },
       () => {
@@ -107,7 +107,7 @@ app.use((req, res, next) => {
       },
     );
   } catch (err) {
-    log(`Fatal error during server startup: ${err?.stack || err}`);
+    log(`Fatal error during server startup: ${(err as any)?.stack || err}`);
     process.exit(1);
   }
 })();

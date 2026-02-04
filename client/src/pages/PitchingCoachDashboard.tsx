@@ -1,16 +1,16 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Users, 
-  Video, 
-  ClipboardList, 
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
+import {
+  Users,
+  Video,
+  ClipboardList,
   Plus,
   Send,
   Clock,
@@ -25,9 +25,9 @@ import {
   Gauge,
   CircleDot,
   TrendingUp,
-  Zap
-} from "lucide-react";
-import type { Athlete, HomeworkAssignment, CoachStudent, Drill } from "@shared/schema";
+  Zap,
+} from 'lucide-react';
+import type { Athlete, HomeworkAssignment, CoachStudent, Drill } from '@shared/schema';
 
 interface StudentWithHomework {
   student: CoachStudent & { athlete?: Athlete };
@@ -37,12 +37,12 @@ interface StudentWithHomework {
 }
 
 const SKILL_FOCUS_OPTIONS = [
-  { value: "rise_ball", label: "Rise Ball" },
-  { value: "drop_ball", label: "Drop Ball" },
-  { value: "curve_ball", label: "Curve Ball" },
-  { value: "change_up", label: "Change-Up" },
-  { value: "mechanics", label: "General Mechanics" },
-  { value: "drag_foot", label: "Drag Foot Technique" },
+  { value: 'rise_ball', label: 'Rise Ball' },
+  { value: 'drop_ball', label: 'Drop Ball' },
+  { value: 'curve_ball', label: 'Curve Ball' },
+  { value: 'change_up', label: 'Change-Up' },
+  { value: 'mechanics', label: 'General Mechanics' },
+  { value: 'drag_foot', label: 'Drag Foot Technique' },
 ];
 
 export default function PitchingCoachDashboard() {
@@ -51,23 +51,23 @@ export default function PitchingCoachDashboard() {
   const [showAssignHomework, setShowAssignHomework] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<number | null>(null);
   const [homeworkData, setHomeworkData] = useState({
-    title: "",
-    description: "",
-    skillFocus: "mechanics",
-    dueDate: "",
-    referenceVideoUrl: "",
+    title: '',
+    description: '',
+    skillFocus: 'mechanics',
+    dueDate: '',
+    referenceVideoUrl: '',
   });
 
   const { data: students } = useQuery<(CoachStudent & { athlete?: Athlete })[]>({
-    queryKey: ["/api/coach/students"],
+    queryKey: ['/api/coach/students'],
   });
 
   const { data: homework } = useQuery<HomeworkAssignment[]>({
-    queryKey: ["/api/homework"],
+    queryKey: ['/api/homework'],
   });
 
   const { data: drills } = useQuery<Drill[]>({
-    queryKey: ["/api/drills"],
+    queryKey: ['/api/drills'],
   });
 
   const assignHomeworkMutation = useMutation({
@@ -79,29 +79,29 @@ export default function PitchingCoachDashboard() {
       dueDate?: string;
       referenceVideoUrl?: string;
     }) => {
-      return apiRequest("POST", "/api/homework", data);
+      return apiRequest('POST', '/api/homework', data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/homework"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/homework'] });
       setShowAssignHomework(false);
       setSelectedStudent(null);
       setHomeworkData({
-        title: "",
-        description: "",
-        skillFocus: "mechanics",
-        dueDate: "",
-        referenceVideoUrl: "",
+        title: '',
+        description: '',
+        skillFocus: 'mechanics',
+        dueDate: '',
+        referenceVideoUrl: '',
       });
       toast({
-        title: "Homework Assigned!",
-        description: "Your student will be notified of the new assignment.",
+        title: 'Homework Assigned!',
+        description: 'Your student will be notified of the new assignment.',
       });
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to assign homework.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to assign homework.',
+        variant: 'destructive',
       });
     },
   });
@@ -110,18 +110,19 @@ export default function PitchingCoachDashboard() {
     student,
     pendingHomework: (index % 3) + 1,
     completedHomework: (index % 5) + 2,
-    lastSubmission: index % 2 === 0 ? "2 days ago" : "1 week ago",
+    lastSubmission: index % 2 === 0 ? '2 days ago' : '1 week ago',
   }));
 
-  const pendingReviewCount = homework?.filter(h => h.status === "completed" && !h.coachFeedback).length || 0;
-  const activeStudentsCount = students?.filter(s => s.status === "active").length || 0;
+  const pendingReviewCount =
+    homework?.filter((h) => h.status === 'completed' && !h.coachFeedback).length || 0;
+  const activeStudentsCount = students?.filter((s) => s.status === 'active').length || 0;
 
   const handleAssignHomework = () => {
     if (!selectedStudent || !homeworkData.title) {
       toast({
-        title: "Missing Information",
-        description: "Please select a student and provide a title.",
-        variant: "destructive",
+        title: 'Missing Information',
+        description: 'Please select a student and provide a title.',
+        variant: 'destructive',
       });
       return;
     }
@@ -140,19 +141,22 @@ export default function PitchingCoachDashboard() {
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-neon-yellow">
-              Private Instructor Studio
-            </h1>
+            <h1 className="text-3xl font-bold text-neon-yellow">Private Instructor Studio</h1>
             <p className="text-muted-foreground mt-1">
               Train your roster remotely with video analysis
             </p>
           </div>
           <div className="flex gap-3">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="border-neon-yellow/50 text-neon-yellow hover-elevate"
               data-testid="button-add-student"
-              onClick={() => toast({ title: "Coming Soon", description: "Student invitation system will be available soon." })}
+              onClick={() =>
+                toast({
+                  title: 'Coming Soon',
+                  description: 'Student invitation system will be available soon.',
+                })
+              }
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Student
@@ -204,7 +208,9 @@ export default function PitchingCoachDashboard() {
             </div>
             <div>
               <h2 className="text-xl font-bold">Pitching Biomechanics Dashboard</h2>
-              <p className="text-sm text-muted-foreground">Position-specific metrics from AI analysis</p>
+              <p className="text-sm text-muted-foreground">
+                Position-specific metrics from AI analysis
+              </p>
             </div>
           </div>
 
@@ -212,25 +218,36 @@ export default function PitchingCoachDashboard() {
             <div className="p-4 rounded-lg bg-background border border-border text-center">
               <CircleDot className="w-8 h-8 mx-auto mb-2 text-neon-pink" />
               <p className="text-sm text-muted-foreground mb-1">Arm Circle Speed</p>
-              <p className="text-2xl font-bold text-neon-pink" data-testid="metric-arm-circle-speed">--</p>
+              <p
+                className="text-2xl font-bold text-neon-pink"
+                data-testid="metric-arm-circle-speed"
+              >
+                --
+              </p>
               <p className="text-xs text-muted-foreground">deg/sec</p>
             </div>
             <div className="p-4 rounded-lg bg-background border border-border text-center">
               <TrendingUp className="w-8 h-8 mx-auto mb-2 text-neon-green" />
               <p className="text-sm text-muted-foreground mb-1">Stride Length</p>
-              <p className="text-2xl font-bold text-neon-green" data-testid="metric-stride-length">--</p>
+              <p className="text-2xl font-bold text-neon-green" data-testid="metric-stride-length">
+                --
+              </p>
               <p className="text-xs text-muted-foreground">% of height</p>
             </div>
             <div className="p-4 rounded-lg bg-background border border-border text-center">
               <Zap className="w-8 h-8 mx-auto mb-2 text-neon-yellow" />
               <p className="text-sm text-muted-foreground mb-1">Hip-Shoulder Sep.</p>
-              <p className="text-2xl font-bold text-neon-yellow" data-testid="metric-hip-shoulder">--</p>
+              <p className="text-2xl font-bold text-neon-yellow" data-testid="metric-hip-shoulder">
+                --
+              </p>
               <p className="text-xs text-muted-foreground">degrees</p>
             </div>
             <div className="p-4 rounded-lg bg-background border border-border text-center">
               <Target className="w-8 h-8 mx-auto mb-2 text-neon-blue" />
               <p className="text-sm text-muted-foreground mb-1">Drag Foot Grade</p>
-              <p className="text-2xl font-bold text-neon-blue" data-testid="metric-drag-foot">--</p>
+              <p className="text-2xl font-bold text-neon-blue" data-testid="metric-drag-foot">
+                --
+              </p>
               <p className="text-xs text-muted-foreground">AI Rating</p>
             </div>
           </div>
@@ -259,7 +276,7 @@ export default function PitchingCoachDashboard() {
             <div className="space-y-3">
               {mockStudentStats.length > 0 ? (
                 mockStudentStats.map((item) => (
-                  <div 
+                  <div
                     key={item.student.id}
                     className="p-4 rounded-lg border border-border hover:border-neon-yellow/30 transition-colors"
                     data-testid={`student-row-${item.student.id}`}
@@ -268,23 +285,31 @@ export default function PitchingCoachDashboard() {
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-full bg-neon-yellow/20 flex items-center justify-center">
                           <span className="text-neon-yellow font-bold text-lg">
-                            {item.student.athlete?.firstName?.charAt(0) || "?"}
+                            {item.student.athlete?.firstName?.charAt(0) || '?'}
                           </span>
                         </div>
                         <div>
-                          <h4 className="font-medium">{item.student.athlete ? `${item.student.athlete.firstName} ${item.student.athlete.lastName}` : "Unknown Student"}</h4>
+                          <h4 className="font-medium">
+                            {item.student.athlete
+                              ? `${item.student.athlete.firstName} ${item.student.athlete.lastName}`
+                              : 'Unknown Student'}
+                          </h4>
                           <p className="text-sm text-muted-foreground">
-                            Started {item.student.startDate || "N/A"}
+                            Started {item.student.startDate || 'N/A'}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-6">
                         <div className="text-center">
-                          <p className="text-lg font-bold text-neon-yellow">{item.pendingHomework}</p>
+                          <p className="text-lg font-bold text-neon-yellow">
+                            {item.pendingHomework}
+                          </p>
                           <p className="text-xs text-muted-foreground">Pending</p>
                         </div>
                         <div className="text-center">
-                          <p className="text-lg font-bold text-neon-green">{item.completedHomework}</p>
+                          <p className="text-lg font-bold text-neon-green">
+                            {item.completedHomework}
+                          </p>
                           <p className="text-xs text-muted-foreground">Completed</p>
                         </div>
                         <Button
@@ -325,9 +350,9 @@ export default function PitchingCoachDashboard() {
             </div>
 
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {homework && homework.filter(h => h.status === "completed").length > 0 ? (
+              {homework && homework.filter((h) => h.status === 'completed').length > 0 ? (
                 homework
-                  .filter(h => h.status === "completed")
+                  .filter((h) => h.status === 'completed')
                   .slice(0, 5)
                   .map((h) => (
                     <div
@@ -338,21 +363,28 @@ export default function PitchingCoachDashboard() {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="font-medium text-sm">{h.title}</p>
-                          <p className="text-xs text-muted-foreground">{h.description?.slice(0, 30) || "Pitching drill"}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {h.description?.slice(0, 30) || 'Pitching drill'}
+                          </p>
                         </div>
-                        <Button 
-                          size="icon" 
-                          variant="ghost" 
+                        <Button
+                          size="icon"
+                          variant="ghost"
                           className="text-neon-pink"
-                          onClick={() => toast({ title: "Video Review", description: "Opening video review panel..." })}
+                          onClick={() =>
+                            toast({
+                              title: 'Video Review',
+                              description: 'Opening video review panel...',
+                            })
+                          }
                           data-testid={`button-play-review-${h.id}`}
                         >
                           <Play className="w-4 h-4" />
                         </Button>
                       </div>
                       {!h.coachFeedback && (
-                        <Badge 
-                          variant="outline" 
+                        <Badge
+                          variant="outline"
                           className="mt-2 text-xs border-neon-pink/50 text-neon-pink"
                         >
                           Needs Feedback
@@ -404,11 +436,13 @@ export default function PitchingCoachDashboard() {
                     {SKILL_FOCUS_OPTIONS.map((option) => (
                       <button
                         key={option.value}
-                        onClick={() => setHomeworkData({ ...homeworkData, skillFocus: option.value })}
+                        onClick={() =>
+                          setHomeworkData({ ...homeworkData, skillFocus: option.value })
+                        }
                         className={`p-2 rounded-lg border text-center text-sm transition-all ${
                           homeworkData.skillFocus === option.value
-                            ? "border-neon-yellow bg-neon-yellow/20 text-neon-yellow"
-                            : "border-border hover:border-neon-yellow/50"
+                            ? 'border-neon-yellow bg-neon-yellow/20 text-neon-yellow'
+                            : 'border-border hover:border-neon-yellow/50'
                         }`}
                         data-testid={`button-skill-${option.value}`}
                       >
@@ -436,18 +470,24 @@ export default function PitchingCoachDashboard() {
                   <Textarea
                     placeholder="Describe what you want the student to focus on..."
                     value={homeworkData.description}
-                    onChange={(e) => setHomeworkData({ ...homeworkData, description: e.target.value })}
+                    onChange={(e) =>
+                      setHomeworkData({ ...homeworkData, description: e.target.value })
+                    }
                     className="mt-1 h-24"
                     data-testid="textarea-homework-desc"
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm text-muted-foreground">Reference Video URL (Optional)</label>
+                  <label className="text-sm text-muted-foreground">
+                    Reference Video URL (Optional)
+                  </label>
                   <Input
                     placeholder="YouTube or drill video URL"
                     value={homeworkData.referenceVideoUrl}
-                    onChange={(e) => setHomeworkData({ ...homeworkData, referenceVideoUrl: e.target.value })}
+                    onChange={(e) =>
+                      setHomeworkData({ ...homeworkData, referenceVideoUrl: e.target.value })
+                    }
                     className="mt-1"
                     data-testid="input-reference-video"
                   />
@@ -470,7 +510,7 @@ export default function PitchingCoachDashboard() {
                     className="bg-neon-yellow text-black hover:bg-neon-yellow/90"
                     data-testid="button-send-homework"
                   >
-                    {assignHomeworkMutation.isPending ? "Sending..." : "Send Assignment"}
+                    {assignHomeworkMutation.isPending ? 'Sending...' : 'Send Assignment'}
                   </Button>
                 </div>
               </div>
@@ -509,18 +549,28 @@ export default function PitchingCoachDashboard() {
           </div>
 
           <div className="mt-4 flex justify-center gap-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="border-neon-green/50 text-neon-green"
-              onClick={() => toast({ title: "Coming Soon", description: "Pro Model comparison will be available in a future update." })}
+              onClick={() =>
+                toast({
+                  title: 'Coming Soon',
+                  description: 'Pro Model comparison will be available in a future update.',
+                })
+              }
               data-testid="button-load-pro-model"
             >
               <Eye className="w-4 h-4 mr-2" />
               Load Pro Model
             </Button>
-            <Button 
+            <Button
               variant="outline"
-              onClick={() => toast({ title: "Coming Soon", description: "Video annotations will be available in a future update." })}
+              onClick={() =>
+                toast({
+                  title: 'Coming Soon',
+                  description: 'Video annotations will be available in a future update.',
+                })
+              }
               data-testid="button-add-annotation"
             >
               <MessageSquare className="w-4 h-4 mr-2" />

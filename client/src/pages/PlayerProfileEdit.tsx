@@ -1,10 +1,10 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Form,
   FormControl,
@@ -13,51 +13,51 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Save, Camera, Loader2 } from "lucide-react";
-import { useLocation } from "wouter";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/use-auth";
-import { apiRequest } from "@/lib/queryClient";
-import { ObjectUploader } from "@/components/ObjectUploader";
-import { useRef } from "react";
-import { api, UpdateAthleteRequest } from "@shared/routes";
+} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ArrowLeft, Save, Camera, Loader2 } from 'lucide-react';
+import { useLocation } from 'wouter';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
+import { apiRequest } from '@/lib/queryClient';
+import { ObjectUploader } from '@/components/ObjectUploader';
+import { useRef } from 'react';
+import { api, UpdateAthleteRequest } from '@shared/routes';
 
 const TRAINING_DAYS = [
-  "Monday",
-  "Tuesday", 
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday"
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
 ];
 
 const profileSchema = api.athletes.update.input.extend({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  playerPhone: z.string().optional().or(z.literal("")),
-  parentPhone: z.string().optional().or(z.literal("")),
-  parentEmail: z.string().email("Invalid email format").optional().or(z.literal("")),
-  goals: z.string().optional().or(z.literal("")),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  playerPhone: z.string().optional().or(z.literal('')),
+  parentPhone: z.string().optional().or(z.literal('')),
+  parentEmail: z.string().email('Invalid email format').optional().or(z.literal('')),
+  goals: z.string().optional().or(z.literal('')),
   preferredTrainingDays: z.array(z.string()).optional(),
   graduationYear: z.coerce.number().min(2020).max(2040).optional().nullable(),
-  school: z.string().optional().or(z.literal("")),
+  school: z.string().optional().or(z.literal('')),
   heightInches: z.coerce.number().min(36).max(84).optional().nullable(),
   weightLbs: z.coerce.number().min(50).max(300).optional().nullable(),
-  bats: z.string().optional().or(z.literal("")),
-  throws: z.string().optional().or(z.literal("")),
-  primaryPosition: z.string().optional().or(z.literal("")),
-  photoUrl: z.string().optional().or(z.literal("")),
+  bats: z.string().optional().or(z.literal('')),
+  throws: z.string().optional().or(z.literal('')),
+  primaryPosition: z.string().optional().or(z.literal('')),
+  photoUrl: z.string().optional().or(z.literal('')),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -87,83 +87,85 @@ export default function PlayerProfileEdit() {
     primaryPosition: string | null;
     photoUrl: string | null;
   }>({
-    queryKey: ["/api/player/athlete"],
+    queryKey: ['/api/player/athlete'],
   });
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      playerPhone: "",
-      parentPhone: "",
-      parentEmail: "",
-      goals: "",
+      firstName: '',
+      lastName: '',
+      playerPhone: '',
+      parentPhone: '',
+      parentEmail: '',
+      goals: '',
       preferredTrainingDays: [],
       graduationYear: null,
-      school: "",
+      school: '',
       heightInches: null,
       weightLbs: null,
-      bats: "",
-      throws: "",
-      primaryPosition: "",
+      bats: '',
+      throws: '',
+      primaryPosition: '',
     },
-    values: playerAthlete ? {
-      firstName: playerAthlete.firstName,
-      lastName: playerAthlete.lastName,
-      playerPhone: playerAthlete.playerPhone || "",
-      parentPhone: playerAthlete.parentPhone || "",
-      parentEmail: playerAthlete.parentEmail || "",
-      goals: playerAthlete.goals || "",
-      preferredTrainingDays: playerAthlete.preferredTrainingDays || [],
-      graduationYear: playerAthlete.graduationYear,
-      school: playerAthlete.school || "",
-      heightInches: playerAthlete.heightInches,
-      weightLbs: playerAthlete.weightLbs,
-      bats: playerAthlete.bats || "",
-      throws: playerAthlete.throws || "",
-      primaryPosition: playerAthlete.primaryPosition || "",
-    } : undefined,
+    values: playerAthlete
+      ? {
+          firstName: playerAthlete.firstName,
+          lastName: playerAthlete.lastName,
+          playerPhone: playerAthlete.playerPhone || '',
+          parentPhone: playerAthlete.parentPhone || '',
+          parentEmail: playerAthlete.parentEmail || '',
+          goals: playerAthlete.goals || '',
+          preferredTrainingDays: playerAthlete.preferredTrainingDays || [],
+          graduationYear: playerAthlete.graduationYear,
+          school: playerAthlete.school || '',
+          heightInches: playerAthlete.heightInches,
+          weightLbs: playerAthlete.weightLbs,
+          bats: playerAthlete.bats || '',
+          throws: playerAthlete.throws || '',
+          primaryPosition: playerAthlete.primaryPosition || '',
+        }
+      : undefined,
   });
 
   const updateProfile = useMutation({
     mutationFn: async (data: ProfileFormData) => {
-      if (!playerAthlete) throw new Error("No athlete profile found");
-      return apiRequest("PUT", `/api/athletes/${playerAthlete.id}`, data);
+      if (!playerAthlete) throw new Error('No athlete profile found');
+      return apiRequest('PUT', `/api/athletes/${playerAthlete.id}`, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/athlete"] });
-      toast({ 
-        title: "Profile Updated", 
-        description: "Your profile has been saved successfully." 
+      queryClient.invalidateQueries({ queryKey: ['/api/player/athlete'] });
+      toast({
+        title: 'Profile Updated',
+        description: 'Your profile has been saved successfully.',
       });
     },
     onError: (err: Error) => {
-      toast({ 
-        title: "Update Failed", 
+      toast({
+        title: 'Update Failed',
         description: err.message,
-        variant: "destructive" 
+        variant: 'destructive',
       });
     },
   });
 
   const updatePhoto = useMutation({
     mutationFn: async (photoUrl: string) => {
-      if (!playerAthlete) throw new Error("No athlete profile found");
-      return apiRequest("PUT", `/api/athletes/${playerAthlete.id}`, { photoUrl });
+      if (!playerAthlete) throw new Error('No athlete profile found');
+      return apiRequest('PUT', `/api/athletes/${playerAthlete.id}`, { photoUrl });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/athlete"] });
-      toast({ 
-        title: "Photo Updated", 
-        description: "Your profile photo has been updated." 
+      queryClient.invalidateQueries({ queryKey: ['/api/player/athlete'] });
+      toast({
+        title: 'Photo Updated',
+        description: 'Your profile photo has been updated.',
       });
     },
     onError: (err: Error) => {
-      toast({ 
-        title: "Upload Failed", 
+      toast({
+        title: 'Upload Failed',
         description: err.message,
-        variant: "destructive" 
+        variant: 'destructive',
       });
     },
   });
@@ -185,7 +187,7 @@ export default function PlayerProfileEdit() {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">No athlete profile found for your account.</p>
-        <Button variant="outline" className="mt-4" onClick={() => navigate("/dashboard")}>
+        <Button variant="outline" className="mt-4" onClick={() => navigate('/dashboard')}>
           Back to Dashboard
         </Button>
       </div>
@@ -195,7 +197,11 @@ export default function PlayerProfileEdit() {
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => navigate("/dashboard")} data-testid="button-back-dashboard">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/dashboard')}
+          data-testid="button-back-dashboard"
+        >
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
         </Button>
       </div>
@@ -217,14 +223,14 @@ export default function PlayerProfileEdit() {
           <div className="flex items-center gap-6">
             <div className="relative group">
               {playerAthlete.photoUrl ? (
-                <img 
-                  src={playerAthlete.photoUrl} 
+                <img
+                  src={playerAthlete.photoUrl}
                   alt={`${playerAthlete.firstName} ${playerAthlete.lastName}`}
                   className="h-24 w-24 rounded-2xl object-cover border-2 border-purple-500/30"
                   data-testid="img-profile-photo"
                 />
               ) : (
-                <div 
+                <div
                   className="h-24 w-24 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-2 border-purple-500/30 flex items-center justify-center text-4xl font-bold text-purple-400"
                   data-testid="avatar-profile-fallback"
                 >
@@ -235,19 +241,19 @@ export default function PlayerProfileEdit() {
                 maxNumberOfFiles={1}
                 maxFileSize={5242880}
                 onGetUploadParameters={async (file) => {
-                  const response = await fetch("/api/uploads/request-url", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                  const response = await fetch('/api/uploads/request-url', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                       name: file.name,
                       size: file.size,
                       type: file.type,
-                      prefix: ".private/athlete-photos",
+                      prefix: '.private/athlete-photos',
                     }),
                   });
                   const { url, objectPath, headers } = await response.json();
                   pendingObjectPath.current = objectPath;
-                  return { url, method: "PUT" as const, headers };
+                  return { url, method: 'PUT' as const, headers };
                 }}
                 onComplete={async () => {
                   if (pendingObjectPath.current) {
@@ -318,7 +324,12 @@ export default function PlayerProfileEdit() {
                     <FormItem>
                       <FormLabel>School</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., Lincoln High School" {...field} value={field.value || ""} data-testid="input-school" />
+                        <Input
+                          placeholder="e.g., Lincoln High School"
+                          {...field}
+                          value={field.value || ''}
+                          data-testid="input-school"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -331,11 +342,11 @@ export default function PlayerProfileEdit() {
                     <FormItem>
                       <FormLabel>Graduation Year</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="number" 
-                          placeholder="e.g., 2027" 
-                          {...field} 
-                          value={field.value || ""} 
+                        <Input
+                          type="number"
+                          placeholder="e.g., 2027"
+                          {...field}
+                          value={field.value || ''}
                           data-testid="input-graduation-year"
                         />
                       </FormControl>
@@ -354,11 +365,11 @@ export default function PlayerProfileEdit() {
                     <FormItem>
                       <FormLabel>Height (inches)</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="number" 
-                          placeholder="e.g., 64" 
-                          {...field} 
-                          value={field.value || ""}
+                        <Input
+                          type="number"
+                          placeholder="e.g., 64"
+                          {...field}
+                          value={field.value || ''}
                           data-testid="input-height"
                         />
                       </FormControl>
@@ -373,11 +384,11 @@ export default function PlayerProfileEdit() {
                     <FormItem>
                       <FormLabel>Weight (lbs)</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="number" 
-                          placeholder="e.g., 125" 
-                          {...field} 
-                          value={field.value || ""}
+                        <Input
+                          type="number"
+                          placeholder="e.g., 125"
+                          {...field}
+                          value={field.value || ''}
                           data-testid="input-weight"
                         />
                       </FormControl>
@@ -393,7 +404,7 @@ export default function PlayerProfileEdit() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Primary Position</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ""}>
+                    <Select onValueChange={field.onChange} value={field.value || ''}>
                       <FormControl>
                         <SelectTrigger data-testid="select-position">
                           <SelectValue placeholder="Select position..." />
@@ -426,7 +437,7 @@ export default function PlayerProfileEdit() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Bats</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <Select onValueChange={field.onChange} value={field.value || ''}>
                         <FormControl>
                           <SelectTrigger data-testid="select-bats">
                             <SelectValue placeholder="Select..." />
@@ -448,7 +459,7 @@ export default function PlayerProfileEdit() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Throws</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <Select onValueChange={field.onChange} value={field.value || ''}>
                         <FormControl>
                           <SelectTrigger data-testid="select-throws">
                             <SelectValue placeholder="Select..." />
@@ -479,11 +490,11 @@ export default function PlayerProfileEdit() {
                   <FormItem>
                     <FormLabel>Your Phone Number</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="tel" 
-                        placeholder="(555) 123-4567" 
-                        {...field} 
-                        value={field.value || ""}
+                      <Input
+                        type="tel"
+                        placeholder="(555) 123-4567"
+                        {...field}
+                        value={field.value || ''}
                         data-testid="input-player-phone"
                       />
                     </FormControl>
@@ -501,11 +512,11 @@ export default function PlayerProfileEdit() {
                     <FormItem>
                       <FormLabel>Parent/Guardian Phone</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="tel" 
-                          placeholder="(555) 123-4567" 
-                          {...field} 
-                          value={field.value || ""}
+                        <Input
+                          type="tel"
+                          placeholder="(555) 123-4567"
+                          {...field}
+                          value={field.value || ''}
                           data-testid="input-parent-phone"
                         />
                       </FormControl>
@@ -520,11 +531,11 @@ export default function PlayerProfileEdit() {
                     <FormItem>
                       <FormLabel>Parent/Guardian Email</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="email" 
-                          placeholder="parent@example.com" 
-                          {...field} 
-                          value={field.value || ""}
+                        <Input
+                          type="email"
+                          placeholder="parent@example.com"
+                          {...field}
+                          value={field.value || ''}
                           data-testid="input-parent-email"
                         />
                       </FormControl>
@@ -548,16 +559,17 @@ export default function PlayerProfileEdit() {
                   <FormItem>
                     <FormLabel>Your Goals</FormLabel>
                     <FormControl>
-                      <Textarea 
+                      <Textarea
                         placeholder="What do you want to achieve? e.g., Improve my rise ball speed, make varsity team, get recruited by D1 school..."
                         className="min-h-[100px]"
                         {...field}
-                        value={field.value || ""}
+                        value={field.value || ''}
                         data-testid="textarea-goals"
                       />
                     </FormControl>
                     <FormDescription>
-                      Share your softball goals so your coach can create a personalized training plan
+                      Share your softball goals so your coach can create a personalized training
+                      plan
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -589,7 +601,7 @@ export default function PlayerProfileEdit() {
                                     if (checked) {
                                       field.onChange([...current, day]);
                                     } else {
-                                      field.onChange(current.filter((d) => d !== day));
+                                      field.onChange(current.filter((d: string) => d !== day));
                                     }
                                   }}
                                   data-testid={`checkbox-day-${day.toLowerCase()}`}
@@ -610,16 +622,16 @@ export default function PlayerProfileEdit() {
           </Card>
 
           <div className="flex justify-end gap-4">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => navigate("/dashboard")}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate('/dashboard')}
               data-testid="button-cancel"
             >
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={updateProfile.isPending}
               className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
               data-testid="button-save-profile"

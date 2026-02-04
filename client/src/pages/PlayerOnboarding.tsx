@@ -1,23 +1,23 @@
-import { useState, useRef, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "wouter";
-import { apiRequest } from "@/lib/queryClient";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { useToast } from "@/hooks/use-toast";
-import { 
-  Video, 
-  Upload, 
-  CheckCircle2, 
-  Clock, 
+import { useState, useRef, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
+import { apiRequest } from '@/lib/queryClient';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
+import {
+  Video,
+  Upload,
+  CheckCircle2,
+  Clock,
   Loader2,
   Lock,
   Unlock,
   Target,
   AlertCircle,
-  Timer
-} from "lucide-react";
+  Timer,
+} from 'lucide-react';
 
 interface VideoPrompt {
   number: number;
@@ -50,10 +50,34 @@ interface OnboardingData {
 }
 
 const DEFAULT_VIDEO_PROMPTS: VideoPrompt[] = [
-  { number: 1, category: "hitting", title: "Hitting", description: "Record your swing from the side", focusAreas: ["bat path", "hip rotation"] },
-  { number: 2, category: "throwing", title: "Throwing", description: "Record your throwing motion", focusAreas: ["arm slot", "follow-through"] },
-  { number: 3, category: "fielding", title: "Fielding", description: "Record yourself fielding ground balls", focusAreas: ["glove position", "footwork"] },
-  { number: 4, category: "pitching_or_catching", title: "Pitching or Catching", description: "Record your pitch or catching drill", focusAreas: ["arm circle", "release point"] },
+  {
+    number: 1,
+    category: 'hitting',
+    title: 'Hitting',
+    description: 'Record your swing from the side',
+    focusAreas: ['bat path', 'hip rotation'],
+  },
+  {
+    number: 2,
+    category: 'throwing',
+    title: 'Throwing',
+    description: 'Record your throwing motion',
+    focusAreas: ['arm slot', 'follow-through'],
+  },
+  {
+    number: 3,
+    category: 'fielding',
+    title: 'Fielding',
+    description: 'Record yourself fielding ground balls',
+    focusAreas: ['glove position', 'footwork'],
+  },
+  {
+    number: 4,
+    category: 'pitching_or_catching',
+    title: 'Pitching or Catching',
+    description: 'Record your pitch or catching drill',
+    focusAreas: ['arm circle', 'release point'],
+  },
 ];
 
 export default function PlayerOnboarding() {
@@ -65,7 +89,7 @@ export default function PlayerOnboarding() {
   const fileInputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({});
 
   const { data: onboarding, isLoading } = useQuery<OnboardingData>({
-    queryKey: ["/api/player/onboarding"],
+    queryKey: ['/api/player/onboarding'],
   });
 
   // Auto-redirect to home when onboarding is complete
@@ -73,29 +97,34 @@ export default function PlayerOnboarding() {
     if (onboarding && (onboarding.dashboardUnlocked || onboarding.baselineComplete)) {
       // Redirect to home after a brief delay to show success message
       const timer = setTimeout(() => {
-        setLocation("/");
+        setLocation('/');
       }, 1500);
       return () => clearTimeout(timer);
     }
   }, [onboarding, setLocation]);
 
   const uploadMutation = useMutation({
-    mutationFn: async (data: { videoUrl: string; videoNumber: number; videoCategory: string; durationSeconds?: number }) => {
-      return apiRequest("POST", "/api/player/baseline-video", data);
+    mutationFn: async (data: {
+      videoUrl: string;
+      videoNumber: number;
+      videoCategory: string;
+      durationSeconds?: number;
+    }) => {
+      return apiRequest('POST', '/api/player/baseline-video', data);
     },
     onSuccess: (response: any) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/onboarding"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/player/onboarding'] });
       setUploadingVideo(null);
       setUploadProgress(0);
-      
+
       if (response.baselineComplete) {
         toast({
-          title: "All Videos Uploaded!",
-          description: "Taking you to your dashboard...",
+          title: 'All Videos Uploaded!',
+          description: 'Taking you to your dashboard...',
         });
       } else {
         toast({
-          title: "Video Uploaded!",
+          title: 'Video Uploaded!',
           description: `${response.remaining} more video(s) to go.`,
         });
       }
@@ -104,19 +133,19 @@ export default function PlayerOnboarding() {
       setUploadingVideo(null);
       setUploadProgress(0);
       toast({
-        title: "Upload Failed",
-        description: error?.message || "Please try again.",
-        variant: "destructive",
+        title: 'Upload Failed',
+        description: error?.message || 'Please try again.',
+        variant: 'destructive',
       });
     },
   });
 
   const handleFileSelect = async (videoNumber: number, category: string, file: File) => {
-    if (!file.type.startsWith("video/")) {
+    if (!file.type.startsWith('video/')) {
       toast({
-        title: "Invalid File",
-        description: "Please select a video file.",
-        variant: "destructive",
+        title: 'Invalid File',
+        description: 'Please select a video file.',
+        variant: 'destructive',
       });
       return;
     }
@@ -125,9 +154,9 @@ export default function PlayerOnboarding() {
     setUploadProgress(10);
 
     try {
-      const video = document.createElement("video");
-      video.preload = "metadata";
-      
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+
       const duration = await new Promise<number>((resolve) => {
         video.onloadedmetadata = () => {
           window.URL.revokeObjectURL(video.src);
@@ -138,9 +167,9 @@ export default function PlayerOnboarding() {
 
       if (duration > 20) {
         toast({
-          title: "Video Too Long",
-          description: "Please upload a video that is no longer than 20 seconds.",
-          variant: "destructive",
+          title: 'Video Too Long',
+          description: 'Please upload a video that is no longer than 20 seconds.',
+          variant: 'destructive',
         });
         setUploadingVideo(null);
         setUploadProgress(0);
@@ -149,9 +178,9 @@ export default function PlayerOnboarding() {
 
       setUploadProgress(30);
 
-      const urlResponse = await fetch("/api/uploads/request-url", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const urlResponse = await fetch('/api/uploads/request-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: `baseline-${category}-${Date.now()}.${file.name.split('.').pop()}`,
           size: file.size,
@@ -160,16 +189,16 @@ export default function PlayerOnboarding() {
       });
 
       if (!urlResponse.ok) {
-        throw new Error("Failed to get upload URL");
+        throw new Error('Failed to get upload URL');
       }
 
       const { uploadURL, objectPath } = await urlResponse.json();
       setUploadProgress(50);
 
       await fetch(uploadURL, {
-        method: "PUT",
+        method: 'PUT',
         body: file,
-        headers: { "Content-Type": file.type },
+        headers: { 'Content-Type': file.type },
       });
 
       setUploadProgress(80);
@@ -180,12 +209,11 @@ export default function PlayerOnboarding() {
         videoCategory: category,
         durationSeconds: Math.round(duration),
       });
-
     } catch (error: any) {
       toast({
-        title: "Upload Failed",
-        description: error?.message || "Please try again.",
-        variant: "destructive",
+        title: 'Upload Failed',
+        description: error?.message || 'Please try again.',
+        variant: 'destructive',
       });
       setUploadingVideo(null);
       setUploadProgress(0);
@@ -201,7 +229,10 @@ export default function PlayerOnboarding() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center" data-testid="loading-onboarding">
+      <div
+        className="min-h-screen bg-[#050505] flex items-center justify-center"
+        data-testid="loading-onboarding"
+      >
         <Loader2 className="w-12 h-12 animate-spin text-purple-500" />
       </div>
     );
@@ -219,7 +250,7 @@ export default function PlayerOnboarding() {
             Your coach has reviewed your baseline videos. You're all set to start training!
           </p>
           <Button
-            onClick={() => setLocation("/dashboard")}
+            onClick={() => setLocation('/dashboard')}
             className="bg-gradient-to-r from-purple-600 to-pink-600"
             data-testid="button-go-dashboard"
           >
@@ -232,30 +263,31 @@ export default function PlayerOnboarding() {
 
   const videoPrompts = onboarding?.videoPrompts || DEFAULT_VIDEO_PROMPTS;
   const uploadedVideos = onboarding?.baselineVideos || [];
-  const uploadedCategories = uploadedVideos.map(v => v.videoCategory);
-  const progress = ((onboarding?.baselineVideoCount || 0) / (onboarding?.baselineVideosRequired || 4)) * 100;
+  const uploadedCategories = uploadedVideos.map((v) => v.videoCategory);
+  const progress =
+    ((onboarding?.baselineVideoCount || 0) / (onboarding?.baselineVideosRequired || 4)) * 100;
 
   const getOnboardingTitle = () => {
     switch (onboarding?.onboardingType) {
-      case "pitching_instructor":
-        return "Pitching Baseline Assessment";
-      case "catching_instructor":
-        return "Catching Baseline Assessment";
-      case "team_coach":
+      case 'pitching_instructor':
+        return 'Pitching Baseline Assessment';
+      case 'catching_instructor':
+        return 'Catching Baseline Assessment';
+      case 'team_coach':
       default:
-        return "Athlete Onboarding Checklist";
+        return 'Athlete Onboarding Checklist';
     }
   };
 
   const getOnboardingSubtitle = () => {
     switch (onboarding?.onboardingType) {
-      case "pitching_instructor":
-        return "Upload 4 videos of your pitches. Your instructor will analyze these to create your personalized training plan.";
-      case "catching_instructor":
-        return "Upload 4 videos of your catching skills. Your instructor will analyze these to create your personalized training plan.";
-      case "team_coach":
+      case 'pitching_instructor':
+        return 'Upload 4 videos of your pitches. Your instructor will analyze these to create your personalized training plan.';
+      case 'catching_instructor':
+        return 'Upload 4 videos of your catching skills. Your instructor will analyze these to create your personalized training plan.';
+      case 'team_coach':
       default:
-        return "Upload 4 videos showing your core skills. Your coach will analyze these to build your training roadmap.";
+        return 'Upload 4 videos showing your core skills. Your coach will analyze these to build your training roadmap.';
     }
   };
 
@@ -289,19 +321,21 @@ export default function PlayerOnboarding() {
           <div className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center mx-auto mb-4">
             <Target className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent" data-testid="text-onboarding-title">
+          <h1
+            className="text-3xl font-bold mb-2 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent"
+            data-testid="text-onboarding-title"
+          >
             {getOnboardingTitle()}
           </h1>
-          <p className="text-gray-400 max-w-md mx-auto">
-            {getOnboardingSubtitle()}
-          </p>
+          <p className="text-gray-400 max-w-md mx-auto">{getOnboardingSubtitle()}</p>
         </div>
 
         <Card className="bg-[#0a0a0a] border-purple-500/30 p-6 mb-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-gray-400">Progress</span>
             <span className="text-purple-400 font-semibold" data-testid="text-progress">
-              {onboarding?.baselineVideoCount || 0} / {onboarding?.baselineVideosRequired || 4} videos
+              {onboarding?.baselineVideoCount || 0} / {onboarding?.baselineVideosRequired || 4}{' '}
+              videos
             </span>
           </div>
           <Progress value={progress} className="h-2" />
@@ -311,7 +345,9 @@ export default function PlayerOnboarding() {
           <Timer className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
           <div>
             <p className="text-amber-400 font-medium">Maximum 20 seconds per video</p>
-            <p className="text-gray-400 text-sm">Show 3-5 repetitions of your motion in each video for accurate analysis.</p>
+            <p className="text-gray-400 text-sm">
+              Show 3-5 repetitions of your motion in each video for accurate analysis.
+            </p>
           </div>
         </div>
 
@@ -319,25 +355,25 @@ export default function PlayerOnboarding() {
           {videoPrompts.map((prompt) => {
             const isUploaded = uploadedCategories.includes(prompt.category);
             const isUploading = uploadingVideo === prompt.number;
-            const uploadedVideo = uploadedVideos.find(v => v.videoCategory === prompt.category);
-            
+            const uploadedVideo = uploadedVideos.find((v) => v.videoCategory === prompt.category);
+
             return (
-              <Card 
-                key={prompt.number} 
+              <Card
+                key={prompt.number}
                 className={`p-6 transition-all ${
-                  isUploaded 
-                    ? "bg-green-900/20 border-green-500/30" 
-                    : "bg-[#0a0a0a] border-gray-800"
+                  isUploaded
+                    ? 'bg-green-900/20 border-green-500/30'
+                    : 'bg-[#0a0a0a] border-gray-800'
                 }`}
                 data-testid={`card-video-${prompt.number}`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-4 flex-1">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      isUploaded 
-                        ? "bg-green-600" 
-                        : "bg-gray-800"
-                    }`}>
+                    <div
+                      className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        isUploaded ? 'bg-green-600' : 'bg-gray-800'
+                      }`}
+                    >
                       {isUploaded ? (
                         <CheckCircle2 className="w-6 h-6 text-white" />
                       ) : (
@@ -345,13 +381,19 @@ export default function PlayerOnboarding() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-white" data-testid={`text-video-title-${prompt.number}`}>
+                      <h3
+                        className="font-semibold text-white"
+                        data-testid={`text-video-title-${prompt.number}`}
+                      >
                         Upload your {prompt.title} video
                       </h3>
                       <p className="text-sm text-gray-400 mt-1">{prompt.description}</p>
                       <div className="flex flex-wrap gap-1 mt-2">
                         {prompt.focusAreas.map((area, idx) => (
-                          <span key={idx} className="text-xs bg-purple-900/30 text-purple-300 px-2 py-0.5 rounded">
+                          <span
+                            key={idx}
+                            className="text-xs bg-purple-900/30 text-purple-300 px-2 py-0.5 rounded"
+                          >
                             {area}
                           </span>
                         ))}
@@ -363,13 +405,15 @@ export default function PlayerOnboarding() {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex-shrink-0">
                     <input
                       type="file"
                       accept="video/*"
                       className="hidden"
-                      ref={(el) => { fileInputRefs.current[prompt.number] = el; }}
+                      ref={(el) => {
+                        fileInputRefs.current[prompt.number] = el;
+                      }}
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
@@ -378,7 +422,7 @@ export default function PlayerOnboarding() {
                       }}
                       data-testid={`input-file-${prompt.number}`}
                     />
-                    
+
                     {!isUploaded && (
                       <Button
                         onClick={() => triggerFileInput(prompt.number)}
@@ -399,16 +443,19 @@ export default function PlayerOnboarding() {
                         )}
                       </Button>
                     )}
-                    
+
                     {isUploaded && (
-                      <span className="text-green-400 text-sm flex items-center gap-1" data-testid={`text-uploaded-${prompt.number}`}>
+                      <span
+                        className="text-green-400 text-sm flex items-center gap-1"
+                        data-testid={`text-uploaded-${prompt.number}`}
+                      >
                         <CheckCircle2 className="w-4 h-4" />
                         Uploaded
                       </span>
                     )}
                   </div>
                 </div>
-                
+
                 {isUploading && uploadProgress > 0 && (
                   <div className="mt-4">
                     <Progress value={uploadProgress} className="h-1" />

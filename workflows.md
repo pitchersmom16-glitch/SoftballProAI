@@ -1,4 +1,5 @@
 #
+
 **Document Version:** 1.1 - Parent-First Flow Update  
 **Last Updated:** January 30, 2026  
 **Purpose:** Complete technical documentation of all user flows, database requirements, API endpoints, and validation rules
@@ -6,21 +7,41 @@
 ---
 
 ## 🔁 Live Updates (canonical change log)
-Keep this section current. Whenever code, routes, or user flows are changed, add a short entry with: **date**, **one-line summary**, **commit hash**, and **author**. This is the single source of truth for other agents (e.g., Claude) and collaborators.
-- 2026-01-30 — fix: update pricing and role selection to correct 3-mode spec - Player $14.99, Private Instructor (Pitching/Catching/Hitting) $49.99, Team Coach $99 (commit: `4d81a37`) — author: pitchersmom16-glitch
+- 2026-02-04 — Add test script to package.json (commit: `a7fc61c`) — author: pitchersmom16-glitch
 
- 2026-01-30 — fix(pricing): correct pricing tiers to match original 3-mode spec - Player $14.99, Private Instructor $49.99, Team Coach $99 (commit: pending) — author: GitHub Copilot
+ 2026-02-04 — Fix all TypeScript compilation errors - 0 errors remaining (commit: `7653119`) — author: copilot-swe-agent[bot]
+
+ 2026-02-04 — Initial progress report with plan for fixing TypeScript errors (commit: `5619c19`) — author: copilot-swe-agent[bot]
+
+ 2026-02-04 — fix: regenerate package-lock.json to resolve bufferutil version mismatch (commit: `77ddd75`) — author: pitchersmom16-glitch
+
+ 2026-02-04 — Fix ESLint v9 flat config (commit: `d37c5e4`) — author: pitchersmom16-glitch
+
+ 2026-02-04 — Merge formatting fixes from main (commit: `f37b36a`) — author: pitchersmom16-glitch
+
+
+- 2026-02-04 — Fix Prettier formatting issues (commit: `b852e9f`) — author: pitchersmom16-glitch
+
+- 2026-02-04 — Fix code formatting with Prettier (commit: `2ec048e`) — author: pitchersmom16-glitch
+
+Keep this section current. Whenever code, routes, or user flows are changed, add a short entry with: **date**, **one-line summary**, **commit hash**, and **author**. This is the single source of truth for other agents (e.g., Claude) and collaborators.
+
+- 2026-02-04 — Save work: changes from 2026-02-04 (commit: `33fd8b8`) — author: pitchersmom16-glitch
+
+2026-01-30 — fix: update pricing and role selection to correct 3-mode spec - Player $14.99, Private Instructor (Pitching/Catching/Hitting) $49.99, Team Coach $99 (commit: `4d81a37`) — author: pitchersmom16-glitch
+
+2026-01-30 — fix(pricing): correct pricing tiers to match original 3-mode spec - Player $14.99, Private Instructor $49.99, Team Coach $99 (commit: pending) — author: GitHub Copilot
+
 - 2026-01-30 — feat(flow): implement industry standard signup flow - Landing → Pricing → Auth → Onboarding (commit: pending) — author: GitHub Copilot
 - 2026-01-30 — fix(brain): normalize object keys and fix syntax typos in knowledge bases (commit: `5ccb7f8`) — author: pitchersmom16-glitch
 
- 2026-01-30 — chore(workflows): improve live-update check robustness and branch handling (commit: `df853d2`) — author: pitchersmom16-glitch
+2026-01-30 — chore(workflows): improve live-update check robustness and branch handling (commit: `df853d2`) — author: pitchersmom16-glitch
 
- 2026-01-30 — chore(security): enforce SESSION_SECRET in production; gate dev auth; add Live Update check and CI; ignore dist-temp (commit: `c5b5a0c`) — author: pitchersmom16-glitch
+2026-01-30 — chore(security): enforce SESSION_SECRET in production; gate dev auth; add Live Update check and CI; ignore dist-temp (commit: `c5b5a0c`) — author: pitchersmom16-glitch
 
- 2026-01-30 — chore: remove tracked build artifacts (dist-temp); add to .gitignore (commit: `9780421`) — author: pitchersmom16-glitch
+2026-01-30 — chore: remove tracked build artifacts (dist-temp); add to .gitignore (commit: `9780421`) — author: pitchersmom16-glitch
 
- 2026-01-30 — chore(workflows): remove duplicate Claude workflows.md; add pointer README and update Claude rules (commit: `d1b09b4`) — author: pitchersmom16-glitch
-
+2026-01-30 — chore(workflows): remove duplicate Claude workflows.md; add pointer README and update Claude rules (commit: `d1b09b4`) — author: pitchersmom16-glitch
 
 - 2026-01-30 — chore: add `setup-githooks` and `sync-workflows` npm scripts (commit: `55aa866`) — author: pitchersmom16-glitch
 - 2026-01-30 — docs(workflows): sync Live Updates entries for auto-sync changes (commit: `655e7dc`) — author: pitchersmom16-glitch
@@ -29,8 +50,9 @@ Keep this section current. Whenever code, routes, or user flows are changed, add
 - 2026-01-30 — Removed `READY_TO_TEST.md` and `FIXES_FOR_TOMORROW.md` (commit: `7dd0c97`) — Commit message: "chore: remove READY_TO_TEST.md and FIXES_FOR_TOMORROW.md — workflows.md is canonical" — author: GitHub Copilot
 
 **How to add an entry:**
-1. Edit this file and prepend the latest entry to this list.  
-2. Include a short summary (1 sentence), the commit hash, and a link to the PR or commit when possible.  
+
+1. Edit this file and prepend the latest entry to this list.
+2. Include a short summary (1 sentence), the commit hash, and a link to the PR or commit when possible.
 3. Commit with message: `docs(workflows): <short summary>` and push to `main`.
 
 ---
@@ -40,7 +62,7 @@ Keep this section current. Whenever code, routes, or user flows are changed, add
 ### Complete User Journey (Updated Jan 30, 2026)
 
 ```
-Landing Page (/) 
+Landing Page (/)
   ↓ Click "Get Started"
 Pricing Page (/pricing) - PUBLIC, no auth required
   ↓ Select a plan:
@@ -62,6 +84,7 @@ Player Onboarding Flow:
 ```
 
 **Key Routes:**
+
 - `/` - Landing page (public)
 - `/pricing` - Pricing tiers (public)
 - `/auth` - Redirects to Replit Auth
@@ -77,24 +100,30 @@ Player Onboarding Flow:
 **Mission:** Virtual Pro Coach for athletes ages 8-16 to learn elite fastpitch mechanics without expensive coaching.
 
 ### Mode A: Player ($14.99/mo)
+
 **Focus:** Personal growth, gamification, and safety  
 **Features:**
+
 - Daily Vibe Check-in: "How are you feeling?" (Soreness tracker)
 - Injury Prevention: If "My arm hurts" → BLOCK pitching drills, show Recovery/Stretching videos
 - Championship Mindset Feed: Daily Kobe Bryant/Mamba Mentality quotes or College Softball highlights
 - 'Coach Me' Button: One-click video upload for instant mechanic feedback
 
 ### Mode B: Team Coach ($99/mo)
+
 **Focus:** Managing a roster of 12-15 players  
 **Features:**
+
 - Practice Architect: Auto-generate practice plans (e.g., '2-Hour Defensive Focus')
 - Split team into stations: Infield, Outfield, Catcher
 - Roster Health Dashboard: Shows which players are Red/Injured or Green/Ready
 - Based on player check-in inputs
 
 ### Mode C: Private Instructor ($49.99/mo)
+
 **Focus:** Pitching, Catching, or Hitting Coaches - Remote training for specific students  
 **Features:**
+
 - 'Stable' Management: Manage up to 25 students
 - Assign Homework Drills: "Do 20 K-Drills" to specific player's app
 - Split-Screen Analysis: Compare student's video side-by-side with Pro Model
@@ -103,150 +132,166 @@ Player Onboarding Flow:
 ---
 
 ## Table of Contents
+
 1. [Player Mode Workflow - PARENT-FIRST](#player-mode-workflow)
 2. [Private Instructor Workflow](#private-i)
- Role Select → Parent Account Setup → Position Select → Video Upload → AI Analysis → Dashboard
- ```
+   Role Select → Parent Account Setup → Position Select → Video Upload → AI Analysis → Dashboard
 
- ### Step 1: Role Selection
- - **Route**: After clicking "Get Started"
- - **Action**: User selects "Player" card
- - **Backend**: `POST /api/user/role` sets `role='player'`
+````
 
- ### Step 2: Parent Account Setup (UPDATED - Parent-First Flow)
- - **Route**: `/profile/setup`
- - **Component**: `ProfileSetup.tsx` (**COMPLETED**)
+### Step 1: Role Selection
+- **Route**: After clicking "Get Started"
+- **Action**: User selects "Player" card
+- **Backend**: `POST /api/user/role` sets `role='player'`
 
- **Industry Research Results:**
- - ✅ **8/8 youth sports apps use parent-first flow**
- - ✅ Parents create accounts, manage athlete profiles
- - ✅ Parents handle payments (not athletes)
- - ✅ Athletes are sub-profiles under parent accounts
+### Step 2: Parent Account Setup (UPDATED - Parent-First Flow)
+- **Route**: `/profile/setup`
+- **Component**: `ProfileSetup.tsx` (**COMPLETED**)
 
- **Required Fields:**
- - **Parent Information:** First Name, Last Name, Email, Phone
- - **Athlete Information:** First Name, Last Name, DOB, Grade, School
- - **Terms:** Accept Terms, Accept 14-day Trial
- - **Payment:** Stripe - 14-day free trial, then $14.99/mo
+**Industry Research Results:**
+- ✅ **8/8 youth sports apps use parent-first flow**
+- ✅ Parents create accounts, manage athlete profiles
+- ✅ Parents handle payments (not athletes)
+- ✅ Athletes are sub-profiles under parent accounts
 
- **Database Updates:**
- ```sql
- -- users table (parent account)
- firstName, lastName, email (updated)
+**Required Fields:**
+- **Parent Information:** First Name, Last Name, Email, Phone
+- **Athlete Information:** First Name, Last Name, DOB, Grade, School
+- **Terms:** Accept Terms, Accept 14-day Trial
+- **Payment:** Stripe - 14-day free trial, then $14.99/mo
 
- -- athletes table (athlete profile linked to parent)
- userId (parent), firstName, lastName, dob, grade, school, parentEmail, parentPhone
- ```
+**Database Updates:**
+```sql
+-- users table (parent account)
+firstName, lastName, email (updated)
 
- **Validation Rules:**
- - Parent email must be valid format
- - Athlete age: 5-25 years (reasonable range for youth sports)
- - Grade: 3rd-12th + College
- - All required fields must be filled
+-- athletes table (athlete profile linked to parent)
+userId (parent), firstName, lastName, dob, grade, school, parentEmail, parentPhone
+````
 
- ### Step 3: Position Selection  
- - **Route**: `/position/select`
- - **Component**: `PositionSelection.tsx` (**TO BE CREATED**)
+**Validation Rules:**
 
- **Options:**
- - Primary Position: Pitcher | Catcher | Infield | Outfield (**required**)
- - Secondary Position: Same + None (optional)
+- Parent email must be valid format
+- Athlete age: 5-25 years (reasonable range for youth sports)
+- Grade: 3rd-12th + College
+- All required fields must be filled
 
- **Database Updates:**
- ```
- primaryPosition, secondaryPosition, positionSelectedAt
- ```
+### Step 3: Position Selection
 
- ### Step 4: Baseline Videos (Position-Specific)
- - **Route**: `/player/onboarding`
- - **Component**: `PlayerOnboarding.tsx` (EXISTS)
+- **Route**: `/position/select`
+- **Component**: `PositionSelection.tsx` (**TO BE CREATED**)
 
- **PITCHER (4 videos):**
- 1. Fastball - Side View (3-5 reps, show leg drive, hip rotation, release)
- 2. Fastball - Rear View (3-5 reps, show stride alignment, glove side)
- 3. Change-up (3-5 reps, show arm speed consistency)
- 4. Movement Pitch - Curve/Rise/Drop (best pitch, spin mechanics)
+**Options:**
 
- **CATCHER (4 videos):**
- 1. Receiving/Framing (5-10 pitches from front, stay low)
- 2. Blocking (5-10 balls in dirt from front)
- 3. Pop Time/Throw-downs (throw to 2nd, show transfer speed)
- 4. Footwork (side view of catch-to-throw transition)
+- Primary Position: Pitcher | Catcher | Infield | Outfield (**required**)
+- Secondary Position: Same + None (optional)
 
- **INFIELD (4 videos):**
- 1. Fielding Ground Balls - Front (5-10 balls hit at you)
- 2. Fielding Backhand/Forehand (balls to left and right)
- 3. Throwing - Side View (after fielding, full arm action)
- 4. Slow Rollers (charging bunts/choppers, quick release)
+**Database Updates:**
 
- **OUTFIELD (4 videos):**
- 1. Fly Balls - Front View (5-10 reps, tracking)
- 2. Throwing to Bases (to 3rd/home, full arm extension)
- 3. Fielding Ground Balls (quick throws to bases)
- 4. First Step Reaction (balls over head or to sides)
+```
+primaryPosition, secondaryPosition, positionSelectedAt
+```
 
- **Database Updates:**
- ```
- baselineVideos table: 4 video URLs + metadata
- baselineComplete = FALSE (until coach reviews)
- ```
+### Step 4: Baseline Videos (Position-Specific)
 
- ### Step 5: AI Analysis
- - **Trigger**: After 4 videos uploaded
- - **Process**: MediaPipe biomechanics analysis
- - **Output**: 5 SMART goals based on mechanics
- - **Duration**: ~15-30 seconds
+- **Route**: `/player/onboarding`
+- **Component**: `PlayerOnboarding.tsx` (EXISTS)
 
- ### Step 6: Dashboard Unlock
- - **Condition**: Coach reviews baseline OR auto-approve after 24hrs
- - **Action**: `dashboardUnlocked = TRUE`
- - **Features**: Goals, Drills, Progress, Daily Check-ins
+**PITCHER (4 videos):**
 
- ---
+1.  Fastball - Side View (3-5 reps, show leg drive, hip rotation, release)
+2.  Fastball - Rear View (3-5 reps, show stride alignment, glove side)
+3.  Change-up (3-5 reps, show arm speed consistency)
+4.  Movement Pitch - Curve/Rise/Drop (best pitch, spin mechanics)
 
- ## OnboardingGate Logic (UPDATED - Parent-First Flow)
+**CATCHER (4 videos):**
 
- **Current Implementation:**
- ```javascript
- // Check if athlete profile exists for current user (parent)
- const { data: athlete } = useQuery(["/api/player/athlete"]);
+1.  Receiving/Framing (5-10 pitches from front, stay low)
+2.  Blocking (5-10 balls in dirt from front)
+3.  Pop Time/Throw-downs (throw to 2nd, show transfer speed)
+4.  Footwork (side view of catch-to-throw transition)
 
- // Check onboarding status
- const { data: onboarding } = useQuery(["/api/player/onboarding"]);
+**INFIELD (4 videos):**
 
- if (!athlete) {
-   // No athlete profile found - redirect to profile setup
-   redirect("/profile/setup");
-   return;
- }
+1.  Fielding Ground Balls - Front (5-10 balls hit at you)
+2.  Fielding Backhand/Forehand (balls to left and right)
+3.  Throwing - Side View (after fielding, full arm action)
+4.  Slow Rollers (charging bunts/choppers, quick release)
 
- if (!athlete.primaryPosition) {
-   // Athlete exists but no position selected - redirect to position selection
-   redirect("/position/select");
-   return;
- }
+**OUTFIELD (4 videos):**
 
- if (!onboarding?.dashboardUnlocked) {
-   // Position selected but onboarding not complete - redirect to video upload
-   redirect("/player/onboarding");
-   return;
- }
+1.  Fly Balls - Front View (5-10 reps, tracking)
+2.  Throwing to Bases (to 3rd/home, full arm extension)
+3.  Fielding Ground Balls (quick throws to bases)
+4.  First Step Reaction (balls over head or to sides)
 
- // All checks passed - show dashboard
- ```
+**Database Updates:**
 
- **Database Relationships:**
- ```sql
- -- Parent user account (from Replit Auth)
- users.id = parent_user_id
+```
+baselineVideos table: 4 video URLs + metadata
+baselineComplete = FALSE (until coach reviews)
+```
 
- -- Athlete profile linked to parent
- athletes.userId = parent_user_id
- athletes.id = athlete_id
+### Step 5: AI Analysis
 
- -- Onboarding status for athlete
- playerOnboarding.userId = parent_user_id
- ```
+- **Trigger**: After 4 videos uploaded
+- **Process**: MediaPipe biomechanics analysis
+- **Output**: 5 SMART goals based on mechanics
+- **Duration**: ~15-30 seconds
+
+### Step 6: Dashboard Unlock
+
+- **Condition**: Coach reviews baseline OR auto-approve after 24hrs
+- **Action**: `dashboardUnlocked = TRUE`
+- **Features**: Goals, Drills, Progress, Daily Check-ins
+
+---
+
+## OnboardingGate Logic (UPDATED - Parent-First Flow)
+
+**Current Implementation:**
+
+```javascript
+// Check if athlete profile exists for current user (parent)
+const { data: athlete } = useQuery(['/api/player/athlete']);
+
+// Check onboarding status
+const { data: onboarding } = useQuery(['/api/player/onboarding']);
+
+if (!athlete) {
+  // No athlete profile found - redirect to profile setup
+  redirect('/profile/setup');
+  return;
+}
+
+if (!athlete.primaryPosition) {
+  // Athlete exists but no position selected - redirect to position selection
+  redirect('/position/select');
+  return;
+}
+
+if (!onboarding?.dashboardUnlocked) {
+  // Position selected but onboarding not complete - redirect to video upload
+  redirect('/player/onboarding');
+  return;
+}
+
+// All checks passed - show dashboard
+```
+
+**Database Relationships:**
+
+```sql
+-- Parent user account (from Replit Auth)
+users.id = parent_user_id
+
+-- Athlete profile linked to parent
+athletes.userId = parent_user_id
+athletes.id = athlete_id
+
+-- Onboarding status for athlete
+playerOnboarding.userId = parent_user_id
+```
 
              ---
 
@@ -496,4 +541,3 @@ Player Onboarding Flow:
              ---
 
              **DOCUMENTATION COMPLETE! Ready to start coding.**
-

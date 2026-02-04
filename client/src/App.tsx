@@ -1,38 +1,38 @@
-import { Switch, Route, Redirect } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { Layout } from "@/components/Layout";
+import { Switch, Route, Redirect } from 'wouter';
+import { queryClient } from './lib/queryClient';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from '@/components/ui/toaster';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { Layout } from '@/components/Layout';
 
-import Landing from "@/pages/Landing";
-import Dashboard from "@/pages/Dashboard";
-import Athletes from "@/pages/Athletes";
-import AthleteDetail from "@/pages/AthleteDetail";
-import Teams from "@/pages/Teams";
-import Assessments from "@/pages/Assessments";
-import AssessmentDetail from "@/pages/AssessmentDetail";
-import Drills from "@/pages/Drills";
-import TrainBrain from "@/pages/TrainBrain";
-import AdminUpload from "@/pages/AdminUpload";
-import RoleSelection from "@/pages/RoleSelection";
-import PlayerDashboard from "@/pages/PlayerDashboard";
-import TeamCoachDashboard from "@/pages/TeamCoachDashboard";
-import PitchingCoachDashboard from "@/pages/PitchingCoachDashboard";
-import SpecialistRoster from "@/pages/SpecialistRoster";
-import Register from "@/pages/Register";
-import PlayerOnboarding from "@/pages/PlayerOnboarding";
-import PlayerProfileEdit from "@/pages/PlayerProfileEdit";
-import BiometricOnboarding from "@/pages/BiometricOnboarding";
-import StatsImport from "@/pages/StatsImport";
-import PublicProfile from "@/pages/PublicProfile";
-import Pricing from "@/pages/Pricing";
-import PlayerGoals from "@/pages/PlayerGoals";
-import ProfileSetup from "@/pages/ProfileSetup";
-import PositionSelection from "@/pages/PositionSelection";
-import { OnboardingGate } from "@/components/OnboardingGate";
+import Landing from '@/pages/Landing';
+import Dashboard from '@/pages/Dashboard';
+import Athletes from '@/pages/Athletes';
+import AthleteDetail from '@/pages/AthleteDetail';
+import Teams from '@/pages/Teams';
+import Assessments from '@/pages/Assessments';
+import AssessmentDetail from '@/pages/AssessmentDetail';
+import Drills from '@/pages/Drills';
+import TrainBrain from '@/pages/TrainBrain';
+import AdminUpload from '@/pages/AdminUpload';
+import RoleSelection from '@/pages/RoleSelection';
+import PlayerDashboard from '@/pages/PlayerDashboard';
+import TeamCoachDashboard from '@/pages/TeamCoachDashboard';
+import PitchingCoachDashboard from '@/pages/PitchingCoachDashboard';
+import SpecialistRoster from '@/pages/SpecialistRoster';
+import Register from '@/pages/Register';
+import PlayerOnboarding from '@/pages/PlayerOnboarding';
+import PlayerProfileEdit from '@/pages/PlayerProfileEdit';
+import BiometricOnboarding from '@/pages/BiometricOnboarding';
+import StatsImport from '@/pages/StatsImport';
+import PublicProfile from '@/pages/PublicProfile';
+import Pricing from '@/pages/Pricing';
+import PlayerGoals from '@/pages/PlayerGoals';
+import ProfileSetup from '@/pages/ProfileSetup';
+import PositionSelection from '@/pages/PositionSelection';
+import { OnboardingGate } from '@/components/OnboardingGate';
 
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from '@/hooks/use-auth';
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -52,7 +52,7 @@ function Router() {
           <Route path="/profile/:id" component={PublicProfile} />
           <Route path="/auth">
             {() => {
-              window.location.href = "/api/login";
+              window.location.href = '/api/login';
               return null;
             }}
           </Route>
@@ -84,12 +84,13 @@ function Router() {
   }
 
   // Helper: Check if user is any type of coach
-  const isCoach = user.role === "team_coach" || user.role === "pitching_coach" || user.role?.includes("coach");
+  const isCoach =
+    user.role === 'team_coach' || user.role === 'pitching_coach' || user.role?.includes('coach');
 
   // ============================================
   // PARENT MODE ROUTES
   // ============================================
-  if (user.role === "parent") {
+  if (user.role === 'parent') {
     return (
       <Layout>
         <Switch>
@@ -97,7 +98,7 @@ function Router() {
           <Route path="/profile/setup" component={ProfileSetup} />
           <Route path="/position/select" component={PositionSelection} />
           <Route path="/register" component={Register} />
-          
+
           {/* Parent dashboard - athlete management */}
           <Route path="/" component={Athletes} />
           <Route path="/dashboard" component={Athletes} />
@@ -107,7 +108,7 @@ function Router() {
           <Route path="/assessments/:id" component={AssessmentDetail} />
           <Route path="/drills" component={Drills} />
           <Route path="/profile/:id" component={PublicProfile} />
-          
+
           {/* Safety Net: Redirect all unknown routes to athlete management */}
           <Route path="*">
             <Redirect to="/athletes" />
@@ -120,41 +121,57 @@ function Router() {
   // ============================================
   // PLAYER MODE ROUTES
   // ============================================
-  if (user.role === "player") {
+  if (user.role === 'player') {
     return (
       <Layout>
         <Switch>
           {/* Landing page is always accessible */}
           <Route path="/" component={Landing} />
-          
+
           {/* Onboarding routes are NOT gated - they're the gate destinations */}
           <Route path="/profile/setup" component={ProfileSetup} />
           <Route path="/position/select" component={PositionSelection} />
           <Route path="/player/onboarding" component={PlayerOnboarding} />
           <Route path="/register" component={Register} />
-          
+
           {/* All other player routes require onboarding to be complete */}
           <Route path="/dashboard">
-            <OnboardingGate><PlayerDashboard /></OnboardingGate>
+            <OnboardingGate>
+              <PlayerDashboard />
+            </OnboardingGate>
           </Route>
           <Route path="/assessments">
-            <OnboardingGate><Assessments /></OnboardingGate>
+            <OnboardingGate>
+              <Assessments />
+            </OnboardingGate>
           </Route>
           <Route path="/assessments/:id">
-            {(params) => <OnboardingGate><AssessmentDetail /></OnboardingGate>}
+            {(params) => (
+              <OnboardingGate>
+                <AssessmentDetail />
+              </OnboardingGate>
+            )}
           </Route>
           <Route path="/drills">
-            <OnboardingGate><Drills /></OnboardingGate>
+            <OnboardingGate>
+              <Drills />
+            </OnboardingGate>
           </Route>
           <Route path="/profile">
-            <OnboardingGate><PlayerProfileEdit /></OnboardingGate>
+            <OnboardingGate>
+              <PlayerProfileEdit />
+            </OnboardingGate>
           </Route>
           <Route path="/profile/:id" component={PublicProfile} />
           <Route path="/stats-import">
-            <OnboardingGate><StatsImport /></OnboardingGate>
+            <OnboardingGate>
+              <StatsImport />
+            </OnboardingGate>
           </Route>
           <Route path="/goals">
-            <OnboardingGate><PlayerGoals /></OnboardingGate>
+            <OnboardingGate>
+              <PlayerGoals />
+            </OnboardingGate>
           </Route>
           {/* Safety Net: Redirect all unknown routes to dashboard */}
           <Route path="*">
@@ -168,7 +185,7 @@ function Router() {
   // ============================================
   // TEAM COACH MODE ROUTES
   // ============================================
-  if (user.role === "team_coach") {
+  if (user.role === 'team_coach') {
     return (
       <Layout>
         <Switch>
@@ -194,7 +211,7 @@ function Router() {
   // ============================================
   // PITCHING/SPECIALIST COACH MODE ROUTES
   // ============================================
-  if (user.role === "pitching_coach") {
+  if (user.role === 'pitching_coach') {
     return (
       <Layout>
         <Switch>

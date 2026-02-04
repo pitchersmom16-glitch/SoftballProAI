@@ -1,17 +1,27 @@
-import { useAssessments, useCreateAssessment } from "@/hooks/use-assessments";
-import { useAthletes } from "@/hooks/use-athletes";
-import { ObjectUploader } from "@/components/ObjectUploader";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Link } from "wouter";
-import { Video, Upload, Play, Clock, CheckCircle } from "lucide-react";
-import { 
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger 
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { useAssessments, useCreateAssessment } from '@/hooks/use-assessments';
+import { useAthletes } from '@/hooks/use-athletes';
+import { ObjectUploader } from '@/components/ObjectUploader';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Link } from 'wouter';
+import { Video, Upload, Play, Clock, CheckCircle } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Assessments() {
   const { data: assessments, isLoading } = useAssessments();
@@ -19,52 +29,54 @@ export default function Assessments() {
   const createAssessment = useCreateAssessment();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedAthleteId, setSelectedAthleteId] = useState<string>("");
-  const [selectedSkill, setSelectedSkill] = useState<string>("hitting");
-  
+  const [selectedAthleteId, setSelectedAthleteId] = useState<string>('');
+  const [selectedSkill, setSelectedSkill] = useState<string>('hitting');
+
   // Handling file upload
   const handleUploadComplete = (result: any) => {
     // Uppy result structure may vary, usually result.successful[0].uploadURL or similar
     // Assuming our ObjectUploader returns the result object directly
-    
+
     // For MVP, we extract the first uploaded file's URL
     // NOTE: In a real app with ObjectUploader, we need to map the result correctly
     // Since ObjectUploader uses onComplete with a result object, we'll assume it worked
     // But we need the URL to create the assessment record.
-    
+
     // The ObjectUploader component uses Uppy. We need to pass a callback that receives the file URL.
     // However, looking at the provided ObjectUploader, it takes onComplete(result).
-    // result.successful[0].response.uploadURL is likely where it is if using XHR, 
+    // result.successful[0].response.uploadURL is likely where it is if using XHR,
     // but with presigned URLs it might be different.
-    
+
     // Let's assume for this MVP we get the file URL from result.successful[0].uploadURL
     const fileUrl = result.successful[0]?.uploadURL;
-    
+
     if (!fileUrl) {
-      toast({ title: "Upload Failed", variant: "destructive" });
+      toast({ title: 'Upload Failed', variant: 'destructive' });
       return;
     }
 
     if (!selectedAthleteId) {
-      toast({ title: "Select an athlete first", variant: "destructive" });
+      toast({ title: 'Select an athlete first', variant: 'destructive' });
       return;
     }
 
-    createAssessment.mutate({
-      athleteId: parseInt(selectedAthleteId),
-      skillType: selectedSkill,
-      videoUrl: fileUrl,
-      status: "pending",
-      date: new Date().toISOString(), // Use string format for timestamp
-    }, {
-      onSuccess: () => {
-        setIsDialogOpen(false);
-        toast({ title: "Assessment Created", description: "Analysis will start automatically." });
+    createAssessment.mutate(
+      {
+        athleteId: parseInt(selectedAthleteId),
+        skillType: selectedSkill,
+        videoUrl: fileUrl,
+        date: new Date(), // Use Date object for timestamp
       },
-      onError: (err) => {
-        toast({ title: "Error", description: err.message, variant: "destructive" });
-      }
-    });
+      {
+        onSuccess: () => {
+          setIsDialogOpen(false);
+          toast({ title: 'Assessment Created', description: 'Analysis will start automatically.' });
+        },
+        onError: (err) => {
+          toast({ title: 'Error', description: err.message, variant: 'destructive' });
+        },
+      },
+    );
   };
 
   return (
@@ -85,7 +97,7 @@ export default function Assessments() {
             <DialogHeader>
               <DialogTitle>Upload Video for Analysis</DialogTitle>
             </DialogHeader>
-            
+
             <div className="space-y-6 py-4">
               <div className="space-y-2">
                 <Label>Athlete</Label>
@@ -94,8 +106,10 @@ export default function Assessments() {
                     <SelectValue placeholder="Select Athlete" />
                   </SelectTrigger>
                   <SelectContent>
-                    {athletes?.map(a => (
-                      <SelectItem key={a.id} value={a.id.toString()}>{a.firstName} {a.lastName}</SelectItem>
+                    {athletes?.map((a) => (
+                      <SelectItem key={a.id} value={a.id.toString()}>
+                        {a.firstName} {a.lastName}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -119,9 +133,9 @@ export default function Assessments() {
                 <ObjectUploader
                   buttonClassName="w-full bg-slate-900 text-white hover:bg-slate-800"
                   onGetUploadParameters={async (file) => {
-                    const res = await fetch("/api/uploads/request-url", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
+                    const res = await fetch('/api/uploads/request-url', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
                         name: file.name,
                         size: file.size,
@@ -130,9 +144,9 @@ export default function Assessments() {
                     });
                     const { uploadURL } = await res.json();
                     return {
-                      method: "PUT",
+                      method: 'PUT',
                       url: uploadURL,
-                      headers: { "Content-Type": file.type },
+                      headers: { 'Content-Type': file.type },
                     };
                   }}
                   onComplete={handleUploadComplete}
@@ -148,8 +162,8 @@ export default function Assessments() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {assessments?.map(assessment => {
-          const athlete = athletes?.find(a => a.id === assessment.athleteId);
+        {assessments?.map((assessment) => {
+          const athlete = athletes?.find((a) => a.id === assessment.athleteId);
           return (
             <Link key={assessment.id} href={`/assessments/${assessment.id}`}>
               <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-white/10 bg-card cursor-pointer">
@@ -164,18 +178,29 @@ export default function Assessments() {
                     {new Date(assessment.date || '').toLocaleDateString()}
                   </div>
                 </div>
-                
+
                 <div className="p-5">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-lg text-white">{athlete ? `${athlete.firstName} ${athlete.lastName}` : "Unknown Athlete"}</h3>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide 
-                      ${assessment.status === 'completed' ? 'bg-green-100 text-green-700' : 
-                        assessment.status === 'analyzing' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>
+                    <h3 className="font-bold text-lg text-white">
+                      {athlete ? `${athlete.firstName} ${athlete.lastName}` : 'Unknown Athlete'}
+                    </h3>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide 
+                      ${
+                        assessment.status === 'completed'
+                          ? 'bg-green-100 text-green-700'
+                          : assessment.status === 'analyzing'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-slate-100 text-slate-600'
+                      }`}
+                    >
                       {assessment.status}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-400 capitalize mb-4">{assessment.skillType} Analysis</p>
-                  
+                  <p className="text-sm text-gray-400 capitalize mb-4">
+                    {assessment.skillType} Analysis
+                  </p>
+
                   <div className="flex items-center gap-2 text-xs text-gray-500">
                     {assessment.status === 'completed' ? (
                       <>

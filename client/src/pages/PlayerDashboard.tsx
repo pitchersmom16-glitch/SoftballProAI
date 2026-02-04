@@ -1,17 +1,17 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { 
-  Sparkles, 
-  Video, 
-  Heart, 
-  Flame, 
-  Moon, 
-  Sun, 
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import {
+  Sparkles,
+  Video,
+  Heart,
+  Flame,
+  Moon,
+  Sun,
   Zap,
   AlertTriangle,
   CheckCircle2,
@@ -21,35 +21,36 @@ import {
   Loader2,
   Dumbbell,
   Target,
-  BarChart3
-} from "lucide-react";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle 
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ObjectUploader } from "@/components/ObjectUploader";
-import { useLocation } from "wouter";
-import type { MentalEdge, PlayerCheckin } from "@shared/schema";
+  BarChart3,
+} from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { ObjectUploader } from '@/components/ObjectUploader';
+import { useLocation } from 'wouter';
+import type { MentalEdge, PlayerCheckin } from '@shared/schema';
 
 const MOOD_OPTIONS = [
-  { value: "great", label: "Feeling Great!", icon: Flame, color: "neon-green" },
-  { value: "good", label: "Good to Go", icon: Zap, color: "neon-green" },
-  { value: "okay", label: "Just Okay", icon: Sun, color: "neon-yellow" },
-  { value: "tired", label: "Pretty Tired", icon: Moon, color: "neon-yellow" },
-  { value: "struggling", label: "Struggling Today", icon: AlertTriangle, color: "neon-pink" },
+  { value: 'great', label: 'Feeling Great!', icon: Flame, color: 'neon-green' },
+  { value: 'good', label: 'Good to Go', icon: Zap, color: 'neon-green' },
+  { value: 'okay', label: 'Just Okay', icon: Sun, color: 'neon-yellow' },
+  { value: 'tired', label: 'Pretty Tired', icon: Moon, color: 'neon-yellow' },
+  { value: 'struggling', label: 'Struggling Today', icon: AlertTriangle, color: 'neon-pink' },
 ];
 
 const SORENESS_AREAS = [
-  { id: "arm", label: "Throwing Arm" },
-  { id: "shoulder", label: "Shoulder" },
-  { id: "legs", label: "Legs" },
-  { id: "back", label: "Back" },
-  { id: "core", label: "Core/Abs" },
-  { id: "none", label: "No Soreness" },
+  { id: 'arm', label: 'Throwing Arm' },
+  { id: 'shoulder', label: 'Shoulder' },
+  { id: 'legs', label: 'Legs' },
+  { id: 'back', label: 'Back' },
+  { id: 'core', label: 'Core/Abs' },
+  { id: 'none', label: 'No Soreness' },
 ];
 
 export default function PlayerDashboard() {
@@ -57,29 +58,30 @@ export default function PlayerDashboard() {
   const queryClient = useQueryClient();
   const [location, navigate] = useLocation();
   const [showCheckin, setShowCheckin] = useState(false);
-  const [mood, setMood] = useState<string>("");
+  const [mood, setMood] = useState<string>('');
   const [sorenessAreas, setSorenessAreas] = useState<string[]>([]);
   const [sorenessLevel, setSorenessLevel] = useState(1);
-  const [notes, setNotes] = useState("");
-  
+  const [notes, setNotes] = useState('');
+
   // Video upload state
   const [showUploadDialog, setShowUploadDialog] = useState(false);
-  const [selectedSkill, setSelectedSkill] = useState<string>("hitting");
+  const [selectedSkill, setSelectedSkill] = useState<string>('hitting');
   const [isUploading, setIsUploading] = useState(false);
 
   // Fetch today's check-in
   const { data: todayCheckin } = useQuery<PlayerCheckin | null>({
-    queryKey: ["/api/player/checkin/today"],
+    queryKey: ['/api/player/checkin/today'],
   });
 
   // Fetch random Championship Mindset motivation
   const { data: championshipContent } = useQuery<MentalEdge | null>({
-    queryKey: ["/api/mental-edge/random"],
+    queryKey: ['/api/mental-edge/random'],
   });
 
   // Determine if player should be blocked from pitching
-  const isArmSore = todayCheckin?.sorenessAreas?.includes("arm") || 
-                    todayCheckin?.sorenessAreas?.includes("shoulder");
+  const isArmSore =
+    todayCheckin?.sorenessAreas?.includes('arm') ||
+    todayCheckin?.sorenessAreas?.includes('shoulder');
   const highSoreness = (todayCheckin?.sorenessLevel || 0) >= 7;
   const shouldBlockPitching = isArmSore && highSoreness;
 
@@ -90,13 +92,13 @@ export default function PlayerDashboard() {
       sorenessLevel: number;
       notes: string;
     }) => {
-      return apiRequest("POST", "/api/player/checkin", data);
+      return apiRequest('POST', '/api/player/checkin', data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/player/checkin/today"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/player/checkin/today'] });
       setShowCheckin(false);
       toast({
-        title: "Check-in Complete!",
+        title: 'Check-in Complete!',
         description: "Thanks for letting me know how you're feeling today.",
       });
     },
@@ -113,19 +115,16 @@ export default function PlayerDashboard() {
 
   // Video upload mutation
   const createAssessmentMutation = useMutation({
-    mutationFn: async (data: {
-      skillType: string;
-      videoUrl: string;
-    }) => {
-      const response = await apiRequest("POST", "/api/player/assessment", data);
+    mutationFn: async (data: { skillType: string; videoUrl: string }) => {
+      const response = await apiRequest('POST', '/api/player/assessment', data);
       return response.json();
     },
     onSuccess: (assessment: { id: number }) => {
       setShowUploadDialog(false);
       setIsUploading(false);
       toast({
-        title: "Video Uploaded!",
-        description: "AI analysis is starting now...",
+        title: 'Video Uploaded!',
+        description: 'AI analysis is starting now...',
       });
       // Navigate to the assessment result page
       if (assessment?.id) {
@@ -135,9 +134,9 @@ export default function PlayerDashboard() {
     onError: (err: Error) => {
       setIsUploading(false);
       toast({
-        title: "Upload Failed",
+        title: 'Upload Failed',
         description: err.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     },
   });
@@ -145,10 +144,14 @@ export default function PlayerDashboard() {
   const handleVideoUploadComplete = (result: any) => {
     // Extract the uploaded file URL
     const fileUrl = result.successful[0]?.uploadURL;
-    
+
     if (!fileUrl) {
       setIsUploading(false);
-      toast({ title: "Upload Failed", description: "Could not get file URL", variant: "destructive" });
+      toast({
+        title: 'Upload Failed',
+        description: 'Could not get file URL',
+        variant: 'destructive',
+      });
       return;
     }
 
@@ -160,14 +163,14 @@ export default function PlayerDashboard() {
   };
 
   const toggleSorenessArea = (area: string) => {
-    if (area === "none") {
-      setSorenessAreas(["none"]);
+    if (area === 'none') {
+      setSorenessAreas(['none']);
       setSorenessLevel(1);
     } else {
-      setSorenessAreas(prev => {
-        const filtered = prev.filter(a => a !== "none");
+      setSorenessAreas((prev) => {
+        const filtered = prev.filter((a) => a !== 'none');
         if (filtered.includes(area)) {
-          return filtered.filter(a => a !== area);
+          return filtered.filter((a) => a !== area);
         }
         return [...filtered, area];
       });
@@ -227,7 +230,7 @@ export default function PlayerDashboard() {
                       className={`p-3 min-h-[44px] rounded-xl border-2 transition-all flex flex-col items-center justify-center ${
                         mood === option.value
                           ? `border-${option.color} bg-${option.color}/20`
-                          : "border-white/10 bg-white/5 hover:bg-white/10"
+                          : 'border-white/10 bg-white/5 hover:bg-white/10'
                       }`}
                     >
                       <option.icon className="h-6 w-6 mb-1" />
@@ -245,13 +248,10 @@ export default function PlayerDashboard() {
                     <Button
                       key={area.id}
                       data-testid={`soreness-${area.id}`}
-                      variant={sorenessAreas.includes(area.id) ? "default" : "outline"}
+                      variant={sorenessAreas.includes(area.id) ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => toggleSorenessArea(area.id)}
-                      className={sorenessAreas.includes(area.id) 
-                        ? "bg-neon-pink text-black" 
-                        : ""
-                      }
+                      className={sorenessAreas.includes(area.id) ? 'bg-neon-pink text-black' : ''}
                     >
                       {area.label}
                     </Button>
@@ -260,7 +260,7 @@ export default function PlayerDashboard() {
               </div>
 
               {/* Soreness Level */}
-              {sorenessAreas.length > 0 && !sorenessAreas.includes("none") && (
+              {sorenessAreas.length > 0 && !sorenessAreas.includes('none') && (
                 <div>
                   <p className="text-sm text-gray-400 mb-3">
                     Soreness Level: <span className="text-white font-bold">{sorenessLevel}/10</span>
@@ -297,24 +297,25 @@ export default function PlayerDashboard() {
                 disabled={!mood || checkinMutation.isPending}
                 className="w-full bg-neon-green hover:bg-neon-green/90 text-black font-bold"
               >
-                {checkinMutation.isPending ? "Saving..." : "Complete Check-in"}
+                {checkinMutation.isPending ? 'Saving...' : 'Complete Check-in'}
               </Button>
             </div>
           ) : (
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 {(() => {
-                  const MoodIcon = MOOD_OPTIONS.find(m => m.value === todayCheckin?.mood)?.icon || Heart;
+                  const MoodIcon =
+                    MOOD_OPTIONS.find((m) => m.value === todayCheckin?.mood)?.icon || Heart;
                   return <MoodIcon className="h-8 w-8 text-neon-green" />;
                 })()}
                 <div>
                   <p className="text-white font-medium">
-                    {MOOD_OPTIONS.find(m => m.value === todayCheckin?.mood)?.label}
+                    {MOOD_OPTIONS.find((m) => m.value === todayCheckin?.mood)?.label}
                   </p>
                   <p className="text-sm text-gray-400">
-                    {todayCheckin?.sorenessAreas?.includes("none") 
-                      ? "No soreness reported" 
-                      : `Soreness: ${todayCheckin?.sorenessAreas?.join(", ")}`}
+                    {todayCheckin?.sorenessAreas?.includes('none')
+                      ? 'No soreness reported'
+                      : `Soreness: ${todayCheckin?.sorenessAreas?.join(', ')}`}
                   </p>
                 </div>
               </div>
@@ -332,11 +333,12 @@ export default function PlayerDashboard() {
               <div>
                 <h3 className="text-lg font-bold text-white">Rest Day Recommended</h3>
                 <p className="text-gray-300 mt-1">
-                  Your arm or shoulder is sore today. Let's focus on recovery and stretching instead of pitching.
+                  Your arm or shoulder is sore today. Let's focus on recovery and stretching instead
+                  of pitching.
                 </p>
                 <Button
                   className="mt-4 bg-neon-pink/20 text-neon-pink border border-neon-pink/40 hover:bg-neon-pink/30"
-                  onClick={() => navigate("/drills")}
+                  onClick={() => navigate('/drills')}
                   data-testid="button-recovery-drills"
                 >
                   View Recovery Drills
@@ -363,9 +365,7 @@ export default function PlayerDashboard() {
                   <p className="text-lg text-white italic leading-relaxed">
                     "{championshipContent.content}"
                   </p>
-                  <p className="text-sm text-neon-yellow mt-2">
-                    — {championshipContent.source}
-                  </p>
+                  <p className="text-sm text-neon-yellow mt-2">— {championshipContent.source}</p>
                 </div>
               </div>
 
@@ -373,7 +373,7 @@ export default function PlayerDashboard() {
                 <Button
                   variant="outline"
                   className="w-full border-neon-yellow/30 text-neon-yellow hover:bg-neon-yellow/10"
-                  onClick={() => window.open(championshipContent.videoUrl!, "_blank")}
+                  onClick={() => window.open(championshipContent.videoUrl!, '_blank')}
                 >
                   <Play className="h-4 w-4 mr-2" />
                   Watch Motivational Video
@@ -419,8 +419,8 @@ export default function PlayerDashboard() {
         <Card className="p-6 bg-[#0a0a0a] border-gray-800">
           <h2 className="text-lg font-bold text-white mb-4">Quick Actions</h2>
           <div className="grid grid-cols-3 gap-3">
-            <Button 
-              onClick={() => navigate("/drills")}
+            <Button
+              onClick={() => navigate('/drills')}
               variant="outline"
               className="h-20 flex flex-col items-center justify-center gap-2"
               data-testid="button-nav-drills"
@@ -428,8 +428,8 @@ export default function PlayerDashboard() {
               <Dumbbell className="h-5 w-5 text-purple-400" />
               <span className="text-sm font-medium">Drills</span>
             </Button>
-            <Button 
-              onClick={() => navigate("/goals")}
+            <Button
+              onClick={() => navigate('/goals')}
               variant="outline"
               className="h-20 flex flex-col items-center justify-center gap-2"
               data-testid="button-nav-goals"
@@ -437,8 +437,8 @@ export default function PlayerDashboard() {
               <Target className="h-5 w-5 text-pink-400" />
               <span className="text-xs">My Goals</span>
             </Button>
-            <Button 
-              onClick={() => setLocation("/stats-import")}
+            <Button
+              onClick={() => navigate('/stats-import')}
               variant="outline"
               className="h-20 flex flex-col items-center justify-center gap-2"
               data-testid="button-nav-stats"
@@ -454,9 +454,11 @@ export default function PlayerDashboard() {
       <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle data-testid="text-upload-dialog-title" className="text-white">Upload Video for AI Analysis</DialogTitle>
+            <DialogTitle data-testid="text-upload-dialog-title" className="text-white">
+              Upload Video for AI Analysis
+            </DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-6 py-4">
             <div className="space-y-2">
               <Label className="text-gray-300">What skill are you working on?</Label>
@@ -484,9 +486,9 @@ export default function PlayerDashboard() {
                 <ObjectUploader
                   buttonClassName="w-full bg-neon-green text-black font-bold"
                   onGetUploadParameters={async (file) => {
-                    const res = await fetch("/api/uploads/request-url", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
+                    const res = await fetch('/api/uploads/request-url', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
                         name: file.name,
                         size: file.size,
@@ -495,18 +497,18 @@ export default function PlayerDashboard() {
                     });
                     const { uploadURL } = await res.json();
                     return {
-                      method: "PUT",
+                      method: 'PUT',
                       url: uploadURL,
-                      headers: { "Content-Type": file.type },
+                      headers: { 'Content-Type': file.type },
                     };
                   }}
                   onComplete={(result) => {
                     // Check if upload was successful before proceeding
                     if (!result.successful || result.successful.length === 0) {
                       toast({
-                        title: "Upload Failed",
-                        description: "No file was uploaded successfully",
-                        variant: "destructive",
+                        title: 'Upload Failed',
+                        description: 'No file was uploaded successfully',
+                        variant: 'destructive',
                       });
                       return;
                     }
@@ -514,7 +516,10 @@ export default function PlayerDashboard() {
                     handleVideoUploadComplete(result);
                   }}
                 >
-                  <div className="flex items-center justify-center gap-2" data-testid="button-select-video">
+                  <div
+                    className="flex items-center justify-center gap-2"
+                    data-testid="button-select-video"
+                  >
                     <Upload className="h-4 w-4" /> Select Video & Upload
                   </div>
                 </ObjectUploader>

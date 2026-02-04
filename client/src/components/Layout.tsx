@@ -1,14 +1,14 @@
-import { Sidebar } from "./Sidebar";
-import { NotificationBell } from "./NotificationBell";
-import { useAuth } from "@/hooks/use-auth";
-import { useLocation } from "wouter";
-import { Button } from "./ui/button";
-import { LogOut, User } from "lucide-react";
+import { Sidebar } from './Sidebar';
+import { NotificationBell } from './NotificationBell';
+import { useAuth } from '@/hooks/use-auth';
+import { useLocation } from 'wouter';
+import { Button } from './ui/button';
+import { LogOut, User } from 'lucide-react';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [location] = useLocation();
-  const isLanding = !isAuthenticated && location === "/";
+  const isLanding = !isAuthenticated && location === '/';
 
   if (isLoading) {
     return (
@@ -36,10 +36,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </div>
               <div className="flex items-center gap-2">
                 <NotificationBell />
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="sm"
-                  onClick={() => window.location.href = '/api/logout'}
+                  onClick={() => (window.location.href = '/api/logout')}
                   className="text-gray-600 hover:text-gray-900"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
@@ -49,9 +49,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </header>
         )}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {children}
-        </main>
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</main>
       </div>
     </div>
   );

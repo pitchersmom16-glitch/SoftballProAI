@@ -5,6 +5,7 @@
 Industry-standard TypeScript monorepo for AI-powered fastpitch coaching.
 
 ## Features
+
 - React + Vite frontend
 - Node.js + Express backend
 - Stripe integration
@@ -12,6 +13,7 @@ Industry-standard TypeScript monorepo for AI-powered fastpitch coaching.
 - Automated tests, linting, formatting, and CI
 
 ## Scripts
+
 - `npm run dev` — Start development server
 - `npm run lint` — Lint code
 - `npm run format` — Format code
@@ -19,4 +21,5 @@ Industry-standard TypeScript monorepo for AI-powered fastpitch coaching.
 - `npm test` — Run tests
 
 ## API Docs
+
 See [swagger.yaml](./swagger.yaml)

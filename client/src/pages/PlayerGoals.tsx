@@ -1,17 +1,17 @@
 /**
  * PLAYER GOALS PAGE
- * 
+ *
  * Displays AI-generated SMART goals based on baseline video analysis
  * Shows progress tracking and recommended drills for each goal
  */
 
-import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Target, TrendingUp, Calendar, CheckCircle2, Loader2 } from "lucide-react";
-import { useLocation } from "wouter";
+import { useQuery } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Target, TrendingUp, Calendar, CheckCircle2, Loader2 } from 'lucide-react';
+import { useLocation } from 'wouter';
 
 interface SmartGoal {
   id: number;
@@ -30,7 +30,7 @@ export default function PlayerGoals() {
   const [, setLocation] = useLocation();
 
   const { data: goals, isLoading } = useQuery<SmartGoal[]>({
-    queryKey: ["/api/player/goals"],
+    queryKey: ['/api/player/goals'],
   });
 
   if (isLoading) {
@@ -55,7 +55,8 @@ export default function PlayerGoals() {
             </h1>
           </div>
           <p className="text-gray-400">
-            Based on your baseline video analysis, here are your personalized, trackable goals for this season.
+            Based on your baseline video analysis, here are your personalized, trackable goals for
+            this season.
           </p>
         </div>
 
@@ -67,9 +68,7 @@ export default function PlayerGoals() {
             <p className="text-gray-400 mb-4">
               Complete your baseline videos to get AI-generated SMART goals!
             </p>
-            <Button onClick={() => setLocation("/player/onboarding")}>
-              Complete Onboarding
-            </Button>
+            <Button onClick={() => setLocation('/player/onboarding')}>Complete Onboarding</Button>
           </Card>
         ) : (
           <div className="space-y-4">
@@ -82,18 +81,21 @@ export default function PlayerGoals() {
                       <h3 className="text-xl font-bold text-white">{goal.metricLabel}</h3>
                     </div>
                     <p className="text-gray-400 text-sm mb-3">{goal.description}</p>
-                    
+
                     <div className="flex items-center gap-4 text-sm">
                       <div>
-                        <span className="text-gray-500">Current:</span>{" "}
+                        <span className="text-gray-500">Current:</span>{' '}
                         <span className="text-white font-medium">
-                          {goal.currentValue !== null ? `${goal.currentValue} ${goal.unit}` : "Baseline TBD"}
+                          {goal.currentValue !== null
+                            ? `${goal.currentValue} ${goal.unit}`
+                            : 'Baseline TBD'}
                         </span>
                       </div>
                       <div>
-                        <span className="text-gray-500">Target:</span>{" "}
+                        <span className="text-gray-500">Target:</span>{' '}
                         <span className="text-purple-400 font-medium">
-                          {goal.targetValue > 0 ? "+" : ""}{goal.targetValue} {goal.unit}
+                          {goal.targetValue > 0 ? '+' : ''}
+                          {goal.targetValue} {goal.unit}
                         </span>
                       </div>
                       <div className="flex items-center gap-1 text-gray-500">
@@ -102,7 +104,7 @@ export default function PlayerGoals() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {goal.progress !== undefined && (
                     <div className="text-right">
                       <div className="text-2xl font-bold text-purple-400 mb-1">
@@ -121,10 +123,15 @@ export default function PlayerGoals() {
                 {/* Recommended Drills */}
                 {goal.recommendedDrills && goal.recommendedDrills.length > 0 && (
                   <div className="mt-4 pt-4 border-t border-gray-800">
-                    <p className="text-sm text-gray-500 mb-2">Recommended Drills to Reach This Goal:</p>
+                    <p className="text-sm text-gray-500 mb-2">
+                      Recommended Drills to Reach This Goal:
+                    </p>
                     <div className="flex flex-wrap gap-2">
                       {goal.recommendedDrills.slice(0, 3).map((drill: any, i: number) => (
-                        <span key={i} className="text-xs bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full">
+                        <span
+                          key={i}
+                          className="text-xs bg-purple-900/30 text-purple-300 px-3 py-1 rounded-full"
+                        >
                           {drill.name}
                         </span>
                       ))}
@@ -138,10 +145,13 @@ export default function PlayerGoals() {
 
         {/* Action Buttons */}
         <div className="mt-8 flex gap-4">
-          <Button variant="outline" onClick={() => setLocation("/dashboard")}>
+          <Button variant="outline" onClick={() => setLocation('/dashboard')}>
             Back to Dashboard
           </Button>
-          <Button onClick={() => setLocation("/drills")} className="bg-gradient-to-r from-purple-600 to-pink-600">
+          <Button
+            onClick={() => setLocation('/drills')}
+            className="bg-gradient-to-r from-purple-600 to-pink-600"
+          >
             View Recommended Drills
           </Button>
         </div>

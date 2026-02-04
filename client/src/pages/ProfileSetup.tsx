@@ -1,59 +1,62 @@
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useLocation } from "wouter";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/use-auth";
-import { loadStripe } from "@stripe/stripe-js";
-import {
-  Elements,
-  CardElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useLocation } from 'wouter';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Progress } from "@/components/ui/progress";
-import { AlertCircle, CreditCard, User, Calendar, GraduationCap } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Progress } from '@/components/ui/progress';
+import { AlertCircle, CreditCard, User, Calendar, GraduationCap } from 'lucide-react';
 
 // Initialize Stripe
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "");
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
 // Form validation schema - Parent-focused
 const parentProfileSchema = z.object({
   // Parent Information
-  parentFirstName: z.string().min(2, "Parent first name must be at least 2 characters"),
-  parentLastName: z.string().min(2, "Parent last name must be at least 2 characters"),
-  parentEmail: z.string().email("Please enter a valid email address"),
+  parentFirstName: z.string().min(2, 'Parent first name must be at least 2 characters'),
+  parentLastName: z.string().min(2, 'Parent last name must be at least 2 characters'),
+  parentEmail: z.string().email('Please enter a valid email address'),
   parentPhone: z.string().refine((phone) => {
     const digitsOnly = phone.replace(/\D/g, '');
     return digitsOnly.length >= 10;
-  }, "Please enter a valid phone number with at least 10 digits"),
-  
+  }, 'Please enter a valid phone number with at least 10 digits'),
+
   // Athlete Information
-  athleteFirstName: z.string().min(2, "Athlete first name must be at least 2 characters"),
-  athleteLastName: z.string().min(2, "Athlete last name must be at least 2 characters"),
+  athleteFirstName: z.string().min(2, 'Athlete first name must be at least 2 characters'),
+  athleteLastName: z.string().min(2, 'Athlete last name must be at least 2 characters'),
   athleteDateOfBirth: z.string().refine((date) => {
     const birthDate = new Date(date);
     const today = new Date();
     const age = today.getFullYear() - birthDate.getFullYear();
     // Allow reasonable age range for youth sports
     return age >= 5 && age <= 25;
-  }, "Please enter a valid date of birth"),
+  }, 'Please enter a valid date of birth'),
   athleteGrade: z.string().min(1, "Please select your athlete's grade"),
-  athleteSchool: z.string().min(2, "School name must be at least 2 characters"),
-  
+  athleteSchool: z.string().min(2, 'School name must be at least 2 characters'),
+
   // Terms and payment
-  acceptTerms: z.boolean().refine(val => val === true, "You must accept the terms and conditions"),
-  acceptTrial: z.boolean().refine(val => val === true, "You must accept the 14-day trial terms"),
+  acceptTerms: z
+    .boolean()
+    .refine((val) => val === true, 'You must accept the terms and conditions'),
+  acceptTrial: z.boolean().refine((val) => val === true, 'You must accept the 14-day trial terms'),
 });
 
 type ParentProfileFormData = z.infer<typeof parentProfileSchema>;
@@ -77,10 +80,10 @@ function PaymentForm({ onSuccess }: { onSuccess: () => void }) {
     try {
       // Create payment method
       const cardElement = elements.getElement(CardElement);
-      if (!cardElement) throw new Error("Card element not found");
+      if (!cardElement) throw new Error('Card element not found');
 
       const { error, paymentMethod } = await stripe.createPaymentMethod({
-        type: "card",
+        type: 'card',
         card: cardElement,
       });
 
@@ -89,26 +92,26 @@ function PaymentForm({ onSuccess }: { onSuccess: () => void }) {
       }
 
       // Create subscription with trial
-      const response = await apiRequest("POST", "/api/stripe/create-subscription", {
+      const response = await apiRequest('POST', '/api/stripe/create-subscription', {
         paymentMethodId: paymentMethod.id,
-        priceId: "price_1Qabcdefghijklmnop", // TODO: Replace with actual Stripe price ID for $14.99/month player subscription
+        priceId: 'price_1Qabcdefghijklmnop', // TODO: Replace with actual Stripe price ID for $14.99/month player subscription
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create subscription");
+        throw new Error('Failed to create subscription');
       }
 
       toast({
-        title: "Payment successful!",
-        description: "Your 14-day free trial has started. Welcome to SoftballProAI!",
+        title: 'Payment successful!',
+        description: 'Your 14-day free trial has started. Welcome to SoftballProAI!',
       });
 
       onSuccess();
     } catch (error: any) {
       toast({
-        title: "Payment failed",
-        description: error.message || "Please try again or contact support.",
-        variant: "destructive",
+        title: 'Payment failed',
+        description: error.message || 'Please try again or contact support.',
+        variant: 'destructive',
       });
     } finally {
       setIsProcessing(false);
@@ -127,10 +130,10 @@ function PaymentForm({ onSuccess }: { onSuccess: () => void }) {
             options={{
               style: {
                 base: {
-                  fontSize: "16px",
-                  color: "#F2F2F2",
-                  "::placeholder": {
-                    color: "#666",
+                  fontSize: '16px',
+                  color: '#F2F2F2',
+                  '::placeholder': {
+                    color: '#666',
                   },
                 },
               },
@@ -150,7 +153,7 @@ function PaymentForm({ onSuccess }: { onSuccess: () => void }) {
         disabled={!stripe || isProcessing}
         className="w-full bg-gradient-brand hover:opacity-90 text-whiteGlow font-semibold py-3"
       >
-        {isProcessing ? "Processing..." : "Start Free Trial"}
+        {isProcessing ? 'Processing...' : 'Start Free Trial'}
       </Button>
     </form>
   );
@@ -172,24 +175,26 @@ export default function ProfileSetup() {
     formState: { errors, isValid },
   } = useForm<ParentProfileFormData>({
     resolver: zodResolver(parentProfileSchema),
-    mode: "onBlur", // Changed from "onChange" to "onBlur" for better UX
+    mode: 'onBlur', // Changed from "onChange" to "onBlur" for better UX
   });
 
-  const athleteDateOfBirth = watch("athleteDateOfBirth");
-  const isAthleteUnder18 = athleteDateOfBirth ? (() => {
-    const birthDate = new Date(athleteDateOfBirth);
-    const today = new Date();
-    const age = today.getFullYear() - birthDate.getFullYear();
-    return age < 18;
-  })() : false;
+  const athleteDateOfBirth = watch('athleteDateOfBirth');
+  const isAthleteUnder18 = athleteDateOfBirth
+    ? (() => {
+        const birthDate = new Date(athleteDateOfBirth);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        return age < 18;
+      })()
+    : false;
 
   // Debug: Log form validity
-  console.log("Form isValid:", isValid, "Errors:", errors);
+  console.log('Form isValid:', isValid, 'Errors:', errors);
 
   const onSubmitProfile = async (data: ParentProfileFormData) => {
     try {
       // Save parent and athlete profile data
-      const response = await apiRequest("POST", "/api/user/profile", {
+      const response = await apiRequest('POST', '/api/user/profile', {
         // Parent info
         parentFirstName: data.parentFirstName,
         parentLastName: data.parentLastName,
@@ -204,41 +209,41 @@ export default function ProfileSetup() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save profile");
+        throw new Error('Failed to save profile');
       }
 
       // CRITICAL: Invalidate the athlete query so OnboardingGate knows athlete now exists
-      await queryClient.invalidateQueries({ queryKey: ["/api/player/athlete"] });
+      await queryClient.invalidateQueries({ queryKey: ['/api/player/athlete'] });
 
       toast({
-        title: "Profile saved!",
+        title: 'Profile saved!',
         description: "Now let's set up your payment.",
       });
 
       setCurrentStep(2);
     } catch (error: any) {
       toast({
-        title: "Error saving profile",
+        title: 'Error saving profile',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
 
   const handlePaymentSuccess = () => {
     // Check user role and redirect appropriately
-    if (user?.role === "player") {
+    if (user?.role === 'player') {
       // Players continue to position selection
-      setLocation("/position/select");
+      setLocation('/position/select');
     } else {
       // Parents go to athlete management dashboard
-      setLocation("/athletes");
+      setLocation('/athletes');
     }
   };
 
   const steps = [
-    { title: "Your Info", icon: User },
-    { title: "Payment", icon: CreditCard },
+    { title: 'Your Info', icon: User },
+    { title: 'Payment', icon: CreditCard },
   ];
 
   return (
@@ -264,25 +269,19 @@ export default function ProfileSetup() {
                   <div key={index} className="flex items-center">
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        isCompleted
-                          ? "bg-electricPink"
-                          : isActive
-                          ? "bg-cyberBlue"
-                          : "bg-charcoal2"
+                        isCompleted ? 'bg-electricPink' : isActive ? 'bg-cyberBlue' : 'bg-charcoal2'
                       }`}
                     >
                       <Icon className="w-5 h-5 text-whiteGlow" />
                     </div>
                     <span
                       className={`ml-2 text-sm ${
-                        isActive ? "text-cyberBlue font-semibold" : "text-whiteGlow/70"
+                        isActive ? 'text-cyberBlue font-semibold' : 'text-whiteGlow/70'
                       }`}
                     >
                       {step.title}
                     </span>
-                    {index < steps.length - 1 && (
-                      <div className="w-8 h-0.5 bg-charcoal2 mx-4" />
-                    )}
+                    {index < steps.length - 1 && <div className="w-8 h-0.5 bg-charcoal2 mx-4" />}
                   </div>
                 );
               })}
@@ -310,7 +309,7 @@ export default function ProfileSetup() {
                     </Label>
                     <Input
                       id="parentFirstName"
-                      {...register("parentFirstName")}
+                      {...register('parentFirstName')}
                       className="bg-charcoal2 border-electricPink/30 text-whiteGlow"
                       placeholder="Enter your first name"
                     />
@@ -325,7 +324,7 @@ export default function ProfileSetup() {
                     </Label>
                     <Input
                       id="parentLastName"
-                      {...register("parentLastName")}
+                      {...register('parentLastName')}
                       className="bg-charcoal2 border-electricPink/30 text-whiteGlow"
                       placeholder="Enter your last name"
                     />
@@ -343,7 +342,7 @@ export default function ProfileSetup() {
                     <Input
                       id="parentEmail"
                       type="email"
-                      {...register("parentEmail")}
+                      {...register('parentEmail')}
                       className="bg-charcoal2 border-electricPink/30 text-whiteGlow"
                       placeholder="your@email.com"
                     />
@@ -359,7 +358,7 @@ export default function ProfileSetup() {
                     <Input
                       id="parentPhone"
                       type="tel"
-                      {...register("parentPhone")}
+                      {...register('parentPhone')}
                       className="bg-charcoal2 border-electricPink/30 text-whiteGlow"
                       placeholder="(555) 123-4567"
                     />
@@ -387,7 +386,7 @@ export default function ProfileSetup() {
                     </Label>
                     <Input
                       id="athleteFirstName"
-                      {...register("athleteFirstName")}
+                      {...register('athleteFirstName')}
                       className="bg-charcoal2 border-electricPink/30 text-whiteGlow"
                       placeholder="Athlete's first name"
                     />
@@ -402,7 +401,7 @@ export default function ProfileSetup() {
                     </Label>
                     <Input
                       id="athleteLastName"
-                      {...register("athleteLastName")}
+                      {...register('athleteLastName')}
                       className="bg-charcoal2 border-electricPink/30 text-whiteGlow"
                       placeholder="Athlete's last name"
                     />
@@ -414,27 +413,35 @@ export default function ProfileSetup() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="athleteDateOfBirth" className="text-whiteGlow flex items-center gap-2">
+                    <Label
+                      htmlFor="athleteDateOfBirth"
+                      className="text-whiteGlow flex items-center gap-2"
+                    >
                       <Calendar className="w-4 h-4" />
                       Date of Birth *
                     </Label>
                     <Input
                       id="athleteDateOfBirth"
                       type="date"
-                      {...register("athleteDateOfBirth")}
+                      {...register('athleteDateOfBirth')}
                       className="bg-charcoal2 border-electricPink/30 text-whiteGlow"
                     />
                     {errors.athleteDateOfBirth && (
-                      <p className="text-solarOrange text-sm">{errors.athleteDateOfBirth.message}</p>
+                      <p className="text-solarOrange text-sm">
+                        {errors.athleteDateOfBirth.message}
+                      </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="athleteGrade" className="text-whiteGlow flex items-center gap-2">
+                    <Label
+                      htmlFor="athleteGrade"
+                      className="text-whiteGlow flex items-center gap-2"
+                    >
                       <GraduationCap className="w-4 h-4" />
                       Grade *
                     </Label>
-                    <Select onValueChange={(value) => setValue("athleteGrade", value)}>
+                    <Select onValueChange={(value) => setValue('athleteGrade', value)}>
                       <SelectTrigger className="bg-charcoal2 border-electricPink/30 text-whiteGlow">
                         <SelectValue placeholder="Select grade" />
                       </SelectTrigger>
@@ -463,7 +470,7 @@ export default function ProfileSetup() {
                     </Label>
                     <Input
                       id="athleteSchool"
-                      {...register("athleteSchool")}
+                      {...register('athleteSchool')}
                       className="bg-charcoal2 border-electricPink/30 text-whiteGlow"
                       placeholder="School name"
                     />
@@ -477,18 +484,14 @@ export default function ProfileSetup() {
               {/* Terms and Conditions */}
               <div className="space-y-4">
                 <div className="flex items-start space-x-2">
-                  <Checkbox
-                    id="acceptTerms"
-                    {...register("acceptTerms")}
-                    className="mt-1"
-                  />
+                  <Checkbox id="acceptTerms" {...register('acceptTerms')} className="mt-1" />
                   <div className="text-sm">
                     <Label htmlFor="acceptTerms" className="text-whiteGlow cursor-pointer">
-                      I accept the{" "}
+                      I accept the{' '}
                       <a href="/terms" className="text-electricPink hover:underline">
                         Terms of Service
-                      </a>{" "}
-                      and{" "}
+                      </a>{' '}
+                      and{' '}
                       <a href="/privacy" className="text-electricPink hover:underline">
                         Privacy Policy
                       </a>
@@ -500,14 +503,11 @@ export default function ProfileSetup() {
                 </div>
 
                 <div className="flex items-start space-x-2">
-                  <Checkbox
-                    id="acceptTrial"
-                    {...register("acceptTrial")}
-                    className="mt-1"
-                  />
+                  <Checkbox id="acceptTrial" {...register('acceptTrial')} className="mt-1" />
                   <div className="text-sm">
                     <Label htmlFor="acceptTrial" className="text-whiteGlow cursor-pointer">
-                      I understand the 14-day free trial and will be charged $14.99/month after the trial ends
+                      I understand the 14-day free trial and will be charged $14.99/month after the
+                      trial ends
                     </Label>
                     {errors.acceptTrial && (
                       <p className="text-solarOrange text-sm mt-1">{errors.acceptTrial.message}</p>
@@ -526,8 +526,8 @@ export default function ProfileSetup() {
 
               {/* Debug: Show form status */}
               <div className="text-sm text-center mt-2">
-                <span className={isValid ? "text-limePop" : "text-solarOrange"}>
-                  Form Status: {isValid ? "Valid ✓" : "Invalid - Check required fields"}
+                <span className={isValid ? 'text-limePop' : 'text-solarOrange'}>
+                  Form Status: {isValid ? 'Valid ✓' : 'Invalid - Check required fields'}
                 </span>
               </div>
             </form>

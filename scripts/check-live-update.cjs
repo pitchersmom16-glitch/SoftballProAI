@@ -42,7 +42,7 @@ if (!commits || commits.length === 0) {
   }
 }
 
-const shortCommits = commits.map(c => c.slice(0, 7));
+const shortCommits = commits.map((c) => c.slice(0, 7));
 const content = fs.readFileSync(workflowsPath, 'utf8');
 
 for (const c of [...shortCommits, ...commits]) {
@@ -61,10 +61,16 @@ try {
 }
 
 if (wfCommits.length > 0) {
-  console.log('workflows.md was updated in recent commits (', wfCommits.join(', '), ') — assuming live update present');
+  console.log(
+    'workflows.md was updated in recent commits (',
+    wfCommits.join(', '),
+    ') — assuming live update present',
+  );
   process.exit(0);
 }
 
 console.error('No Live Update entry found in workflows.md for commits:', shortCommits.join(', '));
-console.error('Please add an entry to `workflows.md` referencing at least one of your commits (date, summary, commit: `abcd123`).');
+console.error(
+  'Please add an entry to `workflows.md` referencing at least one of your commits (date, summary, commit: `abcd123`).',
+);
 process.exit(1);

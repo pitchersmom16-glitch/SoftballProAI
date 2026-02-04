@@ -1,13 +1,13 @@
 /**
  * VIDEO ANALYSIS SERVICE
- * 
+ *
  * Automated pipeline for processing uploaded videos:
  * 1. Extract biomechanics using MediaPipe pose detection
  * 2. Analyze mechanics with Brain AI
  * 3. Generate personalized feedback
  * 4. Recommend corrective drills
  * 5. Suggest SMART goals based on detected issues
- * 
+ *
  * Built for Shannon and every athlete who dreams of improving their game.
  */
 
@@ -21,7 +21,7 @@ interface VideoAnalysisRequest {
   videoUrl: string;
   skillType: string;
   athleteId: number;
-  athleteLevel?: "Beginner" | "Intermediate" | "Advanced";
+  athleteLevel?: 'Beginner' | 'Intermediate' | 'Advanced';
   videoCategory: string;
 }
 
@@ -50,13 +50,22 @@ interface SmartGoal {
 
 /**
  * CLIENT-SIDE ANALYSIS BRIDGE
- * 
+ *
  * Since MediaPipe Pose runs in the browser, this service receives
  * the extracted biomechanics from the PoseAnalyzer component and
  * processes it through the AI Brain for feedback generation.
  */
-export async function processVideoAnalysis(request: VideoAnalysisRequest): Promise<VideoAnalysisResult> {
-  const { assessmentId, videoUrl, skillType, athleteId, athleteLevel = "Intermediate", videoCategory } = request;
+export async function processVideoAnalysis(
+  request: VideoAnalysisRequest,
+): Promise<VideoAnalysisResult> {
+  const {
+    assessmentId,
+    videoUrl,
+    skillType,
+    athleteId,
+    athleteLevel = 'Intermediate',
+    videoCategory,
+  } = request;
 
   try {
     console.log(`[VideoAnalysis] Starting analysis for assessment ${assessmentId}`);
@@ -66,7 +75,7 @@ export async function processVideoAnalysis(request: VideoAnalysisRequest): Promi
       videoUrl,
       skillType: skillType as any,
       athleteLevel,
-      athleteId
+      athleteId,
     });
 
     console.log(`[VideoAnalysis] Brain detected ${brainAnalysis.issuesDetected.length} issues`);
@@ -76,10 +85,12 @@ export async function processVideoAnalysis(request: VideoAnalysisRequest): Promi
       skillType: skillType as any,
       detectedIssues: brainAnalysis.issuesDetected,
       athleteLevel,
-      limit: 5
+      limit: 5,
     });
 
-    console.log(`[VideoAnalysis] Generated ${drillAnalysis.recommendations.length} drill recommendations`);
+    console.log(
+      `[VideoAnalysis] Generated ${drillAnalysis.recommendations.length} drill recommendations`,
+    );
 
     // Step 3: Generate SMART goals based on detected issues
     const goals = generateSmartGoals(brainAnalysis.issuesDetected, skillType, videoCategory);
@@ -105,8 +116,8 @@ export async function processVideoAnalysis(request: VideoAnalysisRequest): Promi
             targetDate: goal.targetDate,
             description: goal.description,
             progress: 0,
-            status: "active",
-            generatedBy: "ai",
+            status: 'active',
+            generatedBy: 'ai',
           });
         } catch (err) {
           // Ignore duplicate goal errors
@@ -118,7 +129,7 @@ export async function processVideoAnalysis(request: VideoAnalysisRequest): Promi
 
     // Step 6: Update assessment with results
     await storage.updateAssessment(assessmentId, {
-      status: "completed",
+      status: 'completed',
       overallScore: calculateOverallScore(brainAnalysis.issuesDetected.length),
     });
 
@@ -128,23 +139,22 @@ export async function processVideoAnalysis(request: VideoAnalysisRequest): Promi
       success: true,
       assessmentId,
       biomechanics: null, // Will be populated by client-side MediaPipe
-      issues: brainAnalysis.issuesDetected.map(issue => ({
+      issues: brainAnalysis.issuesDetected.map((issue) => ({
         type: issue,
         severity: classifyIssueSeverity(issue),
-        description: getIssueDescription(issue, skillType)
+        description: getIssueDescription(issue, skillType),
       })),
       strengths: brainAnalysis.strengths,
       recommendedDrills: drillAnalysis.recommendations,
       aiGeneratedFeedback: feedback,
-      suggestedGoals: goals
+      suggestedGoals: goals,
     };
-
   } catch (error) {
     console.error(`[VideoAnalysis] Error processing assessment ${assessmentId}:`, error);
-    
+
     // Update assessment status to error
     await storage.updateAssessment(assessmentId, {
-      status: "error",
+      status: 'error',
     });
 
     throw error;
@@ -154,126 +164,145 @@ export async function processVideoAnalysis(request: VideoAnalysisRequest): Promi
 /**
  * Generate SMART goals based on detected biomechanical issues
  */
-function generateSmartGoals(issues: string[], skillType: string, videoCategory: string): SmartGoal[] {
+function generateSmartGoals(
+  issues: string[],
+  skillType: string,
+  videoCategory: string,
+): SmartGoal[] {
   const goals: SmartGoal[] = [];
   const sixMonthsFromNow = new Date();
   sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6);
   const targetDate = sixMonthsFromNow.toISOString().split('T')[0];
 
   // Map issues to specific, measurable goals
-  if (skillType === "PITCHING") {
-    if (issues.some(i => i.toLowerCase().includes("velocity") || i.toLowerCase().includes("speed"))) {
+  if (skillType === 'PITCHING') {
+    if (
+      issues.some((i) => i.toLowerCase().includes('velocity') || i.toLowerCase().includes('speed'))
+    ) {
       goals.push({
-        metric: "velocity",
-        metricLabel: "Increase Fastball Velocity",
+        metric: 'velocity',
+        metricLabel: 'Increase Fastball Velocity',
         currentValue: null, // Will be populated from first video
         targetValue: 5, // +5 mph improvement
         targetDate,
-        unit: "mph",
+        unit: 'mph',
         measurable: true,
         attainable: true,
-        description: "Improve fastball velocity through improved hip-shoulder separation and leg drive"
+        description:
+          'Improve fastball velocity through improved hip-shoulder separation and leg drive',
       });
     }
 
-    if (issues.some(i => i.toLowerCase().includes("spin") || i.toLowerCase().includes("rotation"))) {
+    if (
+      issues.some((i) => i.toLowerCase().includes('spin') || i.toLowerCase().includes('rotation'))
+    ) {
       goals.push({
-        metric: "spin_rate",
-        metricLabel: "Improve Spin Rate",
+        metric: 'spin_rate',
+        metricLabel: 'Improve Spin Rate',
         currentValue: null,
         targetValue: 200, // +200 rpm
         targetDate,
-        unit: "rpm",
+        unit: 'rpm',
         measurable: true,
         attainable: true,
-        description: "Increase ball spin through better wrist snap and finger pressure"
+        description: 'Increase ball spin through better wrist snap and finger pressure',
       });
     }
 
-    if (issues.some(i => i.toLowerCase().includes("arm") || i.toLowerCase().includes("drag"))) {
+    if (issues.some((i) => i.toLowerCase().includes('arm') || i.toLowerCase().includes('drag'))) {
       goals.push({
-        metric: "arm_slot_consistency",
-        metricLabel: "Improve Arm Slot Consistency",
+        metric: 'arm_slot_consistency',
+        metricLabel: 'Improve Arm Slot Consistency',
         currentValue: null,
         targetValue: 90, // 90% consistency
         targetDate,
-        unit: "%",
+        unit: '%',
         measurable: true,
         attainable: true,
-        description: "Maintain consistent arm slot angle (165-180°) across all pitches"
+        description: 'Maintain consistent arm slot angle (165-180°) across all pitches',
       });
     }
 
-    if (issues.some(i => i.toLowerCase().includes("strike") || i.toLowerCase().includes("control"))) {
+    if (
+      issues.some((i) => i.toLowerCase().includes('strike') || i.toLowerCase().includes('control'))
+    ) {
       goals.push({
-        metric: "first_pitch_strike",
-        metricLabel: "First Pitch Strike Percentage",
+        metric: 'first_pitch_strike',
+        metricLabel: 'First Pitch Strike Percentage',
         currentValue: null,
         targetValue: 70,
         targetDate,
-        unit: "%",
+        unit: '%',
         measurable: true,
         attainable: true,
-        description: "Achieve 70% first-pitch strike rate through improved mechanics and release point"
+        description:
+          'Achieve 70% first-pitch strike rate through improved mechanics and release point',
       });
     }
 
     // Always add stride length goal for pitchers
     goals.push({
-      metric: "stride_length",
-      metricLabel: "Optimize Stride Length",
+      metric: 'stride_length',
+      metricLabel: 'Optimize Stride Length',
       currentValue: null,
       targetValue: 85, // 85% of height
       targetDate,
-      unit: "% of height",
+      unit: '% of height',
       measurable: true,
       attainable: true,
-      description: "Achieve optimal stride length (80-90% of height) for maximum power transfer"
+      description: 'Achieve optimal stride length (80-90% of height) for maximum power transfer',
     });
   }
 
-  if (skillType === "HITTING") {
-    if (issues.some(i => i.toLowerCase().includes("power") || i.toLowerCase().includes("contact"))) {
+  if (skillType === 'HITTING') {
+    if (
+      issues.some((i) => i.toLowerCase().includes('power') || i.toLowerCase().includes('contact'))
+    ) {
       goals.push({
-        metric: "exit_velocity",
-        metricLabel: "Increase Exit Velocity",
+        metric: 'exit_velocity',
+        metricLabel: 'Increase Exit Velocity',
         currentValue: null,
         targetValue: 5, // +5 mph
         targetDate,
-        unit: "mph",
+        unit: 'mph',
         measurable: true,
         attainable: true,
-        description: "Improve bat speed and contact quality through better hip rotation and weight transfer"
+        description:
+          'Improve bat speed and contact quality through better hip rotation and weight transfer',
       });
     }
 
-    if (issues.some(i => i.toLowerCase().includes("hip") || i.toLowerCase().includes("rotation"))) {
+    if (
+      issues.some((i) => i.toLowerCase().includes('hip') || i.toLowerCase().includes('rotation'))
+    ) {
       goals.push({
-        metric: "hip_rotation",
-        metricLabel: "Improve Hip Rotation Angle",
+        metric: 'hip_rotation',
+        metricLabel: 'Improve Hip Rotation Angle',
         currentValue: null,
         targetValue: 45, // 45 degrees
         targetDate,
-        unit: "degrees",
+        unit: 'degrees',
         measurable: true,
         attainable: true,
-        description: "Generate more power through full hip rotation during swing"
+        description: 'Generate more power through full hip rotation during swing',
       });
     }
   }
 
-  if (skillType === "CATCHING") {
-    if (issues.some(i => i.toLowerCase().includes("transfer") || i.toLowerCase().includes("pop"))) {
+  if (skillType === 'CATCHING') {
+    if (
+      issues.some((i) => i.toLowerCase().includes('transfer') || i.toLowerCase().includes('pop'))
+    ) {
       goals.push({
-        metric: "pop_time",
-        metricLabel: "Improve Pop Time",
+        metric: 'pop_time',
+        metricLabel: 'Improve Pop Time',
         currentValue: null,
         targetValue: -0.15, // Reduce by 0.15 seconds
         targetDate,
-        unit: "seconds",
+        unit: 'seconds',
         measurable: true,
         attainable: true,
-        description: "Achieve sub-2.0 second pop time through faster transfer and footwork"
+        description: 'Achieve sub-2.0 second pop time through faster transfer and footwork',
       });
     }
   }
@@ -282,15 +311,15 @@ function generateSmartGoals(issues: string[], skillType: string, videoCategory: 
   if (goals.length < 3) {
     // Add general improvement goals
     goals.push({
-      metric: "consistency",
-      metricLabel: "Improve Mechanical Consistency",
+      metric: 'consistency',
+      metricLabel: 'Improve Mechanical Consistency',
       currentValue: null,
       targetValue: 85,
       targetDate,
-      unit: "%",
+      unit: '%',
       measurable: true,
       attainable: true,
-      description: "Maintain consistent mechanics across all repetitions"
+      description: 'Maintain consistent mechanics across all repetitions',
     });
   }
 
@@ -338,7 +367,7 @@ function generateAIFeedback(analysis: any, videoCategory: string): string {
  */
 function calculateOverallScore(issueCount: number): number {
   // Start at 100, subtract 10 points per major issue
-  const baseScore = 100 - (issueCount * 10);
+  const baseScore = 100 - issueCount * 10;
   return Math.max(40, Math.min(100, baseScore)); // Clamp between 40-100
 }
 
@@ -348,13 +377,13 @@ function calculateOverallScore(issueCount: number): number {
 function classifyIssueSeverity(issue: string): 'critical' | 'moderate' | 'minor' {
   const criticalKeywords = ['injury', 'danger', 'severe', 'major'];
   const moderateKeywords = ['incorrect', 'poor', 'weak', 'inefficient'];
-  
+
   const lowerIssue = issue.toLowerCase();
-  
-  if (criticalKeywords.some(keyword => lowerIssue.includes(keyword))) {
+
+  if (criticalKeywords.some((keyword) => lowerIssue.includes(keyword))) {
     return 'critical';
   }
-  if (moderateKeywords.some(keyword => lowerIssue.includes(keyword))) {
+  if (moderateKeywords.some((keyword) => lowerIssue.includes(keyword))) {
     return 'moderate';
   }
   return 'minor';
@@ -366,12 +395,16 @@ function classifyIssueSeverity(issue: string): 'critical' | 'moderate' | 'minor'
 function getIssueDescription(issue: string, skillType: string): string {
   // Map common issues to detailed descriptions
   const issueDescriptions: Record<string, string> = {
-    "arm drag": "Your throwing arm is lagging behind your body rotation, reducing velocity and increasing injury risk.",
-    "no hip rotation": "Your hips aren't rotating fully, limiting power generation in your swing.",
-    "casting": "You're releasing the bat too early, losing bat speed and power through the zone.",
-    "pulling off": "You're stepping away from the plate instead of toward it, reducing power and contact quality.",
-    "early break": "Your hands are breaking too early in the pitch, disrupting timing and velocity.",
-    "poor weight transfer": "Weight isn't shifting properly from back to front, limiting power generation."
+    'arm drag':
+      'Your throwing arm is lagging behind your body rotation, reducing velocity and increasing injury risk.',
+    'no hip rotation': "Your hips aren't rotating fully, limiting power generation in your swing.",
+    casting: "You're releasing the bat too early, losing bat speed and power through the zone.",
+    'pulling off':
+      "You're stepping away from the plate instead of toward it, reducing power and contact quality.",
+    'early break':
+      'Your hands are breaking too early in the pitch, disrupting timing and velocity.',
+    'poor weight transfer':
+      "Weight isn't shifting properly from back to front, limiting power generation.",
   };
 
   const lowerIssue = issue.toLowerCase();
@@ -389,15 +422,15 @@ function getIssueDescription(issue: string, skillType: string): string {
  */
 export async function storeBiomechanicsData(
   assessmentId: number,
-  metrics: BiomechanicsMetrics
+  metrics: BiomechanicsMetrics,
 ): Promise<void> {
   try {
     // Validate biomechanics ranges before storage
     const validatedMetrics = validateBiomechanics(metrics);
-    
+
     await storage.createSkeletalAnalysis({
       assessmentId,
-      skillType: "PITCHING",
+      skillType: 'PITCHING',
       metrics: {
         armSlotAngle: validatedMetrics.armSlotAngle,
         kneeFlexion: validatedMetrics.kneeFlexion,
@@ -406,8 +439,8 @@ export async function storeBiomechanicsData(
         backLegDrive: null,
         headPosition: null,
         analyzedAt: new Date().toISOString(),
-        analysisVersion: "1.0"
-      }
+        analysisVersion: '1.0',
+      },
     });
 
     console.log(`[VideoAnalysis] Stored biomechanics for assessment ${assessmentId}`);
@@ -420,17 +453,21 @@ export async function storeBiomechanicsData(
 // Validate biomechanics metrics against physically possible ranges
 function validateBiomechanics(metrics: BiomechanicsMetrics): BiomechanicsMetrics {
   const validated = { ...metrics };
-  
+
   // Arm slot angle: 140-180° (high 3/4 to over the top)
   if (metrics.armSlotAngle !== null) {
     if (metrics.armSlotAngle < 0 || metrics.armSlotAngle > 360) {
-      console.warn(`[Validation] Invalid arm slot angle: ${metrics.armSlotAngle}° - setting to null`);
+      console.warn(
+        `[Validation] Invalid arm slot angle: ${metrics.armSlotAngle}° - setting to null`,
+      );
       validated.armSlotAngle = null;
     } else if (metrics.armSlotAngle < 120 || metrics.armSlotAngle > 190) {
-      console.warn(`[Validation] Unusual arm slot angle: ${metrics.armSlotAngle}° (expected 140-180°)`);
+      console.warn(
+        `[Validation] Unusual arm slot angle: ${metrics.armSlotAngle}° (expected 140-180°)`,
+      );
     }
   }
-  
+
   // Knee flexion: 70-130° (90-110° optimal)
   if (metrics.kneeFlexion !== null) {
     if (metrics.kneeFlexion < 0 || metrics.kneeFlexion > 180) {
@@ -440,16 +477,20 @@ function validateBiomechanics(metrics: BiomechanicsMetrics): BiomechanicsMetrics
       console.warn(`[Validation] Unusual knee flexion: ${metrics.kneeFlexion}° (expected 90-110°)`);
     }
   }
-  
+
   // Torque/hip-shoulder separation: 30-60° (40-50° optimal)
   if (metrics.torqueSeparation !== null) {
     if (metrics.torqueSeparation < 0 || metrics.torqueSeparation > 180) {
-      console.warn(`[Validation] Invalid torque separation: ${metrics.torqueSeparation}° - setting to null`);
+      console.warn(
+        `[Validation] Invalid torque separation: ${metrics.torqueSeparation}° - setting to null`,
+      );
       validated.torqueSeparation = null;
     } else if (metrics.torqueSeparation < 20 || metrics.torqueSeparation > 70) {
-      console.warn(`[Validation] Unusual torque separation: ${metrics.torqueSeparation}° (expected 40-50°)`);
+      console.warn(
+        `[Validation] Unusual torque separation: ${metrics.torqueSeparation}° (expected 40-50°)`,
+      );
     }
   }
-  
+
   return validated;
 }

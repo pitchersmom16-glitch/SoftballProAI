@@ -1,17 +1,17 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "@shared/routes";
-import type { Drill, CreateDrillRequest } from "@shared/schema";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { api } from '@shared/routes';
+import type { Drill, CreateDrillRequest } from '@shared/schema';
 
 export function useDrills(category?: string) {
   return useQuery({
     queryKey: [api.drills.list.path, category],
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (category) params.append("category", category);
-      
+      if (category) params.append('category', category);
+
       const url = `${api.drills.list.path}?${params.toString()}`;
-      const res = await fetch(url, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch drills");
+      const res = await fetch(url, { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch drills');
       return api.drills.list.responses[200].parse(await res.json());
     },
   });
@@ -24,11 +24,11 @@ export function useCreateDrill() {
       const validated = api.drills.create.input.parse(data);
       const res = await fetch(api.drills.create.path, {
         method: api.drills.create.method,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(validated),
-        credentials: "include",
+        credentials: 'include',
       });
-      if (!res.ok) throw new Error("Failed to create drill");
+      if (!res.ok) throw new Error('Failed to create drill');
       return api.drills.create.responses[201].parse(await res.json());
     },
     onSuccess: () => {

@@ -106,7 +106,9 @@ Player Sees:
 ## 🎯 HOW THE SMART GOALS WORK
 
 ### **For Pitchers:**
+
 Based on detected issues, AI generates goals like:
+
 1. **Increase Fastball Velocity** - Current: 58mph → Target: 63mph (+5mph)
 2. **Improve Spin Rate** - Current: 1800rpm → Target: 2000rpm (+200rpm)
 3. **Arm Slot Consistency** - Current: Varies → Target: 90% consistency
@@ -114,16 +116,19 @@ Based on detected issues, AI generates goals like:
 5. **Optimize Stride Length** - Current: 75% of height → Target: 85%
 
 ### **For Hitters:**
+
 1. **Increase Exit Velocity** - +5mph improvement
 2. **Improve Hip Rotation** - 45° target angle
 3. **Contact Quality** - 85% consistency
 
 ### **For Catchers:**
+
 1. **Improve Pop Time** - Reduce by 0.15 seconds
 2. **Transfer Speed** - Sub-0.3 second transfer
 3. **Blocking Efficiency** - 90% block rate
 
 **All goals are:**
+
 - ✅ **Specific** - Exact metric and target value
 - ✅ **Measurable** - Numeric targets (mph, rpm, %, degrees)
 - ✅ **Attainable** - Based on detected issues, not random
@@ -163,11 +168,13 @@ Wait for "serving on port 5000".
 ### **Step 4: Test the Full Flow**
 
 **As a Player:**
+
 1. Sign up as new player → Select "Pitcher"
 2. Upload 4 baseline videos (you can use test videos)
 3. Dashboard will be LOCKED until coach approves
 
 **As a Coach:**
+
 1. Switch to Pitching Coach mode (or create coach account)
 2. Go to Specialist Roster
 3. See player in "Baseline Queue"
@@ -178,6 +185,7 @@ Wait for "serving on port 5000".
 8. Click "Approve & Unlock Dashboard"
 
 **Back to Player:**
+
 1. Player dashboard is now UNLOCKED
 2. Click "My Goals" button
 3. See 5 AI-generated SMART goals
@@ -202,20 +210,21 @@ Wait for "serving on port 5000".
    - "Poor weight transfer"
 
 3. **Generates personalized feedback:**
+
    ```
    Great job uploading your fastball video! Here's what I observed:
-   
+
    **Strengths:**
    ✅ Good balance throughout delivery
    ✅ Consistent release point
-   
+
    **Areas for Improvement:**
    ⚠️ Arm drag detected - reducing velocity and risking injury
    ⚠️ Limited hip-shoulder separation
-   
+
    **Coaching Insight:**
    Focus on hip-shoulder separation during load phase to generate more power...
-   
+
    Keep working hard! I've recommended specific drills to help you improve!
    ```
 
@@ -239,6 +248,7 @@ Wait for "serving on port 5000".
 **Before:** "Here's some generic drills, good luck kid"
 
 **Now with SoftballProAI:**
+
 1. Shannon uploads her 4 pitching videos
 2. AI watches and identifies: "arm drag", "needs more leg drive"
 3. Generates specific goals: "Increase velocity from 52mph to 57mph by July"

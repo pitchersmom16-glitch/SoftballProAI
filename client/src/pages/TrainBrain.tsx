@@ -1,42 +1,68 @@
-import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Brain, Plus, Video, Quote, Trash2, Tag, User, Zap, Target, BookOpen, Heart } from "lucide-react";
-import type { Drill, MentalEdge } from "@shared/schema";
+import { useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from '@/components/ui/form';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest, queryClient } from '@/lib/queryClient';
+import {
+  Brain,
+  Plus,
+  Video,
+  Quote,
+  Trash2,
+  Tag,
+  User,
+  Zap,
+  Target,
+  BookOpen,
+  Heart,
+} from 'lucide-react';
+import type { Drill, MentalEdge } from '@shared/schema';
 
 // Form schemas
 const drillFormSchema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters"),
-  category: z.enum(["Pitching", "Hitting", "Catching", "Throwing"]),
-  skillType: z.string().min(1, "Skill type is required"),
-  difficulty: z.enum(["Beginner", "Intermediate", "Advanced"]),
-  description: z.string().min(20, "Description must be at least 20 characters"),
-  videoUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  name: z.string().min(3, 'Name must be at least 3 characters'),
+  category: z.enum(['Pitching', 'Hitting', 'Catching', 'Throwing']),
+  skillType: z.string().min(1, 'Skill type is required'),
+  difficulty: z.enum(['Beginner', 'Intermediate', 'Advanced']),
+  description: z.string().min(20, 'Description must be at least 20 characters'),
+  videoUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   expertSource: z.string().optional(),
-  mechanicTags: z.string().min(1, "At least one mechanic tag is required"),
+  mechanicTags: z.string().min(1, 'At least one mechanic tag is required'),
   issueAddressed: z.string().optional(),
 });
 
 const mentalEdgeFormSchema = z.object({
-  title: z.string().min(3, "Title must be at least 3 characters"),
-  contentType: z.enum(["quote", "video", "principle", "visualization"]),
-  category: z.enum(["Pre-Game", "Recovery", "Focus", "Confidence", "Resilience"]),
-  source: z.string().min(1, "Source is required"),
-  content: z.string().min(10, "Content must be at least 10 characters"),
-  videoUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  tags: z.string().min(1, "At least one tag is required"),
+  title: z.string().min(3, 'Title must be at least 3 characters'),
+  contentType: z.enum(['quote', 'video', 'principle', 'visualization']),
+  category: z.enum(['Pre-Game', 'Recovery', 'Focus', 'Confidence', 'Resilience']),
+  source: z.string().min(1, 'Source is required'),
+  content: z.string().min(10, 'Content must be at least 10 characters'),
+  videoUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  tags: z.string().min(1, 'At least one tag is required'),
   usageContext: z.string().optional(),
 });
 
@@ -45,31 +71,31 @@ type MentalEdgeFormValues = z.infer<typeof mentalEdgeFormSchema>;
 
 export default function TrainBrain() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("drills");
+  const [activeTab, setActiveTab] = useState('drills');
 
   // Fetch existing drills
   const { data: drills = [], isLoading: loadingDrills } = useQuery<Drill[]>({
-    queryKey: ["/api/drills"],
+    queryKey: ['/api/drills'],
   });
 
   // Fetch existing mental edge content
   const { data: mentalEdge = [], isLoading: loadingMental } = useQuery<MentalEdge[]>({
-    queryKey: ["/api/mental-edge"],
+    queryKey: ['/api/mental-edge'],
   });
 
   // Drill form
   const drillForm = useForm<DrillFormValues>({
     resolver: zodResolver(drillFormSchema),
     defaultValues: {
-      name: "",
-      category: "Pitching",
-      skillType: "pitching",
-      difficulty: "Intermediate",
-      description: "",
-      videoUrl: "",
-      expertSource: "",
-      mechanicTags: "",
-      issueAddressed: "",
+      name: '',
+      category: 'Pitching',
+      skillType: 'pitching',
+      difficulty: 'Intermediate',
+      description: '',
+      videoUrl: '',
+      expertSource: '',
+      mechanicTags: '',
+      issueAddressed: '',
     },
   });
 
@@ -77,14 +103,14 @@ export default function TrainBrain() {
   const mentalForm = useForm<MentalEdgeFormValues>({
     resolver: zodResolver(mentalEdgeFormSchema),
     defaultValues: {
-      title: "",
-      contentType: "quote",
-      category: "Pre-Game",
-      source: "",
-      content: "",
-      videoUrl: "",
-      tags: "",
-      usageContext: "",
+      title: '',
+      contentType: 'quote',
+      category: 'Pre-Game',
+      source: '',
+      content: '',
+      videoUrl: '',
+      tags: '',
+      usageContext: '',
     },
   });
 
@@ -94,19 +120,22 @@ export default function TrainBrain() {
       const payload = {
         ...data,
         videoUrl: data.videoUrl || undefined,
-        mechanicTags: data.mechanicTags.split(",").map(t => t.trim()).filter(Boolean),
+        mechanicTags: data.mechanicTags
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean),
         equipment: [],
-        ageRange: "All Ages",
+        ageRange: 'All Ages',
       };
-      return apiRequest("POST", "/api/brain/train/drill", payload);
+      return apiRequest('POST', '/api/brain/train/drill', payload);
     },
     onSuccess: () => {
-      toast({ title: "Drill Added!", description: "The AI Brain has learned new knowledge." });
-      queryClient.invalidateQueries({ queryKey: ["/api/drills"] });
+      toast({ title: 'Drill Added!', description: 'The AI Brain has learned new knowledge.' });
+      queryClient.invalidateQueries({ queryKey: ['/api/drills'] });
       drillForm.reset();
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     },
   });
 
@@ -116,39 +145,42 @@ export default function TrainBrain() {
       const payload = {
         ...data,
         videoUrl: data.videoUrl || undefined,
-        tags: data.tags.split(",").map(t => t.trim()).filter(Boolean),
+        tags: data.tags
+          .split(',')
+          .map((t) => t.trim())
+          .filter(Boolean),
       };
-      return apiRequest("POST", "/api/brain/train/mental-edge", payload);
+      return apiRequest('POST', '/api/brain/train/mental-edge', payload);
     },
     onSuccess: () => {
-      toast({ title: "Mental Edge Added!", description: "New mindset content has been absorbed." });
-      queryClient.invalidateQueries({ queryKey: ["/api/mental-edge"] });
+      toast({ title: 'Mental Edge Added!', description: 'New mindset content has been absorbed.' });
+      queryClient.invalidateQueries({ queryKey: ['/api/mental-edge'] });
       mentalForm.reset();
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     },
   });
 
   // Delete drill mutation
   const deleteDrillMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest("DELETE", `/api/drills/${id}`);
+      return apiRequest('DELETE', `/api/drills/${id}`);
     },
     onSuccess: () => {
-      toast({ title: "Drill Removed", description: "Knowledge has been deleted." });
-      queryClient.invalidateQueries({ queryKey: ["/api/drills"] });
+      toast({ title: 'Drill Removed', description: 'Knowledge has been deleted.' });
+      queryClient.invalidateQueries({ queryKey: ['/api/drills'] });
     },
   });
 
   // Delete mental edge mutation
   const deleteMentalMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest("DELETE", `/api/mental-edge/${id}`);
+      return apiRequest('DELETE', `/api/mental-edge/${id}`);
     },
     onSuccess: () => {
-      toast({ title: "Content Removed", description: "Mental edge content deleted." });
-      queryClient.invalidateQueries({ queryKey: ["/api/mental-edge"] });
+      toast({ title: 'Content Removed', description: 'Mental edge content deleted.' });
+      queryClient.invalidateQueries({ queryKey: ['/api/mental-edge'] });
     },
   });
 
@@ -162,22 +194,33 @@ export default function TrainBrain() {
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case "Pitching": return <Target className="w-4 h-4" />;
-      case "Hitting": return <Zap className="w-4 h-4" />;
-      case "Catching": return <User className="w-4 h-4" />;
-      case "Throwing": return <Target className="w-4 h-4" />;
-      default: return <BookOpen className="w-4 h-4" />;
+      case 'Pitching':
+        return <Target className="w-4 h-4" />;
+      case 'Hitting':
+        return <Zap className="w-4 h-4" />;
+      case 'Catching':
+        return <User className="w-4 h-4" />;
+      case 'Throwing':
+        return <Target className="w-4 h-4" />;
+      default:
+        return <BookOpen className="w-4 h-4" />;
     }
   };
 
   const getMentalCategoryColor = (category: string) => {
     switch (category) {
-      case "Pre-Game": return "bg-neon-green/20 text-neon-green border-neon-green/40";
-      case "Recovery": return "bg-blue-500/20 text-blue-400 border-blue-500/40";
-      case "Focus": return "bg-purple-500/20 text-purple-400 border-purple-500/40";
-      case "Confidence": return "bg-hot-pink/20 text-hot-pink border-hot-pink/40";
-      case "Resilience": return "bg-electric-yellow/20 text-electric-yellow border-electric-yellow/40";
-      default: return "bg-gray-500/20 text-gray-400 border-gray-500/40";
+      case 'Pre-Game':
+        return 'bg-neon-green/20 text-neon-green border-neon-green/40';
+      case 'Recovery':
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/40';
+      case 'Focus':
+        return 'bg-purple-500/20 text-purple-400 border-purple-500/40';
+      case 'Confidence':
+        return 'bg-hot-pink/20 text-hot-pink border-hot-pink/40';
+      case 'Resilience':
+        return 'bg-electric-yellow/20 text-electric-yellow border-electric-yellow/40';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/40';
     }
   };
 
@@ -191,7 +234,9 @@ export default function TrainBrain() {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-white">Train the AI Brain</h1>
-            <p className="text-muted-foreground">Continuously teach new knowledge to the Expert System</p>
+            <p className="text-muted-foreground">
+              Continuously teach new knowledge to the Expert System
+            </p>
           </div>
         </div>
 
@@ -199,25 +244,33 @@ export default function TrainBrain() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <Card className="bg-card border-border">
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-neon-green">{drills.filter(d => d.category === "Pitching").length}</p>
+              <p className="text-2xl font-bold text-neon-green">
+                {drills.filter((d) => d.category === 'Pitching').length}
+              </p>
               <p className="text-xs text-muted-foreground">Pitching</p>
             </CardContent>
           </Card>
           <Card className="bg-card border-border">
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-hot-pink">{drills.filter(d => d.category === "Hitting").length}</p>
+              <p className="text-2xl font-bold text-hot-pink">
+                {drills.filter((d) => d.category === 'Hitting').length}
+              </p>
               <p className="text-xs text-muted-foreground">Hitting</p>
             </CardContent>
           </Card>
           <Card className="bg-card border-border">
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-electric-yellow">{drills.filter(d => d.category === "Catching").length}</p>
+              <p className="text-2xl font-bold text-electric-yellow">
+                {drills.filter((d) => d.category === 'Catching').length}
+              </p>
               <p className="text-xs text-muted-foreground">Catching</p>
             </CardContent>
           </Card>
           <Card className="bg-card border-border">
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-purple-400">{drills.filter(d => d.category === "Throwing").length}</p>
+              <p className="text-2xl font-bold text-purple-400">
+                {drills.filter((d) => d.category === 'Throwing').length}
+              </p>
               <p className="text-xs text-muted-foreground">Throwing</p>
             </CardContent>
           </Card>
@@ -231,11 +284,19 @@ export default function TrainBrain() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-card border border-border">
-            <TabsTrigger value="drills" data-testid="tab-drills" className="data-[state=active]:bg-neon-green/20 data-[state=active]:text-neon-green">
+            <TabsTrigger
+              value="drills"
+              data-testid="tab-drills"
+              className="data-[state=active]:bg-neon-green/20 data-[state=active]:text-neon-green"
+            >
               <Video className="w-4 h-4 mr-2" />
               Drill Knowledge
             </TabsTrigger>
-            <TabsTrigger value="mental" data-testid="tab-mental" className="data-[state=active]:bg-hot-pink/20 data-[state=active]:text-hot-pink">
+            <TabsTrigger
+              value="mental"
+              data-testid="tab-mental"
+              className="data-[state=active]:bg-hot-pink/20 data-[state=active]:text-hot-pink"
+            >
               <Heart className="w-4 h-4 mr-2" />
               Mental Edge
             </TabsTrigger>
@@ -263,7 +324,11 @@ export default function TrainBrain() {
                           <FormItem>
                             <FormLabel>Drill Name</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g., Internal Rotation Power Drill" {...field} data-testid="input-drill-name" />
+                              <Input
+                                placeholder="e.g., Internal Rotation Power Drill"
+                                {...field}
+                                data-testid="input-drill-name"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -277,10 +342,13 @@ export default function TrainBrain() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Category</FormLabel>
-                              <Select onValueChange={(value) => {
-                                field.onChange(value);
-                                drillForm.setValue("skillType", value.toLowerCase());
-                              }} defaultValue={field.value}>
+                              <Select
+                                onValueChange={(value) => {
+                                  field.onChange(value);
+                                  drillForm.setValue('skillType', value.toLowerCase());
+                                }}
+                                defaultValue={field.value}
+                              >
                                 <FormControl>
                                   <SelectTrigger data-testid="select-drill-category">
                                     <SelectValue placeholder="Select category" />
@@ -329,7 +397,11 @@ export default function TrainBrain() {
                           <FormItem>
                             <FormLabel>YouTube URL</FormLabel>
                             <FormControl>
-                              <Input placeholder="https://www.youtube.com/watch?v=..." {...field} data-testid="input-drill-video" />
+                              <Input
+                                placeholder="https://www.youtube.com/watch?v=..."
+                                {...field}
+                                data-testid="input-drill-video"
+                              />
                             </FormControl>
                             <FormDescription>Reference video for this drill</FormDescription>
                             <FormMessage />
@@ -344,7 +416,7 @@ export default function TrainBrain() {
                           <FormItem>
                             <FormLabel>Description</FormLabel>
                             <FormControl>
-                              <Textarea 
+                              <Textarea
                                 placeholder="Detailed biomechanical explanation of the drill..."
                                 className="min-h-[100px]"
                                 {...field}
@@ -363,13 +435,15 @@ export default function TrainBrain() {
                           <FormItem>
                             <FormLabel>Mechanic Tags</FormLabel>
                             <FormControl>
-                              <Input 
+                              <Input
                                 placeholder="Internal Rotation, Hip Drive, Arm Path (comma separated)"
                                 {...field}
                                 data-testid="input-drill-tags"
                               />
                             </FormControl>
-                            <FormDescription>Key biomechanical concepts (comma separated)</FormDescription>
+                            <FormDescription>
+                              Key biomechanical concepts (comma separated)
+                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -383,7 +457,11 @@ export default function TrainBrain() {
                             <FormItem>
                               <FormLabel>Expert Source</FormLabel>
                               <FormControl>
-                                <Input placeholder="e.g., Amanda Scarborough" {...field} data-testid="input-drill-source" />
+                                <Input
+                                  placeholder="e.g., Amanda Scarborough"
+                                  {...field}
+                                  data-testid="input-drill-source"
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -397,7 +475,11 @@ export default function TrainBrain() {
                             <FormItem>
                               <FormLabel>Issue Addressed</FormLabel>
                               <FormControl>
-                                <Input placeholder="e.g., Weak leg drive" {...field} data-testid="input-drill-issue" />
+                                <Input
+                                  placeholder="e.g., Weak leg drive"
+                                  {...field}
+                                  data-testid="input-drill-issue"
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -405,14 +487,14 @@ export default function TrainBrain() {
                         />
                       </div>
 
-                      <Button 
-                        type="submit" 
+                      <Button
+                        type="submit"
                         className="w-full bg-neon-green text-black hover:bg-neon-green/90"
                         disabled={addDrillMutation.isPending}
                         data-testid="button-train-drill"
                       >
                         <Brain className="w-4 h-4 mr-2" />
-                        {addDrillMutation.isPending ? "Training..." : "Train AI Brain"}
+                        {addDrillMutation.isPending ? 'Training...' : 'Train AI Brain'}
                       </Button>
                     </form>
                   </Form>
@@ -432,11 +514,13 @@ export default function TrainBrain() {
                     {loadingDrills ? (
                       <p className="text-muted-foreground">Loading...</p>
                     ) : drills.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8">No drills yet. Add some!</p>
+                      <p className="text-muted-foreground text-center py-8">
+                        No drills yet. Add some!
+                      </p>
                     ) : (
                       drills.map((drill) => (
-                        <div 
-                          key={drill.id} 
+                        <div
+                          key={drill.id}
                           className="p-3 rounded-lg bg-background/50 border border-border hover-elevate group"
                           data-testid={`drill-item-${drill.id}`}
                         >
@@ -454,7 +538,10 @@ export default function TrainBrain() {
                                   {drill.difficulty}
                                 </Badge>
                                 {drill.expertSource && (
-                                  <Badge variant="outline" className="text-xs text-muted-foreground">
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs text-muted-foreground"
+                                  >
                                     {drill.expertSource}
                                   </Badge>
                                 )}
@@ -501,7 +588,11 @@ export default function TrainBrain() {
                           <FormItem>
                             <FormLabel>Title</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g., Championship Mindset - Fearless Focus" {...field} data-testid="input-mental-title" />
+                              <Input
+                                placeholder="e.g., Championship Mindset - Fearless Focus"
+                                {...field}
+                                data-testid="input-mental-title"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -566,7 +657,11 @@ export default function TrainBrain() {
                           <FormItem>
                             <FormLabel>Source</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g., Kobe Bryant, Michael Jordan" {...field} data-testid="input-mental-source" />
+                              <Input
+                                placeholder="e.g., Kobe Bryant, Michael Jordan"
+                                {...field}
+                                data-testid="input-mental-source"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -580,7 +675,11 @@ export default function TrainBrain() {
                           <FormItem>
                             <FormLabel>Video URL (optional)</FormLabel>
                             <FormControl>
-                              <Input placeholder="https://www.youtube.com/watch?v=..." {...field} data-testid="input-mental-video" />
+                              <Input
+                                placeholder="https://www.youtube.com/watch?v=..."
+                                {...field}
+                                data-testid="input-mental-video"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -594,7 +693,7 @@ export default function TrainBrain() {
                           <FormItem>
                             <FormLabel>Content</FormLabel>
                             <FormControl>
-                              <Textarea 
+                              <Textarea
                                 placeholder="The quote, principle, or visualization content..."
                                 className="min-h-[100px]"
                                 {...field}
@@ -613,7 +712,7 @@ export default function TrainBrain() {
                           <FormItem>
                             <FormLabel>Tags</FormLabel>
                             <FormControl>
-                              <Input 
+                              <Input
                                 placeholder="Championship Mindset, Work Ethic, Fearless (comma separated)"
                                 {...field}
                                 data-testid="input-mental-tags"
@@ -631,7 +730,11 @@ export default function TrainBrain() {
                           <FormItem>
                             <FormLabel>Usage Context</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g., Before at-bat, after strikeout" {...field} data-testid="input-mental-context" />
+                              <Input
+                                placeholder="e.g., Before at-bat, after strikeout"
+                                {...field}
+                                data-testid="input-mental-context"
+                              />
                             </FormControl>
                             <FormDescription>When should this content be used?</FormDescription>
                             <FormMessage />
@@ -639,14 +742,14 @@ export default function TrainBrain() {
                         )}
                       />
 
-                      <Button 
-                        type="submit" 
+                      <Button
+                        type="submit"
                         className="w-full bg-hot-pink text-white hover:bg-hot-pink/90"
                         disabled={addMentalMutation.isPending}
                         data-testid="button-train-mental"
                       >
                         <Brain className="w-4 h-4 mr-2" />
-                        {addMentalMutation.isPending ? "Adding..." : "Add to Mental Edge"}
+                        {addMentalMutation.isPending ? 'Adding...' : 'Add to Mental Edge'}
                       </Button>
                     </form>
                   </Form>
@@ -666,20 +769,22 @@ export default function TrainBrain() {
                     {loadingMental ? (
                       <p className="text-muted-foreground">Loading...</p>
                     ) : mentalEdge.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8">No content yet. Add some inspiration!</p>
+                      <p className="text-muted-foreground text-center py-8">
+                        No content yet. Add some inspiration!
+                      </p>
                     ) : (
                       mentalEdge.map((item) => (
-                        <div 
-                          key={item.id} 
+                        <div
+                          key={item.id}
                           className="p-3 rounded-lg bg-background/50 border border-border hover-elevate group"
                           data-testid={`mental-item-${item.id}`}
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
-                                {item.contentType === "video" ? (
+                                {item.contentType === 'video' ? (
                                   <Video className="w-4 h-4 text-hot-pink" />
-                                ) : item.contentType === "quote" ? (
+                                ) : item.contentType === 'quote' ? (
                                   <Quote className="w-4 h-4 text-electric-yellow" />
                                 ) : (
                                   <Brain className="w-4 h-4 text-neon-green" />
@@ -690,7 +795,9 @@ export default function TrainBrain() {
                                 {item.content}
                               </p>
                               <div className="flex flex-wrap gap-1 mt-1">
-                                <Badge className={`text-xs ${getMentalCategoryColor(item.category)}`}>
+                                <Badge
+                                  className={`text-xs ${getMentalCategoryColor(item.category)}`}
+                                >
                                   {item.category}
                                 </Badge>
                                 <Badge variant="outline" className="text-xs">

@@ -1,18 +1,23 @@
-import { useParams, useLocation } from "wouter";
-import { useAthlete, useDeleteAthlete, useUpdateAthlete } from "@/hooks/use-athletes";
-import { useTeams } from "@/hooks/use-teams";
-import { useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { 
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription 
-} from "@/components/ui/dialog";
-import { ArrowLeft, Trash2, Camera, Loader2, Rocket } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { ObjectUploader } from "@/components/ObjectUploader";
-import { useQueryClient } from "@tanstack/react-query";
-import { api } from "@shared/routes";
-import PoseAnalyzer from "@/components/PoseAnalyzer";
+import { useParams, useLocation } from 'wouter';
+import { useAthlete, useDeleteAthlete, useUpdateAthlete } from '@/hooks/use-athletes';
+import { useTeams } from '@/hooks/use-teams';
+import { useState, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { ArrowLeft, Trash2, Camera, Loader2, Rocket } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { ObjectUploader } from '@/components/ObjectUploader';
+import { useQueryClient } from '@tanstack/react-query';
+import { api } from '@shared/routes';
+import PoseAnalyzer from '@/components/PoseAnalyzer';
 
 export default function AthleteDetail() {
   const { id } = useParams<{ id: string }>();
@@ -26,21 +31,29 @@ export default function AthleteDetail() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const pendingObjectPath = useRef<string | null>(null);
-  
-  const TEST_VIDEO_URL = "https://storage.googleapis.com/mediapipe-tasks/pose_landmarker/walking_preview.mp4";
 
-  const team = teams?.find(t => t.id === athlete?.teamId);
+  const TEST_VIDEO_URL =
+    'https://storage.googleapis.com/mediapipe-tasks/pose_landmarker/walking_preview.mp4';
+
+  const team = teams?.find((t) => t.id === athlete?.teamId);
 
   const confirmDelete = () => {
     if (athlete) {
       deleteAthlete.mutate(athlete.id, {
         onSuccess: () => {
-          toast({ title: "Athlete deleted", description: `${athlete.firstName} ${athlete.lastName} has been removed.` });
-          navigate("/athletes");
+          toast({
+            title: 'Athlete deleted',
+            description: `${athlete.firstName} ${athlete.lastName} has been removed.`,
+          });
+          navigate('/athletes');
         },
         onError: () => {
-          toast({ title: "Error", description: "Failed to delete athlete.", variant: "destructive" });
-        }
+          toast({
+            title: 'Error',
+            description: 'Failed to delete athlete.',
+            variant: 'destructive',
+          });
+        },
       });
     }
   };
@@ -58,7 +71,7 @@ export default function AthleteDetail() {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">Athlete not found</p>
-        <Button variant="outline" className="mt-4" onClick={() => navigate("/athletes")}>
+        <Button variant="outline" className="mt-4" onClick={() => navigate('/athletes')}>
           Back to Athletes
         </Button>
       </div>
@@ -68,7 +81,11 @@ export default function AthleteDetail() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => navigate("/athletes")} data-testid="button-back-athletes">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/athletes')}
+          data-testid="button-back-athletes"
+        >
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Athletes
         </Button>
       </div>
@@ -78,14 +95,14 @@ export default function AthleteDetail() {
           <div className="flex items-center gap-6">
             <div className="relative group">
               {athlete.photoUrl ? (
-                <img 
-                  src={athlete.photoUrl} 
+                <img
+                  src={athlete.photoUrl}
                   alt={`${athlete.firstName} ${athlete.lastName}`}
                   className="h-24 w-24 rounded-2xl object-cover border-2 border-neon-green/30"
                   data-testid="img-athlete-photo"
                 />
               ) : (
-                <div 
+                <div
                   className="h-24 w-24 rounded-2xl bg-gradient-to-br from-neon-pink/20 to-neon-purple/20 border-2 border-neon-green/30 flex items-center justify-center text-4xl font-bold text-neon-green"
                   data-testid="avatar-athlete-fallback"
                 >
@@ -96,27 +113,27 @@ export default function AthleteDetail() {
                 maxNumberOfFiles={1}
                 maxFileSize={5242880}
                 onGetUploadParameters={async (file) => {
-                  const response = await fetch("/api/uploads/request-url", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                  const response = await fetch('/api/uploads/request-url', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                       name: file.name,
                       size: file.size,
-                      contentType: file.type || "image/jpeg",
+                      contentType: file.type || 'image/jpeg',
                     }),
-                    credentials: "include",
+                    credentials: 'include',
                   });
 
                   if (!response.ok) {
-                    throw new Error("Failed to get upload URL");
+                    throw new Error('Failed to get upload URL');
                   }
 
                   const data = await response.json();
                   pendingObjectPath.current = data.objectPath;
                   return {
-                    method: "PUT" as const,
+                    method: 'PUT' as const,
                     url: data.uploadURL,
-                    headers: { "Content-Type": file.type || "image/jpeg" },
+                    headers: { 'Content-Type': file.type || 'image/jpeg' },
                   };
                 }}
                 onComplete={async () => {
@@ -126,30 +143,44 @@ export default function AthleteDetail() {
                       { id: athlete.id, photoUrl: objectPath },
                       {
                         onSuccess: () => {
-                          toast({ title: "Photo uploaded", description: "Profile picture has been updated." });
-                          queryClient.invalidateQueries({ queryKey: [api.athletes.get.path, athlete.id] });
+                          toast({
+                            title: 'Photo uploaded',
+                            description: 'Profile picture has been updated.',
+                          });
+                          queryClient.invalidateQueries({
+                            queryKey: [api.athletes.get.path, athlete.id],
+                          });
                           queryClient.invalidateQueries({ queryKey: [api.athletes.list.path] });
                           pendingObjectPath.current = null;
                         },
                         onError: () => {
-                          toast({ title: "Error", description: "Failed to save photo.", variant: "destructive" });
+                          toast({
+                            title: 'Error',
+                            description: 'Failed to save photo.',
+                            variant: 'destructive',
+                          });
                           pendingObjectPath.current = null;
                         },
-                      }
+                      },
                     );
                   }
                 }}
                 buttonClassName="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 h-10 w-10 rounded-full bg-neon-pink p-0 flex items-center justify-center shadow-lg"
               >
                 {updateAthlete.isPending ? (
-                  <Loader2 className="h-5 w-5 animate-spin text-black" data-testid="icon-upload-loading" />
+                  <Loader2
+                    className="h-5 w-5 animate-spin text-black"
+                    data-testid="icon-upload-loading"
+                  />
                 ) : (
                   <Camera className="h-5 w-5 text-black" data-testid="icon-upload-camera" />
                 )}
               </ObjectUploader>
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white" data-testid="text-athlete-name">{athlete.firstName} {athlete.lastName}</h1>
+              <h1 className="text-3xl font-bold text-white" data-testid="text-athlete-name">
+                {athlete.firstName} {athlete.lastName}
+              </h1>
               <p className="text-lg text-muted-foreground">
                 {athlete.primaryPosition} {athlete.jerseyNumber && `• #${athlete.jerseyNumber}`}
               </p>
@@ -164,29 +195,43 @@ export default function AthleteDetail() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-6 border-t border-white/10">
           <div>
-            <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Bats</p>
+            <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">
+              Bats
+            </p>
             <p className="text-lg font-semibold text-white">{athlete.bats || '-'}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Throws</p>
+            <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">
+              Throws
+            </p>
             <p className="text-lg font-semibold text-white">{athlete.throws || '-'}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Height</p>
+            <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">
+              Height
+            </p>
             <p className="text-lg font-semibold text-white">
-              {athlete.heightInches ? `${Math.floor(athlete.heightInches/12)}'${athlete.heightInches%12}"` : '-'}
+              {athlete.heightInches
+                ? `${Math.floor(athlete.heightInches / 12)}'${athlete.heightInches % 12}"`
+                : '-'}
             </p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">Weight</p>
-            <p className="text-lg font-semibold text-white">{athlete.weightLbs ? `${athlete.weightLbs} lbs` : '-'}</p>
+            <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-1">
+              Weight
+            </p>
+            <p className="text-lg font-semibold text-white">
+              {athlete.weightLbs ? `${athlete.weightLbs} lbs` : '-'}
+            </p>
           </div>
         </div>
 
-        {(athlete.firstName.toLowerCase() === "shannon") && (
+        {athlete.firstName.toLowerCase() === 'shannon' && (
           <div className="pt-6 border-t border-white/10">
-            <h3 className="text-sm font-semibold text-neon-pink uppercase tracking-wider mb-4">Biomechanics Analysis (Test Mode)</h3>
-            <Button 
+            <h3 className="text-sm font-semibold text-neon-pink uppercase tracking-wider mb-4">
+              Biomechanics Analysis (Test Mode)
+            </h3>
+            <Button
               className="bg-gradient-to-r from-neon-pink to-purple-600"
               onClick={() => setShowBiomechanics(true)}
               data-testid="button-test-biomechanics"
@@ -200,9 +245,11 @@ export default function AthleteDetail() {
         )}
 
         <div className="pt-6 border-t border-white/10">
-          <h3 className="text-sm font-semibold text-red-400 uppercase tracking-wider mb-4">Danger Zone</h3>
-          <Button 
-            variant="destructive" 
+          <h3 className="text-sm font-semibold text-red-400 uppercase tracking-wider mb-4">
+            Danger Zone
+          </h3>
+          <Button
+            variant="destructive"
             onClick={() => setDeleteDialogOpen(true)}
             data-testid="button-delete-athlete"
           >
@@ -221,17 +268,22 @@ export default function AthleteDetail() {
               Biomechanics Analysis - {athlete.firstName} {athlete.lastName}
             </DialogTitle>
             <DialogDescription>
-              Real-time pose detection with MediaPipe. Play the video to see skeletal overlay and metrics.
+              Real-time pose detection with MediaPipe. Play the video to see skeletal overlay and
+              metrics.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <PoseAnalyzer 
+            <PoseAnalyzer
               videoUrl={TEST_VIDEO_URL}
-              onMetricsUpdate={(metrics) => console.log("Biomechanics metrics:", metrics)}
+              onMetricsUpdate={(metrics) => console.log('Biomechanics metrics:', metrics)}
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowBiomechanics(false)} data-testid="button-close-biomechanics">
+            <Button
+              variant="outline"
+              onClick={() => setShowBiomechanics(false)}
+              data-testid="button-close-biomechanics"
+            >
               Close
             </Button>
           </DialogFooter>
@@ -243,20 +295,25 @@ export default function AthleteDetail() {
           <DialogHeader>
             <DialogTitle>Delete Athlete</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete {athlete.firstName} {athlete.lastName}? This action cannot be undone.
+              Are you sure you want to delete {athlete.firstName} {athlete.lastName}? This action
+              cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} data-testid="button-cancel-delete">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              data-testid="button-cancel-delete"
+            >
               Cancel
             </Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={confirmDelete}
               disabled={deleteAthlete.isPending}
               data-testid="button-confirm-delete"
             >
-              {deleteAthlete.isPending ? "Deleting..." : "Delete"}
+              {deleteAthlete.isPending ? 'Deleting...' : 'Delete'}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,12 +1,22 @@
-import { useDrills } from "@/hooks/use-drills";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Dumbbell, Play, Target, Users, Zap, Brain, Wind, HeartPulse, AlertTriangle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useDrills } from '@/hooks/use-drills';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import {
+  Dumbbell,
+  Play,
+  Target,
+  Users,
+  Zap,
+  Brain,
+  Wind,
+  HeartPulse,
+  AlertTriangle,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface PlayerCheckin {
   id: number;
@@ -19,45 +29,46 @@ interface PlayerCheckin {
 }
 
 const CATEGORIES = [
-  { value: "all", label: "All", icon: Dumbbell },
-  { value: "PITCHING", label: "Pitching", icon: Target },
-  { value: "CATCHING", label: "Catching", icon: Users },
-  { value: "INFIELD", label: "Infield", icon: Zap },
-  { value: "OUTFIELD", label: "Outfield", icon: Wind },
-  { value: "CONDITIONING", label: "Conditioning", icon: Dumbbell },
-  { value: "MENTAL", label: "Mental", icon: Brain },
+  { value: 'all', label: 'All', icon: Dumbbell },
+  { value: 'PITCHING', label: 'Pitching', icon: Target },
+  { value: 'CATCHING', label: 'Catching', icon: Users },
+  { value: 'INFIELD', label: 'Infield', icon: Zap },
+  { value: 'OUTFIELD', label: 'Outfield', icon: Wind },
+  { value: 'CONDITIONING', label: 'Conditioning', icon: Dumbbell },
+  { value: 'MENTAL', label: 'Mental', icon: Brain },
 ];
 
 const DIFFICULTIES = [
-  { value: "all", label: "All Levels" },
-  { value: "Beginner", label: "Beginner" },
-  { value: "Intermediate", label: "Intermediate" },
-  { value: "Advanced", label: "Advanced" },
+  { value: 'all', label: 'All Levels' },
+  { value: 'Beginner', label: 'Beginner' },
+  { value: 'Intermediate', label: 'Intermediate' },
+  { value: 'Advanced', label: 'Advanced' },
 ];
 
 export default function Drills() {
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [diffFilter, setDiffFilter] = useState<string>("all");
-  
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [diffFilter, setDiffFilter] = useState<string>('all');
+
   // Fetch today's check-in to check for injury blocks
   const { data: todayCheckin } = useQuery<PlayerCheckin | null>({
-    queryKey: ["/api/player/checkin/today"],
+    queryKey: ['/api/player/checkin/today'],
   });
-  
+
   const blockedActivities = todayCheckin?.blockedActivities || [];
-  const isPitchingBlocked = blockedActivities.includes("pitching") || blockedActivities.includes("throwing");
-  
+  const isPitchingBlocked =
+    blockedActivities.includes('pitching') || blockedActivities.includes('throwing');
+
   const { data: drills, isLoading } = useDrills(
-    categoryFilter === "all" ? undefined : categoryFilter
+    categoryFilter === 'all' ? undefined : categoryFilter,
   );
 
-  const filteredDrills = drills?.filter(drill => {
+  const filteredDrills = drills?.filter((drill) => {
     // SAFETY FIRST: Block pitching drills if arm/shoulder soreness detected
-    if (isPitchingBlocked && drill.category === "PITCHING") {
+    if (isPitchingBlocked && drill.category === 'PITCHING') {
       return false;
     }
-    
-    if (diffFilter !== "all" && drill.difficulty !== diffFilter) return false;
+
+    if (diffFilter !== 'all' && drill.difficulty !== diffFilter) return false;
     return true;
   });
 
@@ -65,42 +76,52 @@ export default function Drills() {
     <div className="space-y-8 p-6">
       <div className="flex flex-col gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-white" data-testid="text-drills-title">Drill Library</h1>
-          <p className="text-gray-400 mt-1" data-testid="text-drills-subtitle">Academy drills across all skill categories</p>
+          <h1 className="text-3xl font-bold text-white" data-testid="text-drills-title">
+            Drill Library
+          </h1>
+          <p className="text-gray-400 mt-1" data-testid="text-drills-subtitle">
+            Academy drills across all skill categories
+          </p>
         </div>
-        
+
         {/* SAFETY WARNING: Pitching blocked due to soreness */}
         {isPitchingBlocked && (
           <Alert className="bg-red-500/10 border-red-500/50 text-red-100">
             <AlertTriangle className="h-5 w-5 text-red-400" />
-            <AlertTitle className="text-red-200 font-semibold">Pitching Drills Blocked - Injury Prevention</AlertTitle>
+            <AlertTitle className="text-red-200 font-semibold">
+              Pitching Drills Blocked - Injury Prevention
+            </AlertTitle>
             <AlertDescription className="text-red-100/90">
-              Based on your check-in, pitching drills are temporarily blocked to protect your arm. 
-              Focus on <button 
-                onClick={() => setCategoryFilter("CONDITIONING")} 
+              Based on your check-in, pitching drills are temporarily blocked to protect your arm.
+              Focus on{' '}
+              <button
+                onClick={() => setCategoryFilter('CONDITIONING')}
                 className="underline font-semibold hover:text-white"
               >
                 Recovery & Conditioning
-              </button> or <button 
-                onClick={() => setCategoryFilter("MENTAL")} 
+              </button>{' '}
+              or{' '}
+              <button
+                onClick={() => setCategoryFilter('MENTAL')}
                 className="underline font-semibold hover:text-white"
               >
                 Mental Training
-              </button> today.
+              </button>{' '}
+              today.
             </AlertDescription>
           </Alert>
         )}
-        
+
         <div className="flex flex-wrap gap-2" data-testid="filter-category-buttons">
-          {CATEGORIES.map(cat => {
+          {CATEGORIES.map((cat) => {
             const Icon = cat.icon;
             const isActive = categoryFilter === cat.value;
-            const isBlocked = isPitchingBlocked && cat.value === "PITCHING";
-            
+            const isBlocked = isPitchingBlocked && cat.value === 'PITCHING';
+
             return (
               <Button
                 key={cat.value}
-                variant={isActive ? "default" : "outline"}
+                variant={isActive ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => {
                   if (isBlocked) return; // Don't allow selecting blocked category
@@ -108,9 +129,9 @@ export default function Drills() {
                 }}
                 disabled={isBlocked}
                 className={cn(
-                  "gap-2",
-                  isActive && "bg-gradient-to-r from-purple-600 to-pink-600 border-0",
-                  isBlocked && "opacity-40 cursor-not-allowed hover:opacity-40"
+                  'gap-2',
+                  isActive && 'bg-gradient-to-r from-purple-600 to-pink-600 border-0',
+                  isBlocked && 'opacity-40 cursor-not-allowed hover:opacity-40',
                 )}
                 data-testid={`button-filter-${cat.value.toLowerCase()}`}
               >
@@ -123,12 +144,12 @@ export default function Drills() {
         </div>
 
         <div className="flex flex-wrap gap-2" data-testid="filter-difficulty-buttons">
-          {DIFFICULTIES.map(diff => {
+          {DIFFICULTIES.map((diff) => {
             const isActive = diffFilter === diff.value;
             return (
               <Button
                 key={diff.value}
-                variant={isActive ? "secondary" : "ghost"}
+                variant={isActive ? 'secondary' : 'ghost'}
                 size="sm"
                 onClick={() => setDiffFilter(diff.value)}
                 data-testid={`button-difficulty-${diff.value.toLowerCase()}`}
@@ -142,95 +163,128 @@ export default function Drills() {
 
       <div className="text-sm text-gray-500" data-testid="text-drill-count">
         Showing {filteredDrills?.length || 0} drills
-        {categoryFilter !== "all" && ` in ${categoryFilter}`}
-        {diffFilter !== "all" && ` (${diffFilter})`}
+        {categoryFilter !== 'all' && ` in ${categoryFilter}`}
+        {diffFilter !== 'all' && ` (${diffFilter})`}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="drills-grid">
-        {isLoading ? (
-          [1,2,3,4,5,6].map(i => (
-            <div key={i} className="h-64 bg-white/5 rounded-xl animate-pulse border border-white/10" data-testid={`skeleton-drill-${i}`} />
-          ))
-        ) : (
-          filteredDrills?.map(drill => (
-            <Card 
-              key={drill.id} 
-              className="overflow-hidden bg-white/5 border-white/10 hover-elevate transition-all duration-300 group cursor-pointer h-full flex flex-col"
-              data-testid={`card-drill-${drill.id}`}
-            >
-              <div className="relative h-40 bg-gradient-to-br from-purple-900/50 to-pink-900/50">
-                {drill.videoUrl ? (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="h-14 w-14 rounded-full bg-white/10 backdrop-blur flex items-center justify-center">
-                      <Play className="h-6 w-6 text-white ml-1" />
+      <div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        data-testid="drills-grid"
+      >
+        {isLoading
+          ? [1, 2, 3, 4, 5, 6].map((i) => (
+              <div
+                key={i}
+                className="h-64 bg-white/5 rounded-xl animate-pulse border border-white/10"
+                data-testid={`skeleton-drill-${i}`}
+              />
+            ))
+          : filteredDrills?.map((drill) => (
+              <Card
+                key={drill.id}
+                className="overflow-hidden bg-white/5 border-white/10 hover-elevate transition-all duration-300 group cursor-pointer h-full flex flex-col"
+                data-testid={`card-drill-${drill.id}`}
+              >
+                <div className="relative h-40 bg-gradient-to-br from-purple-900/50 to-pink-900/50">
+                  {drill.videoUrl ? (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="h-14 w-14 rounded-full bg-white/10 backdrop-blur flex items-center justify-center">
+                        <Play className="h-6 w-6 text-white ml-1" />
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Dumbbell className="h-10 w-10 text-white/30" />
-                  </div>
-                )}
-                <div className="absolute top-3 right-3">
-                  <Badge className="bg-black/50 backdrop-blur text-white border-0" data-testid={`badge-category-${drill.id}`}>
-                    {drill.category}
-                  </Badge>
-                </div>
-                {drill.difficulty && (
-                  <div className="absolute top-3 left-3">
-                    <Badge 
-                      variant="outline" 
-                      className={cn(
-                        "border-0 backdrop-blur",
-                        drill.difficulty === "Beginner" && "bg-green-500/20 text-green-300",
-                        drill.difficulty === "Intermediate" && "bg-yellow-500/20 text-yellow-300",
-                        drill.difficulty === "Advanced" && "bg-red-500/20 text-red-300"
-                      )}
-                      data-testid={`badge-difficulty-${drill.id}`}
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Dumbbell className="h-10 w-10 text-white/30" />
+                    </div>
+                  )}
+                  <div className="absolute top-3 right-3">
+                    <Badge
+                      className="bg-black/50 backdrop-blur text-white border-0"
+                      data-testid={`badge-category-${drill.id}`}
                     >
-                      {drill.difficulty}
+                      {drill.category}
                     </Badge>
                   </div>
-                )}
-              </div>
-              
-              <div className="p-5 flex-1 flex flex-col">
-                <div className="mb-3">
-                  <h3 className="text-lg font-semibold text-white mb-1" data-testid={`text-drill-name-${drill.id}`}>{drill.name}</h3>
-                  {drill.expertSource && (
-                    <p className="text-xs text-purple-400" data-testid={`text-drill-expert-${drill.id}`}>{drill.expertSource}</p>
+                  {drill.difficulty && (
+                    <div className="absolute top-3 left-3">
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          'border-0 backdrop-blur',
+                          drill.difficulty === 'Beginner' && 'bg-green-500/20 text-green-300',
+                          drill.difficulty === 'Intermediate' && 'bg-yellow-500/20 text-yellow-300',
+                          drill.difficulty === 'Advanced' && 'bg-red-500/20 text-red-300',
+                        )}
+                        data-testid={`badge-difficulty-${drill.id}`}
+                      >
+                        {drill.difficulty}
+                      </Badge>
+                    </div>
                   )}
                 </div>
-                
-                <p className="text-gray-400 text-sm line-clamp-3 mb-4 flex-1" data-testid={`text-drill-description-${drill.id}`}>
-                  {drill.description}
-                </p>
 
-                {drill.mechanicTags && drill.mechanicTags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-4" data-testid={`tags-drill-${drill.id}`}>
-                    {drill.mechanicTags.slice(0, 3).map((tag, i) => (
-                      <Badge key={i} variant="outline" className="text-xs border-gray-700 text-gray-400" data-testid={`tag-${drill.id}-${i}`}>
-                        {tag}
-                      </Badge>
-                    ))}
-                    {drill.mechanicTags.length > 3 && (
-                      <Badge variant="outline" className="text-xs border-gray-700 text-gray-400" data-testid={`tag-${drill.id}-more`}>
-                        +{drill.mechanicTags.length - 3}
-                      </Badge>
+                <div className="p-5 flex-1 flex flex-col">
+                  <div className="mb-3">
+                    <h3
+                      className="text-lg font-semibold text-white mb-1"
+                      data-testid={`text-drill-name-${drill.id}`}
+                    >
+                      {drill.name}
+                    </h3>
+                    {drill.expertSource && (
+                      <p
+                        className="text-xs text-purple-400"
+                        data-testid={`text-drill-expert-${drill.id}`}
+                      >
+                        {drill.expertSource}
+                      </p>
                     )}
                   </div>
-                )}
 
-                <Button 
-                  variant="outline" 
-                  className="w-full mt-auto"
-                  data-testid={`button-view-drill-${drill.id}`}
-                >
-                  View Details
-                </Button>
-              </div>
-            </Card>
-          ))
-        )}
+                  <p
+                    className="text-gray-400 text-sm line-clamp-3 mb-4 flex-1"
+                    data-testid={`text-drill-description-${drill.id}`}
+                  >
+                    {drill.description}
+                  </p>
+
+                  {drill.mechanicTags && drill.mechanicTags.length > 0 && (
+                    <div
+                      className="flex flex-wrap gap-1 mb-4"
+                      data-testid={`tags-drill-${drill.id}`}
+                    >
+                      {drill.mechanicTags.slice(0, 3).map((tag, i) => (
+                        <Badge
+                          key={i}
+                          variant="outline"
+                          className="text-xs border-gray-700 text-gray-400"
+                          data-testid={`tag-${drill.id}-${i}`}
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                      {drill.mechanicTags.length > 3 && (
+                        <Badge
+                          variant="outline"
+                          className="text-xs border-gray-700 text-gray-400"
+                          data-testid={`tag-${drill.id}-more`}
+                        >
+                          +{drill.mechanicTags.length - 3}
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+
+                  <Button
+                    variant="outline"
+                    className="w-full mt-auto"
+                    data-testid={`button-view-drill-${drill.id}`}
+                  >
+                    View Details
+                  </Button>
+                </div>
+              </Card>
+            ))}
       </div>
 
       {filteredDrills?.length === 0 && !isLoading && (

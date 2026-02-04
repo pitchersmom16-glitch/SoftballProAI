@@ -1,11 +1,11 @@
-import session from "express-session";
-import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
-import type { Express, RequestHandler } from "express";
-import connectPg from "connect-pg-simple";
-import { storage } from "../storage";
-import crypto from "crypto";
-import rateLimit from "express-rate-limit";
+import session from 'express-session';
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import type { Express, RequestHandler } from 'express';
+import connectPg from 'connect-pg-simple';
+import { storage } from '../storage';
+import crypto from 'crypto';
+import rateLimit from 'express-rate-limit';
 
 // Simple local authentication for development
 export function getSession() {
@@ -18,21 +18,23 @@ export function getSession() {
     }
     // Generate a random secret for development (do not log the secret).
     const randomSecret = crypto.randomBytes(32).toString('hex');
-    console.warn('[Security] SESSION_SECRET not set; using a randomly generated secret for development only.');
+    console.warn(
+      '[Security] SESSION_SECRET not set; using a randomly generated secret for development only.',
+    );
     process.env.SESSION_SECRET = randomSecret;
   }
-  
+
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
-  const isProduction = process.env.NODE_ENV === "production";
-  
+  const isProduction = process.env.NODE_ENV === 'production';
+
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
     conString: process.env.DATABASE_URL,
     createTableIfMissing: false,
     ttl: sessionTtl,
-    tableName: "sessions",
+    tableName: 'sessions',
   });
-  
+
   return session({
     secret: process.env.SESSION_SECRET!,
     store: sessionStore,
@@ -41,14 +43,14 @@ export function getSession() {
     cookie: {
       httpOnly: true, // Prevents XSS access to cookies
       secure: isProduction, // HTTPS only in production
-      sameSite: "strict", // CSRF protection
+      sameSite: 'strict', // CSRF protection
       maxAge: sessionTtl,
     },
   });
 }
 
 export async function setupAuth(app: Express) {
-  app.set("trust proxy", 1);
+  app.set('trust proxy', 1);
   app.use(getSession());
   app.use(passport.initialize());
   app.use(passport.session());
@@ -60,8 +62,8 @@ export async function setupAuth(app: Express) {
     passport.use(
       new LocalStrategy(
         {
-          usernameField: "email",
-          passwordField: "password",
+          usernameField: 'email',
+          passwordField: 'password',
         },
         async (email, password, done) => {
           try {
@@ -80,10 +82,10 @@ export async function setupAuth(app: Express) {
               claims: {
                 sub: userId,
                 email,
-                given_name: "Dev",
-                family_name: "User",
-                first_name: "Dev",
-                last_name: "User",
+                given_name: 'Dev',
+                family_name: 'User',
+                first_name: 'Dev',
+                last_name: 'User',
               },
             };
 
@@ -91,8 +93,8 @@ export async function setupAuth(app: Express) {
           } catch (error) {
             return done(error);
           }
-        }
-      )
+        },
+      ),
     );
   } else {
     // In production, do not register permissive local auth
@@ -105,18 +107,18 @@ export async function setupAuth(app: Express) {
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 10, // 10 attempts per window (more lenient for dev)
-    message: "Too many login attempts. Please try again in 15 minutes.",
+    message: 'Too many login attempts. Please try again in 15 minutes.',
     standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
     legacyHeaders: false, // Disable `X-RateLimit-*` headers
     skip: (req) => req.method === 'GET', // Don't rate limit auto-login
   });
 
   // Login route
-  app.post("/api/login", authLimiter, (req, res, next) => {
-    passport.authenticate("local", (err: any, user: any, info: any) => {
+  app.post('/api/login', authLimiter, (req, res, next) => {
+    passport.authenticate('local', (err: any, user: any, info: any) => {
       if (err) return next(err);
-      if (!user) return res.status(401).json({ message: "Authentication failed" });
-      
+      if (!user) return res.status(401).json({ message: 'Authentication failed' });
+
       req.logIn(user, (err) => {
         if (err) return next(err);
         res.json({ success: true, user });
@@ -126,48 +128,60 @@ export async function setupAuth(app: Express) {
 
   // Auto-login route for development (disabled in production)
   if (enableDevAuth) {
-    app.get("/api/login", (req, res) => {
+    app.get('/api/login', (req, res) => {
       if (req.isAuthenticated()) {
-        return res.redirect("/");
+        return res.redirect('/');
       }
-      
+
       // Auto-login as FIXED dev user (not timestamp-based)
-      const userId = "dev-user-local";
-      
-      req.logIn({ claims: { sub: userId, email: "dev@softballproai.com", given_name: "Dev", family_name: "User", first_name: "Dev", last_name: "User" } }, async (err) => {
-        if (err) return res.status(500).json({ message: "Auto-login failed" });
-        
-        // Ensure user exists in database
-        await storage.upsertUser({
-          id: userId,
-          email: "dev@softballproai.com",
-        });
-        
-        res.redirect("/");
-      });
+      const userId = 'dev-user-local';
+
+      req.logIn(
+        {
+          claims: {
+            sub: userId,
+            email: 'dev@softballproai.com',
+            given_name: 'Dev',
+            family_name: 'User',
+            first_name: 'Dev',
+            last_name: 'User',
+          },
+        },
+        async (err) => {
+          if (err) return res.status(500).json({ message: 'Auto-login failed' });
+
+          // Ensure user exists in database
+          await storage.upsertUser({
+            id: userId,
+            email: 'dev@softballproai.com',
+          });
+
+          res.redirect('/');
+        },
+      );
     });
   }
 
   // Logout route
-  app.get("/api/logout", (req, res) => {
+  app.get('/api/logout', (req, res) => {
     req.logout(() => {
-      res.redirect("/");
+      res.redirect('/');
     });
   });
 
   // Current user route
-  app.get("/api/user", (req, res) => {
+  app.get('/api/user', (req, res) => {
     if (req.isAuthenticated()) {
       res.json(req.user);
     } else {
-      res.status(401).json({ message: "Not authenticated" });
+      res.status(401).json({ message: 'Not authenticated' });
     }
   });
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
   if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: 'Unauthorized' });
   }
   next();
 };
@@ -175,14 +189,14 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
 // Helper function to register additional auth routes
 export function registerAuthRoutes(app: Express) {
   // Get current authenticated user
-  app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
       const userId = (req.user as any).claims.sub;
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
+      console.error('Error fetching user:', error);
+      res.status(500).json({ message: 'Failed to fetch user' });
     }
   });
 }
