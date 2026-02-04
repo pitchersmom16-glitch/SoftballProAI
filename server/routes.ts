@@ -1777,12 +1777,10 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       const data = inviteSchema.parse(req.body);
 
       if (!data.parentEmail && !data.studentEmail && !data.phone) {
-        return res
-          .status(400)
-          .json({
-            message:
-              'At least one contact method is required (parent email, student email, or phone)',
-          });
+        return res.status(400).json({
+          message:
+            'At least one contact method is required (parent email, student email, or phone)',
+        });
       }
 
       // Generate unique invite token

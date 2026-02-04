@@ -7,8 +7,8 @@
 ---
 
 ## 🔁 Live Updates (canonical change log)
-- 2026-02-04 — Fix code formatting with Prettier (commit: `2ec048e`) — author: pitchersmom16-glitch
 
+- 2026-02-04 — Fix code formatting with Prettier (commit: `2ec048e`) — author: pitchersmom16-glitch
 
 Keep this section current. Whenever code, routes, or user flows are changed, add a short entry with: **date**, **one-line summary**, **commit hash**, and **author**. This is the single source of truth for other agents (e.g., Claude) and collaborators.
 
