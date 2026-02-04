@@ -1,5 +1,5 @@
-import type { Express } from "express";
-import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
+import type { Express } from 'express';
+import { ObjectStorageService, ObjectNotFoundError } from './objectStorage';
 
 /**
  * Register object storage routes for file uploads.
@@ -35,13 +35,13 @@ export function registerObjectStorageRoutes(app: Express): void {
    * IMPORTANT: The client should NOT send the file to this endpoint.
    * Send JSON metadata only, then upload the file directly to uploadURL.
    */
-  app.post("/api/uploads/request-url", async (req, res) => {
+  app.post('/api/uploads/request-url', async (req, res) => {
     try {
       const { name, size, contentType } = req.body;
 
       if (!name) {
         return res.status(400).json({
-          error: "Missing required field: name",
+          error: 'Missing required field: name',
         });
       }
 
@@ -57,8 +57,8 @@ export function registerObjectStorageRoutes(app: Express): void {
         metadata: { name, size, contentType },
       });
     } catch (error) {
-      console.error("Error generating upload URL:", error);
-      res.status(500).json({ error: "Failed to generate upload URL" });
+      console.error('Error generating upload URL:', error);
+      res.status(500).json({ error: 'Failed to generate upload URL' });
     }
   });
 
@@ -73,15 +73,14 @@ export function registerObjectStorageRoutes(app: Express): void {
   app.get(/^\/objects\/(.*)/, async (req, res) => {
     try {
       const objectPath = req.params[0];
-      const objectFile = await objectStorageService.getObjectEntityFile("/objects/" + objectPath);
+      const objectFile = await objectStorageService.getObjectEntityFile('/objects/' + objectPath);
       await objectStorageService.downloadObject(objectFile, res);
     } catch (error) {
-      console.error("Error serving object:", error);
+      console.error('Error serving object:', error);
       if (error instanceof ObjectNotFoundError) {
-        return res.status(404).json({ error: "Object not found" });
+        return res.status(404).json({ error: 'Object not found' });
       }
-      return res.status(500).json({ error: "Failed to serve object" });
+      return res.status(500).json({ error: 'Failed to serve object' });
     }
   });
 }
-

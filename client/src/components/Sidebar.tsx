@@ -1,29 +1,29 @@
-import { Link, useLocation } from "wouter";
-import { useAuth } from "@/hooks/use-auth";
-import { 
-  LayoutDashboard, 
-  Users, 
-  Video, 
-  Dumbbell, 
-  LogOut, 
+import { Link, useLocation } from 'wouter';
+import { useAuth } from '@/hooks/use-auth';
+import {
+  LayoutDashboard,
+  Users,
+  Video,
+  Dumbbell,
+  LogOut,
   ShieldCheck,
   Menu,
   X,
   Brain,
   Database,
-  User
-} from "lucide-react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import logo from "@/assets/logo.jpg";
+  User,
+} from 'lucide-react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import logo from '@/assets/logo.jpg';
 
 export function Sidebar() {
   const [location] = useLocation();
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
 
-  const isPlayer = user?.role === "player";
+  const isPlayer = user?.role === 'player';
 
   const coachNavigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -48,7 +48,11 @@ export function Sidebar() {
     <div className="flex flex-col h-full bg-black text-white">
       <div className="p-6 border-b border-white/10">
         <Link href="/">
-          <img src={logo} alt="SoftballProAI" className="h-14 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity" />
+          <img
+            src={logo}
+            alt="SoftballProAI"
+            className="h-14 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+          />
         </Link>
         {user && (
           <div className="mt-4 flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
@@ -56,7 +60,9 @@ export function Sidebar() {
               {user.firstName?.[0] || 'C'}
             </div>
             <div className="overflow-hidden">
-              <p className="text-sm font-medium truncate text-white">{user.firstName} {user.lastName}</p>
+              <p className="text-sm font-medium truncate text-white">
+                {user.firstName} {user.lastName}
+              </p>
               <p className="text-xs text-gray-400 truncate">{isPlayer ? 'Player' : 'Coach'}</p>
             </div>
           </div>
@@ -72,13 +78,16 @@ export function Sidebar() {
                 onClick={() => setOpen(false)}
                 className={`
                   flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer
-                  ${isActive 
-                    ? 'bg-neon-green/20 text-neon-green shadow-lg shadow-neon-green/20' 
-                    : 'text-gray-300 hover:bg-white/5 hover:text-white'
+                  ${
+                    isActive
+                      ? 'bg-neon-green/20 text-neon-green shadow-lg shadow-neon-green/20'
+                      : 'text-gray-300 hover:bg-white/5 hover:text-white'
                   }
                 `}
               >
-                <item.icon className={`h-5 w-5 ${isActive ? 'text-neon-green' : 'text-gray-500'}`} />
+                <item.icon
+                  className={`h-5 w-5 ${isActive ? 'text-neon-green' : 'text-gray-500'}`}
+                />
                 {item.name}
               </div>
             </Link>
@@ -103,7 +112,11 @@ export function Sidebar() {
       {/* Mobile Trigger */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-black border-b border-white/10 z-40 flex items-center justify-between px-4">
         <Link href="/">
-          <img src={logo} alt="SoftballProAI" className="h-10 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity" />
+          <img
+            src={logo}
+            alt="SoftballProAI"
+            className="h-10 w-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+          />
         </Link>
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>

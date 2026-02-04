@@ -4,36 +4,31 @@
  */
 
 // Load environment variables
-import { config } from "dotenv";
+import { config } from 'dotenv';
 config();
 
-import { db } from "../server/db";
-import { users, playerOnboarding, playerCheckins } from "../shared/schema";
-import { eq, or, like } from "drizzle-orm";
+import { db } from '../server/db';
+import { users, playerOnboarding, playerCheckins } from '../shared/schema';
+import { eq, or, like } from 'drizzle-orm';
 
 async function cleanDevUsers() {
-  console.log("🧹 Cleaning dev users from database...\n");
+  console.log('🧹 Cleaning dev users from database...\n');
 
   try {
     // Find all dev users
     const devUsers = await db
       .select()
       .from(users)
-      .where(
-        or(
-          eq(users.email, "dev@softballproai.com"),
-          like(users.id, "dev-user%")
-        )
-      );
+      .where(or(eq(users.email, 'dev@softballproai.com'), like(users.id, 'dev-user%')));
 
     if (devUsers.length === 0) {
-      console.log("✅ No dev users found. Database is clean!");
+      console.log('✅ No dev users found. Database is clean!');
       process.exit(0);
     }
 
     console.log(`Found ${devUsers.length} dev user(s):`);
     devUsers.forEach((u) => {
-      console.log(`  - ID: ${u.id}, Email: ${u.email}, Role: ${u.role || "none"}`);
+      console.log(`  - ID: ${u.id}, Email: ${u.email}, Role: ${u.role || 'none'}`);
     });
     console.log();
 
@@ -66,22 +61,16 @@ async function cleanDevUsers() {
     // Finally, delete the users
     const deletedUsers = await db
       .delete(users)
-      .where(
-        or(
-          eq(users.email, "dev@softballproai.com"),
-          like(users.id, "dev-user%")
-        )
-      )
+      .where(or(eq(users.email, 'dev@softballproai.com'), like(users.id, 'dev-user%')))
       .returning();
 
     console.log();
     console.log(`✅ SUCCESS! Deleted ${deletedUsers.length} dev user(s)`);
     console.log();
-    console.log("🎯 Database is now clean and ready for fresh testing!");
+    console.log('🎯 Database is now clean and ready for fresh testing!');
     console.log("   Run 'npm run dev' to start the server.");
-    
   } catch (error) {
-    console.error("❌ ERROR cleaning dev users:", error);
+    console.error('❌ ERROR cleaning dev users:', error);
     process.exit(1);
   }
 

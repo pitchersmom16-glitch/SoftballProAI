@@ -1,23 +1,76 @@
-import { db } from "./db";
-import { 
-  coaches, teams, athletes, drills, assessments, assessmentFeedback, mentalEdge, playerCheckins,
-  practicePlans, coachStudents, homeworkAssignments, playerCoachRelationships, coachInvites, playerSettings,
-  studentInvites, baselineVideos, playerOnboarding, notifications, gameChangerStats, skeletalAnalysis, playerGoals,
-  teamStats, userSubscriptions,
-  type Coach, type Team, type Athlete, type Drill, type Assessment, type Feedback, type MentalEdge, type PlayerCheckin,
-  type PracticePlan, type CoachStudent, type HomeworkAssignment, type PlayerCoachRelationship, type CoachInvite, type PlayerSettings,
-  type StudentInvite, type BaselineVideo, type PlayerOnboarding, type Notification, type GameChangerStats, type SkeletalAnalysis, type PlayerGoal,
-  type TeamStats, type UserSubscription,
-  type CreateCoachRequest, type CreateTeamRequest, type CreateAthleteRequest, 
-  type CreateDrillRequest, type CreateMentalEdgeRequest, type CreateAssessmentRequest, type CreateFeedbackRequest,
-  type CreatePlayerCheckinRequest, type UpdateAthleteRequest, type UpdateAssessmentRequest,
-  type CreatePlayerCoachRelationshipRequest, type CreateCoachInviteRequest, type CreatePlayerSettingsRequest,
-  type CreateStudentInviteRequest, type CreateBaselineVideoRequest, type CreatePlayerOnboardingRequest,
-  type CreateNotificationRequest, type CreateGameChangerStatsRequest, type CreateSkeletalAnalysisRequest, type CreatePlayerGoalRequest,
-  type CreateTeamStatsRequest, type CreateUserSubscriptionRequest
-} from "@shared/schema";
-import { users, type UserRole } from "@shared/models/auth";
-import { eq, desc, and } from "drizzle-orm";
+import { db } from './db';
+import {
+  coaches,
+  teams,
+  athletes,
+  drills,
+  assessments,
+  assessmentFeedback,
+  mentalEdge,
+  playerCheckins,
+  practicePlans,
+  coachStudents,
+  homeworkAssignments,
+  playerCoachRelationships,
+  coachInvites,
+  playerSettings,
+  studentInvites,
+  baselineVideos,
+  playerOnboarding,
+  notifications,
+  gameChangerStats,
+  skeletalAnalysis,
+  playerGoals,
+  teamStats,
+  userSubscriptions,
+  type Coach,
+  type Team,
+  type Athlete,
+  type Drill,
+  type Assessment,
+  type Feedback,
+  type MentalEdge,
+  type PlayerCheckin,
+  type PracticePlan,
+  type CoachStudent,
+  type HomeworkAssignment,
+  type PlayerCoachRelationship,
+  type CoachInvite,
+  type PlayerSettings,
+  type StudentInvite,
+  type BaselineVideo,
+  type PlayerOnboarding,
+  type Notification,
+  type GameChangerStats,
+  type SkeletalAnalysis,
+  type PlayerGoal,
+  type TeamStats,
+  type UserSubscription,
+  type CreateCoachRequest,
+  type CreateTeamRequest,
+  type CreateAthleteRequest,
+  type CreateDrillRequest,
+  type CreateMentalEdgeRequest,
+  type CreateAssessmentRequest,
+  type CreateFeedbackRequest,
+  type CreatePlayerCheckinRequest,
+  type UpdateAthleteRequest,
+  type UpdateAssessmentRequest,
+  type CreatePlayerCoachRelationshipRequest,
+  type CreateCoachInviteRequest,
+  type CreatePlayerSettingsRequest,
+  type CreateStudentInviteRequest,
+  type CreateBaselineVideoRequest,
+  type CreatePlayerOnboardingRequest,
+  type CreateNotificationRequest,
+  type CreateGameChangerStatsRequest,
+  type CreateSkeletalAnalysisRequest,
+  type CreatePlayerGoalRequest,
+  type CreateTeamStatsRequest,
+  type CreateUserSubscriptionRequest,
+} from '@shared/schema';
+import { users, type UserRole } from '@shared/models/auth';
+import { eq, desc, and } from 'drizzle-orm';
 
 export interface IStorage {
   // Coaches
@@ -54,95 +107,106 @@ export interface IStorage {
   getAssessment(id: number): Promise<Assessment | undefined>;
   createAssessment(assessment: CreateAssessmentRequest): Promise<Assessment>;
   updateAssessment(id: number, update: UpdateAssessmentRequest): Promise<Assessment>;
-  
+
   // Feedback
   getFeedback(assessmentId: number): Promise<Feedback[]>;
   createFeedback(feedback: CreateFeedbackRequest): Promise<Feedback>;
-  
+
   // User Role
   getUser(userId: string): Promise<{ id: string; role: UserRole | null } | undefined>;
   updateUserRole(userId: string, role: UserRole): Promise<void>;
-  updateUser(userId: string, user: { firstName?: string; lastName?: string; email?: string }): Promise<void>;
+  updateUser(
+    userId: string,
+    user: { firstName?: string; lastName?: string; email?: string },
+  ): Promise<void>;
   upsertUser(user: { id: string; email: string; role?: UserRole }): Promise<void>;
-  
+
   // Player Check-ins
   getPlayerCheckinByDate(userId: string, date: string): Promise<PlayerCheckin | undefined>;
   createPlayerCheckin(checkin: CreatePlayerCheckinRequest): Promise<PlayerCheckin>;
-  
+
   // Practice Plans
   getPracticePlans(teamId?: number): Promise<PracticePlan[]>;
   createPracticePlan(plan: Partial<PracticePlan>): Promise<PracticePlan>;
-  
+
   // Coach Students (Stable)
   getCoachStudents(coachId: number): Promise<(CoachStudent & { athlete?: Athlete })[]>;
   createCoachStudent(student: Partial<CoachStudent>): Promise<CoachStudent>;
-  
+
   // Homework Assignments
   getHomeworkAssignments(coachId?: number, athleteId?: number): Promise<HomeworkAssignment[]>;
   createHomeworkAssignment(assignment: Partial<HomeworkAssignment>): Promise<HomeworkAssignment>;
-  
+
   // Player-Coach Relationships (Hybrid Coaching)
   getPlayerCoaches(playerId: string): Promise<(PlayerCoachRelationship & { coach?: Coach })[]>;
   getCoachPlayers(coachId: number): Promise<(PlayerCoachRelationship & { player?: any })[]>;
-  createPlayerCoachRelationship(rel: CreatePlayerCoachRelationshipRequest): Promise<PlayerCoachRelationship>;
-  updatePlayerCoachRelationship(id: number, update: Partial<PlayerCoachRelationship>): Promise<PlayerCoachRelationship>;
+  createPlayerCoachRelationship(
+    rel: CreatePlayerCoachRelationshipRequest,
+  ): Promise<PlayerCoachRelationship>;
+  updatePlayerCoachRelationship(
+    id: number,
+    update: Partial<PlayerCoachRelationship>,
+  ): Promise<PlayerCoachRelationship>;
   deletePlayerCoachRelationship(id: number): Promise<void>;
-  
+
   // Coach Invites
   getPlayerInvites(playerId: string): Promise<CoachInvite[]>;
   getCoachInvites(coachId: number): Promise<CoachInvite[]>;
   getInviteByToken(token: string): Promise<CoachInvite | undefined>;
   createCoachInvite(invite: CreateCoachInviteRequest): Promise<CoachInvite>;
   updateCoachInvite(id: number, update: Partial<CoachInvite>): Promise<CoachInvite>;
-  
+
   // Player Settings
   getPlayerSettings(userId: string): Promise<PlayerSettings | undefined>;
   createPlayerSettings(settings: CreatePlayerSettingsRequest): Promise<PlayerSettings>;
   updatePlayerSettings(userId: string, update: Partial<PlayerSettings>): Promise<PlayerSettings>;
-  
+
   // Assessments by status (for coach review queue)
   getAssessmentsByStatus(status: string, coachId?: number): Promise<Assessment[]>;
-  
+
   // === SPECIALIST COACH MODE ===
-  
+
   // Student Invites (Smart Invite System)
   getStudentInvitesByCoach(coachId: number): Promise<StudentInvite[]>;
   getStudentInviteByToken(token: string): Promise<StudentInvite | undefined>;
   createStudentInvite(invite: CreateStudentInviteRequest): Promise<StudentInvite>;
   updateStudentInvite(id: number, update: Partial<StudentInvite>): Promise<StudentInvite>;
   getCoachActiveStudentCount(coachId: number): Promise<number>;
-  
+
   // Baseline Videos
   getBaselineVideos(userId: string): Promise<BaselineVideo[]>;
   createBaselineVideo(video: CreateBaselineVideoRequest): Promise<BaselineVideo>;
   updateBaselineVideo(id: number, update: Partial<BaselineVideo>): Promise<BaselineVideo>;
-  
+
   // Player Onboarding
   getPlayerOnboarding(userId: string): Promise<PlayerOnboarding | undefined>;
   createPlayerOnboarding(onboarding: CreatePlayerOnboardingRequest): Promise<PlayerOnboarding>;
-  updatePlayerOnboarding(userId: string, update: Partial<PlayerOnboarding>): Promise<PlayerOnboarding>;
-  
+  updatePlayerOnboarding(
+    userId: string,
+    update: Partial<PlayerOnboarding>,
+  ): Promise<PlayerOnboarding>;
+
   // Coach by referral code
   getCoachByReferralCode(code: string): Promise<Coach | undefined>;
   updateCoach(id: number, update: Partial<Coach>): Promise<Coach>;
-  
+
   // Team referral and update
   getTeamByReferralCode(code: string): Promise<Team | undefined>;
   updateTeam(id: number, update: Partial<Team>): Promise<Team>;
   getTeamsByHeadCoach(coachId: number): Promise<Team[]>;
-  
+
   // === NOTIFICATIONS ===
   getNotifications(userId: string): Promise<Notification[]>;
   getUnreadNotificationCount(userId: string): Promise<number>;
   createNotification(notification: CreateNotificationRequest): Promise<Notification>;
   markNotificationRead(id: number): Promise<Notification>;
   markAllNotificationsRead(userId: string): Promise<void>;
-  
+
   // === GAMECHANGER STATS ===
   createGameChangerStats(stats: CreateGameChangerStatsRequest): Promise<GameChangerStats>;
   getGameChangerStatsByUserId(userId: string): Promise<GameChangerStats | undefined>;
   getGameChangerStatsByAthleteId(athleteId: number): Promise<GameChangerStats | undefined>;
-  
+
   // === SKELETAL ANALYSIS ===
   createSkeletalAnalysis(analysis: CreateSkeletalAnalysisRequest): Promise<SkeletalAnalysis>;
   getSkeletalAnalysisByAthleteId(athleteId: number): Promise<SkeletalAnalysis | undefined>;
@@ -165,7 +229,10 @@ export class DatabaseStorage implements IStorage {
     return coach;
   }
   async createCoach(coach: CreateCoachRequest): Promise<Coach> {
-    const [newCoach] = await db.insert(coaches).values(coach as any).returning();
+    const [newCoach] = await db
+      .insert(coaches)
+      .values(coach as any)
+      .returning();
     return newCoach;
   }
 
@@ -178,7 +245,10 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(teams);
   }
   async createTeam(team: CreateTeamRequest): Promise<Team> {
-    const [newTeam] = await db.insert(teams).values(team as any).returning();
+    const [newTeam] = await db
+      .insert(teams)
+      .values(team as any)
+      .returning();
     return newTeam;
   }
 
@@ -205,7 +275,10 @@ export class DatabaseStorage implements IStorage {
     return athlete;
   }
   async createAthlete(athlete: CreateAthleteRequest): Promise<Athlete> {
-    const [newAthlete] = await db.insert(athletes).values(athlete as any).returning();
+    const [newAthlete] = await db
+      .insert(athletes)
+      .values(athlete as any)
+      .returning();
     return newAthlete;
   }
   async updateAthlete(id: number, update: UpdateAthleteRequest): Promise<Athlete> {
@@ -225,7 +298,10 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(drills);
   }
   async createDrill(drill: CreateDrillRequest): Promise<Drill> {
-    const [newDrill] = await db.insert(drills).values(drill as any).returning();
+    const [newDrill] = await db
+      .insert(drills)
+      .values(drill as any)
+      .returning();
     return newDrill;
   }
   async deleteDrill(id: number): Promise<void> {
@@ -237,7 +313,10 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(mentalEdge);
   }
   async createMentalEdge(content: CreateMentalEdgeRequest): Promise<MentalEdge> {
-    const [newContent] = await db.insert(mentalEdge).values(content as any).returning();
+    const [newContent] = await db
+      .insert(mentalEdge)
+      .values(content as any)
+      .returning();
     return newContent;
   }
   async deleteMentalEdge(id: number): Promise<void> {
@@ -247,7 +326,11 @@ export class DatabaseStorage implements IStorage {
   // Assessments
   async getAssessments(athleteId?: number): Promise<Assessment[]> {
     if (athleteId) {
-      return db.select().from(assessments).where(eq(assessments.athleteId, athleteId)).orderBy(desc(assessments.createdAt));
+      return db
+        .select()
+        .from(assessments)
+        .where(eq(assessments.athleteId, athleteId))
+        .orderBy(desc(assessments.createdAt));
     }
     return db.select().from(assessments).orderBy(desc(assessments.createdAt));
   }
@@ -256,34 +339,53 @@ export class DatabaseStorage implements IStorage {
     return assessment;
   }
   async createAssessment(assessment: CreateAssessmentRequest): Promise<Assessment> {
-    const [newAssessment] = await db.insert(assessments).values(assessment as any).returning();
+    const [newAssessment] = await db
+      .insert(assessments)
+      .values(assessment as any)
+      .returning();
     return newAssessment;
   }
   async updateAssessment(id: number, update: UpdateAssessmentRequest): Promise<Assessment> {
-    const [updated] = await db.update(assessments).set(update).where(eq(assessments.id, id)).returning();
+    const [updated] = await db
+      .update(assessments)
+      .set(update)
+      .where(eq(assessments.id, id))
+      .returning();
     return updated;
   }
 
   // Feedback
   async getFeedback(assessmentId: number): Promise<Feedback[]> {
-    return db.select().from(assessmentFeedback).where(eq(assessmentFeedback.assessmentId, assessmentId));
+    return db
+      .select()
+      .from(assessmentFeedback)
+      .where(eq(assessmentFeedback.assessmentId, assessmentId));
   }
   async createFeedback(feedback: CreateFeedbackRequest): Promise<Feedback> {
-    const [newFeedback] = await db.insert(assessmentFeedback).values(feedback as any).returning();
+    const [newFeedback] = await db
+      .insert(assessmentFeedback)
+      .values(feedback as any)
+      .returning();
     return newFeedback;
   }
 
   // User Role
   async getUser(userId: string): Promise<{ id: string; role: UserRole | null } | undefined> {
-    const result = await db.select({ id: users.id, role: users.role }).from(users).where(eq(users.id, userId));
+    const result = await db
+      .select({ id: users.id, role: users.role })
+      .from(users)
+      .where(eq(users.id, userId));
     return result[0];
   }
-  
+
   async updateUserRole(userId: string, role: UserRole): Promise<void> {
     await db.update(users).set({ role }).where(eq(users.id, userId));
   }
 
-  async updateUser(userId: string, user: { firstName?: string; lastName?: string; email?: string }): Promise<void> {
+  async updateUser(
+    userId: string,
+    user: { firstName?: string; lastName?: string; email?: string },
+  ): Promise<void> {
     await db.update(users).set(user).where(eq(users.id, userId));
   }
 
@@ -316,111 +418,173 @@ export class DatabaseStorage implements IStorage {
 
   // Player Check-ins
   async getPlayerCheckinByDate(userId: string, date: string): Promise<PlayerCheckin | undefined> {
-    const [checkin] = await db.select().from(playerCheckins)
+    const [checkin] = await db
+      .select()
+      .from(playerCheckins)
       .where(and(eq(playerCheckins.userId, userId), eq(playerCheckins.date, date)));
     return checkin;
   }
 
   async createPlayerCheckin(checkin: CreatePlayerCheckinRequest): Promise<PlayerCheckin> {
-    const [newCheckin] = await db.insert(playerCheckins).values(checkin as any).returning();
+    const [newCheckin] = await db
+      .insert(playerCheckins)
+      .values(checkin as any)
+      .returning();
     return newCheckin;
   }
 
   // Practice Plans
   async getPracticePlans(teamId?: number): Promise<PracticePlan[]> {
     if (teamId) {
-      return db.select().from(practicePlans).where(eq(practicePlans.teamId, teamId)).orderBy(desc(practicePlans.createdAt));
+      return db
+        .select()
+        .from(practicePlans)
+        .where(eq(practicePlans.teamId, teamId))
+        .orderBy(desc(practicePlans.createdAt));
     }
     return db.select().from(practicePlans).orderBy(desc(practicePlans.createdAt));
   }
 
   async createPracticePlan(plan: Partial<PracticePlan>): Promise<PracticePlan> {
-    const [newPlan] = await db.insert(practicePlans).values(plan as any).returning();
+    const [newPlan] = await db
+      .insert(practicePlans)
+      .values(plan as any)
+      .returning();
     return newPlan;
   }
 
   // Coach Students (Stable)
   async getCoachStudents(coachId: number): Promise<(CoachStudent & { athlete?: Athlete })[]> {
-    const students = await db.select().from(coachStudents).where(eq(coachStudents.coachId, coachId));
-    
+    const students = await db
+      .select()
+      .from(coachStudents)
+      .where(eq(coachStudents.coachId, coachId));
+
     // Join with athletes
     const enrichedStudents = await Promise.all(
       students.map(async (student) => {
         if (student.athleteId) {
-          const [athlete] = await db.select().from(athletes).where(eq(athletes.id, student.athleteId));
+          const [athlete] = await db
+            .select()
+            .from(athletes)
+            .where(eq(athletes.id, student.athleteId));
           return { ...student, athlete };
         }
         return student;
-      })
+      }),
     );
-    
+
     return enrichedStudents;
   }
 
   async createCoachStudent(student: Partial<CoachStudent>): Promise<CoachStudent> {
-    const [newStudent] = await db.insert(coachStudents).values(student as any).returning();
+    const [newStudent] = await db
+      .insert(coachStudents)
+      .values(student as any)
+      .returning();
     return newStudent;
   }
 
   // Homework Assignments
-  async getHomeworkAssignments(coachId?: number, athleteId?: number): Promise<HomeworkAssignment[]> {
+  async getHomeworkAssignments(
+    coachId?: number,
+    athleteId?: number,
+  ): Promise<HomeworkAssignment[]> {
     if (coachId && athleteId) {
-      return db.select().from(homeworkAssignments)
-        .where(and(eq(homeworkAssignments.coachId, coachId), eq(homeworkAssignments.athleteId, athleteId)))
+      return db
+        .select()
+        .from(homeworkAssignments)
+        .where(
+          and(
+            eq(homeworkAssignments.coachId, coachId),
+            eq(homeworkAssignments.athleteId, athleteId),
+          ),
+        )
         .orderBy(desc(homeworkAssignments.createdAt));
     }
     if (coachId) {
-      return db.select().from(homeworkAssignments).where(eq(homeworkAssignments.coachId, coachId)).orderBy(desc(homeworkAssignments.createdAt));
+      return db
+        .select()
+        .from(homeworkAssignments)
+        .where(eq(homeworkAssignments.coachId, coachId))
+        .orderBy(desc(homeworkAssignments.createdAt));
     }
     if (athleteId) {
-      return db.select().from(homeworkAssignments).where(eq(homeworkAssignments.athleteId, athleteId)).orderBy(desc(homeworkAssignments.createdAt));
+      return db
+        .select()
+        .from(homeworkAssignments)
+        .where(eq(homeworkAssignments.athleteId, athleteId))
+        .orderBy(desc(homeworkAssignments.createdAt));
     }
     return db.select().from(homeworkAssignments).orderBy(desc(homeworkAssignments.createdAt));
   }
 
-  async createHomeworkAssignment(assignment: Partial<HomeworkAssignment>): Promise<HomeworkAssignment> {
-    const [newAssignment] = await db.insert(homeworkAssignments).values(assignment as any).returning();
+  async createHomeworkAssignment(
+    assignment: Partial<HomeworkAssignment>,
+  ): Promise<HomeworkAssignment> {
+    const [newAssignment] = await db
+      .insert(homeworkAssignments)
+      .values(assignment as any)
+      .returning();
     return newAssignment;
   }
 
   // Player-Coach Relationships (Hybrid Coaching)
-  async getPlayerCoaches(playerId: string): Promise<(PlayerCoachRelationship & { coach?: Coach })[]> {
-    const relationships = await db.select().from(playerCoachRelationships)
+  async getPlayerCoaches(
+    playerId: string,
+  ): Promise<(PlayerCoachRelationship & { coach?: Coach })[]> {
+    const relationships = await db
+      .select()
+      .from(playerCoachRelationships)
       .where(eq(playerCoachRelationships.playerId, playerId));
-    
+
     // Join with coaches
     const enriched = await Promise.all(
       relationships.map(async (rel) => {
         const [coach] = await db.select().from(coaches).where(eq(coaches.id, rel.coachId));
         return { ...rel, coach };
-      })
+      }),
     );
-    
+
     return enriched;
   }
 
   async getCoachPlayers(coachId: number): Promise<(PlayerCoachRelationship & { player?: any })[]> {
-    const relationships = await db.select().from(playerCoachRelationships)
+    const relationships = await db
+      .select()
+      .from(playerCoachRelationships)
       .where(eq(playerCoachRelationships.coachId, coachId));
-    
+
     // Join with users (players)
     const enriched = await Promise.all(
       relationships.map(async (rel) => {
         const [player] = await db.select().from(users).where(eq(users.id, rel.playerId));
         return { ...rel, player };
-      })
+      }),
     );
-    
+
     return enriched;
   }
 
-  async createPlayerCoachRelationship(rel: CreatePlayerCoachRelationshipRequest): Promise<PlayerCoachRelationship> {
-    const [newRel] = await db.insert(playerCoachRelationships).values(rel as any).returning();
+  async createPlayerCoachRelationship(
+    rel: CreatePlayerCoachRelationshipRequest,
+  ): Promise<PlayerCoachRelationship> {
+    const [newRel] = await db
+      .insert(playerCoachRelationships)
+      .values(rel as any)
+      .returning();
     return newRel;
   }
 
-  async updatePlayerCoachRelationship(id: number, update: Partial<PlayerCoachRelationship>): Promise<PlayerCoachRelationship> {
-    const [updated] = await db.update(playerCoachRelationships).set(update).where(eq(playerCoachRelationships.id, id)).returning();
+  async updatePlayerCoachRelationship(
+    id: number,
+    update: Partial<PlayerCoachRelationship>,
+  ): Promise<PlayerCoachRelationship> {
+    const [updated] = await db
+      .update(playerCoachRelationships)
+      .set(update)
+      .where(eq(playerCoachRelationships.id, id))
+      .returning();
     return updated;
   }
 
@@ -430,47 +594,69 @@ export class DatabaseStorage implements IStorage {
 
   // Coach Invites
   async getPlayerInvites(playerId: string): Promise<CoachInvite[]> {
-    return db.select().from(coachInvites)
+    return db
+      .select()
+      .from(coachInvites)
       .where(eq(coachInvites.fromPlayerId, playerId))
       .orderBy(desc(coachInvites.createdAt));
   }
 
   async getCoachInvites(coachId: number): Promise<CoachInvite[]> {
-    return db.select().from(coachInvites)
+    return db
+      .select()
+      .from(coachInvites)
       .where(eq(coachInvites.toCoachId, coachId))
       .orderBy(desc(coachInvites.createdAt));
   }
 
   async getInviteByToken(token: string): Promise<CoachInvite | undefined> {
-    const [invite] = await db.select().from(coachInvites)
+    const [invite] = await db
+      .select()
+      .from(coachInvites)
       .where(eq(coachInvites.inviteToken, token));
     return invite;
   }
 
   async createCoachInvite(invite: CreateCoachInviteRequest): Promise<CoachInvite> {
-    const [newInvite] = await db.insert(coachInvites).values(invite as any).returning();
+    const [newInvite] = await db
+      .insert(coachInvites)
+      .values(invite as any)
+      .returning();
     return newInvite;
   }
 
   async updateCoachInvite(id: number, update: Partial<CoachInvite>): Promise<CoachInvite> {
-    const [updated] = await db.update(coachInvites).set(update).where(eq(coachInvites.id, id)).returning();
+    const [updated] = await db
+      .update(coachInvites)
+      .set(update)
+      .where(eq(coachInvites.id, id))
+      .returning();
     return updated;
   }
 
   // Player Settings
   async getPlayerSettings(userId: string): Promise<PlayerSettings | undefined> {
-    const [settings] = await db.select().from(playerSettings)
+    const [settings] = await db
+      .select()
+      .from(playerSettings)
       .where(eq(playerSettings.userId, userId));
     return settings;
   }
 
   async createPlayerSettings(settings: CreatePlayerSettingsRequest): Promise<PlayerSettings> {
-    const [newSettings] = await db.insert(playerSettings).values(settings as any).returning();
+    const [newSettings] = await db
+      .insert(playerSettings)
+      .values(settings as any)
+      .returning();
     return newSettings;
   }
 
-  async updatePlayerSettings(userId: string, update: Partial<PlayerSettings>): Promise<PlayerSettings> {
-    const [updated] = await db.update(playerSettings)
+  async updatePlayerSettings(
+    userId: string,
+    update: Partial<PlayerSettings>,
+  ): Promise<PlayerSettings> {
+    const [updated] = await db
+      .update(playerSettings)
       .set({ ...update, updatedAt: new Date() })
       .where(eq(playerSettings.userId, userId))
       .returning();
@@ -480,11 +666,15 @@ export class DatabaseStorage implements IStorage {
   // Assessments by status (for coach review queue)
   async getAssessmentsByStatus(status: string, coachId?: number): Promise<Assessment[]> {
     if (coachId) {
-      return db.select().from(assessments)
+      return db
+        .select()
+        .from(assessments)
         .where(and(eq(assessments.status, status), eq(assessments.coachId, coachId)))
         .orderBy(desc(assessments.createdAt));
     }
-    return db.select().from(assessments)
+    return db
+      .select()
+      .from(assessments)
       .where(eq(assessments.status, status))
       .orderBy(desc(assessments.createdAt));
   }
@@ -493,64 +683,102 @@ export class DatabaseStorage implements IStorage {
 
   // Student Invites (Smart Invite System)
   async getStudentInvitesByCoach(coachId: number): Promise<StudentInvite[]> {
-    return db.select().from(studentInvites)
+    return db
+      .select()
+      .from(studentInvites)
       .where(eq(studentInvites.coachId, coachId))
       .orderBy(desc(studentInvites.createdAt));
   }
 
   async getStudentInviteByToken(token: string): Promise<StudentInvite | undefined> {
-    const [invite] = await db.select().from(studentInvites)
+    const [invite] = await db
+      .select()
+      .from(studentInvites)
       .where(eq(studentInvites.inviteToken, token));
     return invite;
   }
 
   async createStudentInvite(invite: CreateStudentInviteRequest): Promise<StudentInvite> {
-    const [newInvite] = await db.insert(studentInvites).values(invite as any).returning();
+    const [newInvite] = await db
+      .insert(studentInvites)
+      .values(invite as any)
+      .returning();
     return newInvite;
   }
 
   async updateStudentInvite(id: number, update: Partial<StudentInvite>): Promise<StudentInvite> {
-    const [updated] = await db.update(studentInvites).set(update).where(eq(studentInvites.id, id)).returning();
+    const [updated] = await db
+      .update(studentInvites)
+      .set(update)
+      .where(eq(studentInvites.id, id))
+      .returning();
     return updated;
   }
 
   async getCoachActiveStudentCount(coachId: number): Promise<number> {
-    const relationships = await db.select().from(playerCoachRelationships)
-      .where(and(eq(playerCoachRelationships.coachId, coachId), eq(playerCoachRelationships.status, "active")));
+    const relationships = await db
+      .select()
+      .from(playerCoachRelationships)
+      .where(
+        and(
+          eq(playerCoachRelationships.coachId, coachId),
+          eq(playerCoachRelationships.status, 'active'),
+        ),
+      );
     return relationships.length;
   }
 
   // Baseline Videos
   async getBaselineVideos(userId: string): Promise<BaselineVideo[]> {
-    return db.select().from(baselineVideos)
+    return db
+      .select()
+      .from(baselineVideos)
       .where(eq(baselineVideos.userId, userId))
       .orderBy(baselineVideos.videoNumber);
   }
 
   async createBaselineVideo(video: CreateBaselineVideoRequest): Promise<BaselineVideo> {
-    const [newVideo] = await db.insert(baselineVideos).values(video as any).returning();
+    const [newVideo] = await db
+      .insert(baselineVideos)
+      .values(video as any)
+      .returning();
     return newVideo;
   }
 
   async updateBaselineVideo(id: number, update: Partial<BaselineVideo>): Promise<BaselineVideo> {
-    const [updated] = await db.update(baselineVideos).set(update).where(eq(baselineVideos.id, id)).returning();
+    const [updated] = await db
+      .update(baselineVideos)
+      .set(update)
+      .where(eq(baselineVideos.id, id))
+      .returning();
     return updated;
   }
 
   // Player Onboarding
   async getPlayerOnboarding(userId: string): Promise<PlayerOnboarding | undefined> {
-    const [onboarding] = await db.select().from(playerOnboarding)
+    const [onboarding] = await db
+      .select()
+      .from(playerOnboarding)
       .where(eq(playerOnboarding.userId, userId));
     return onboarding;
   }
 
-  async createPlayerOnboarding(onboarding: CreatePlayerOnboardingRequest): Promise<PlayerOnboarding> {
-    const [newOnboarding] = await db.insert(playerOnboarding).values(onboarding as any).returning();
+  async createPlayerOnboarding(
+    onboarding: CreatePlayerOnboardingRequest,
+  ): Promise<PlayerOnboarding> {
+    const [newOnboarding] = await db
+      .insert(playerOnboarding)
+      .values(onboarding as any)
+      .returning();
     return newOnboarding;
   }
 
-  async updatePlayerOnboarding(userId: string, update: Partial<PlayerOnboarding>): Promise<PlayerOnboarding> {
-    const [updated] = await db.update(playerOnboarding)
+  async updatePlayerOnboarding(
+    userId: string,
+    update: Partial<PlayerOnboarding>,
+  ): Promise<PlayerOnboarding> {
+    const [updated] = await db
+      .update(playerOnboarding)
       .set({ ...update, updatedAt: new Date() })
       .where(eq(playerOnboarding.userId, userId))
       .returning();
@@ -559,8 +787,7 @@ export class DatabaseStorage implements IStorage {
 
   // Coach by referral code
   async getCoachByReferralCode(code: string): Promise<Coach | undefined> {
-    const [coach] = await db.select().from(coaches)
-      .where(eq(coaches.referralCode, code));
+    const [coach] = await db.select().from(coaches).where(eq(coaches.referralCode, code));
     return coach;
   }
 
@@ -571,8 +798,7 @@ export class DatabaseStorage implements IStorage {
 
   // Team referral and update
   async getTeamByReferralCode(code: string): Promise<Team | undefined> {
-    const [team] = await db.select().from(teams)
-      .where(eq(teams.referralCode, code));
+    const [team] = await db.select().from(teams).where(eq(teams.referralCode, code));
     return team;
   }
 
@@ -582,30 +808,37 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTeamsByHeadCoach(coachId: number): Promise<Team[]> {
-    return db.select().from(teams)
-      .where(eq(teams.headCoachId, coachId));
+    return db.select().from(teams).where(eq(teams.headCoachId, coachId));
   }
 
   // === NOTIFICATIONS ===
   async getNotifications(userId: string): Promise<Notification[]> {
-    return db.select().from(notifications)
+    return db
+      .select()
+      .from(notifications)
       .where(eq(notifications.userId, userId))
       .orderBy(desc(notifications.createdAt));
   }
 
   async getUnreadNotificationCount(userId: string): Promise<number> {
-    const unread = await db.select().from(notifications)
+    const unread = await db
+      .select()
+      .from(notifications)
       .where(and(eq(notifications.userId, userId), eq(notifications.read, false)));
     return unread.length;
   }
 
   async createNotification(notification: CreateNotificationRequest): Promise<Notification> {
-    const [newNotification] = await db.insert(notifications).values(notification as any).returning();
+    const [newNotification] = await db
+      .insert(notifications)
+      .values(notification as any)
+      .returning();
     return newNotification;
   }
 
   async markNotificationRead(id: number): Promise<Notification> {
-    const [updated] = await db.update(notifications)
+    const [updated] = await db
+      .update(notifications)
       .set({ read: true })
       .where(eq(notifications.id, id))
       .returning();
@@ -613,26 +846,31 @@ export class DatabaseStorage implements IStorage {
   }
 
   async markAllNotificationsRead(userId: string): Promise<void> {
-    await db.update(notifications)
-      .set({ read: true })
-      .where(eq(notifications.userId, userId));
+    await db.update(notifications).set({ read: true }).where(eq(notifications.userId, userId));
   }
 
   // === GAMECHANGER STATS ===
   async createGameChangerStats(stats: CreateGameChangerStatsRequest): Promise<GameChangerStats> {
-    const [newStats] = await db.insert(gameChangerStats).values(stats as any).returning();
+    const [newStats] = await db
+      .insert(gameChangerStats)
+      .values(stats as any)
+      .returning();
     return newStats;
   }
 
   async getGameChangerStatsByUserId(userId: string): Promise<GameChangerStats | undefined> {
-    const [stats] = await db.select().from(gameChangerStats)
+    const [stats] = await db
+      .select()
+      .from(gameChangerStats)
       .where(eq(gameChangerStats.userId, userId))
       .orderBy(desc(gameChangerStats.createdAt));
     return stats;
   }
 
   async getGameChangerStatsByAthleteId(athleteId: number): Promise<GameChangerStats | undefined> {
-    const [stats] = await db.select().from(gameChangerStats)
+    const [stats] = await db
+      .select()
+      .from(gameChangerStats)
       .where(eq(gameChangerStats.athleteId, athleteId))
       .orderBy(desc(gameChangerStats.createdAt));
     return stats;
@@ -640,19 +878,26 @@ export class DatabaseStorage implements IStorage {
 
   // === SKELETAL ANALYSIS ===
   async createSkeletalAnalysis(analysis: CreateSkeletalAnalysisRequest): Promise<SkeletalAnalysis> {
-    const [newAnalysis] = await db.insert(skeletalAnalysis).values(analysis as any).returning();
+    const [newAnalysis] = await db
+      .insert(skeletalAnalysis)
+      .values(analysis as any)
+      .returning();
     return newAnalysis;
   }
 
   async getSkeletalAnalysisByAthleteId(athleteId: number): Promise<SkeletalAnalysis | undefined> {
-    const [analysis] = await db.select().from(skeletalAnalysis)
+    const [analysis] = await db
+      .select()
+      .from(skeletalAnalysis)
       .where(eq(skeletalAnalysis.athleteId, athleteId))
       .orderBy(desc(skeletalAnalysis.createdAt));
     return analysis;
   }
 
   async getSkeletalAnalysisByUserId(userId: string): Promise<SkeletalAnalysis | undefined> {
-    const [analysis] = await db.select().from(skeletalAnalysis)
+    const [analysis] = await db
+      .select()
+      .from(skeletalAnalysis)
       .where(eq(skeletalAnalysis.userId, userId))
       .orderBy(desc(skeletalAnalysis.createdAt));
     return analysis;
@@ -660,18 +905,24 @@ export class DatabaseStorage implements IStorage {
 
   // === PLAYER GOALS ===
   async getPlayerGoals(userId: string): Promise<PlayerGoal[]> {
-    return db.select().from(playerGoals)
+    return db
+      .select()
+      .from(playerGoals)
       .where(eq(playerGoals.userId, userId))
       .orderBy(playerGoals.createdAt);
   }
 
   async createPlayerGoal(goal: CreatePlayerGoalRequest): Promise<PlayerGoal> {
-    const [newGoal] = await db.insert(playerGoals).values(goal as any).returning();
+    const [newGoal] = await db
+      .insert(playerGoals)
+      .values(goal as any)
+      .returning();
     return newGoal;
   }
 
   async updatePlayerGoal(id: number, update: Partial<PlayerGoal>): Promise<PlayerGoal> {
-    const [updated] = await db.update(playerGoals)
+    const [updated] = await db
+      .update(playerGoals)
       .set({ ...update, updatedAt: new Date() })
       .where(eq(playerGoals.id, id))
       .returning();
@@ -680,37 +931,53 @@ export class DatabaseStorage implements IStorage {
 
   // === TEAM STATS ===
   async createTeamStats(stats: CreateTeamStatsRequest): Promise<TeamStats> {
-    const [newStats] = await db.insert(teamStats).values(stats as any).returning();
+    const [newStats] = await db
+      .insert(teamStats)
+      .values(stats as any)
+      .returning();
     return newStats;
   }
 
   async getTeamStatsByTeamId(teamId: number): Promise<TeamStats | undefined> {
-    const [stats] = await db.select().from(teamStats)
+    const [stats] = await db
+      .select()
+      .from(teamStats)
       .where(eq(teamStats.teamId, teamId))
       .orderBy(desc(teamStats.createdAt));
     return stats;
   }
 
   async getTeamStatsByCoachId(coachId: number): Promise<TeamStats[]> {
-    return db.select().from(teamStats)
+    return db
+      .select()
+      .from(teamStats)
       .where(eq(teamStats.coachId, coachId))
       .orderBy(desc(teamStats.createdAt));
   }
 
   // === USER SUBSCRIPTIONS ===
   async getUserSubscription(userId: string): Promise<UserSubscription | undefined> {
-    const [sub] = await db.select().from(userSubscriptions)
+    const [sub] = await db
+      .select()
+      .from(userSubscriptions)
       .where(eq(userSubscriptions.userId, userId));
     return sub;
   }
 
   async createUserSubscription(sub: CreateUserSubscriptionRequest): Promise<UserSubscription> {
-    const [newSub] = await db.insert(userSubscriptions).values(sub as any).returning();
+    const [newSub] = await db
+      .insert(userSubscriptions)
+      .values(sub as any)
+      .returning();
     return newSub;
   }
 
-  async updateUserSubscription(userId: string, update: Partial<UserSubscription>): Promise<UserSubscription> {
-    const [updated] = await db.update(userSubscriptions)
+  async updateUserSubscription(
+    userId: string,
+    update: Partial<UserSubscription>,
+  ): Promise<UserSubscription> {
+    const [updated] = await db
+      .update(userSubscriptions)
       .set(update)
       .where(eq(userSubscriptions.userId, userId))
       .returning();

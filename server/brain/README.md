@@ -13,9 +13,11 @@ The **SoftballProAI Brain** is a comprehensive AI coaching system built to analy
 ## Knowledge Base Structure
 
 ### 1. **Softball Knowledge Base** (`softball_knowledge_base.ts`)
+
 Comprehensive technical knowledge covering all positions and skills.
 
 #### Contents:
+
 - **Pitching Knowledge**
   - Windmill mechanics (arm circle, drag foot, release point)
   - Velocity generation (internal rotation, hip-shoulder separation)
@@ -60,9 +62,11 @@ Comprehensive technical knowledge covering all positions and skills.
 ---
 
 ### 2. **Mental Training Knowledge** (`mental_training_knowledge.ts`)
+
 Championship mindset, sports psychology, and motivational content.
 
 #### Contents:
+
 - **Mamba Mentality (Kobe Bryant)**
   - Core philosophy and principles
   - Key quotes and lessons
@@ -93,9 +97,11 @@ Championship mindset, sports psychology, and motivational content.
 ---
 
 ### 3. **Strength Training Knowledge** (`strength_training_knowledge.ts`)
+
 CrossFit-inspired functional fitness for softball athletes with age-appropriate programming.
 
 #### Contents:
+
 - **CrossFit for Softball**
   - Philosophy and focus areas
   - Real-world results and case studies
@@ -130,9 +136,11 @@ CrossFit-inspired functional fitness for softball athletes with age-appropriate 
 ---
 
 ### 4. **Tournament Rules Knowledge** (`tournament_rules_knowledge.ts`)
+
 Comprehensive rules reference for all major softball organizations.
 
 #### Contents:
+
 - **NFHS (High School) Rules - 2026 Edition**
   - Major rule changes (pitching delivery, electronic devices, uniforms, drying agents)
   - Points of emphasis (obstruction, unobstructed view)
@@ -170,9 +178,11 @@ Comprehensive rules reference for all major softball organizations.
 ---
 
 ### 5. **Practice Planning Knowledge** (`practice_planning_knowledge.ts`)
+
 Complete practice structure and planning for all age groups.
 
 #### Contents:
+
 - **Practice Framework**
   - Philosophy (max reps, small groups, engagement)
   - Practice components (warm-up, skill development, tactical, conditioning, cool-down)
@@ -212,7 +222,9 @@ Complete practice structure and planning for all age groups.
 ## How the Brain Uses This Knowledge
 
 ### 1. **Video Analysis Integration**
+
 When a player uploads a video for analysis:
+
 - The Brain identifies the skill type (pitching, hitting, catching, fielding)
 - MediaPipe extracts biomechanical data (arm angles, hip rotation, timing, etc.)
 - The analysis engine compares metrics to benchmarks in the knowledge base
@@ -220,20 +232,26 @@ When a player uploads a video for analysis:
 - Corrective drills are recommended from the softball knowledge base
 
 ### 2. **Personalized Coaching**
+
 Based on biometric analysis:
+
 - Age-appropriate recommendations from strength training knowledge
 - Mental training strategies matched to player's situation
 - Expert insights applied to specific mechanical issues
 - Practice plans tailored to player's needs
 
 ### 3. **Context-Aware Mentorship**
+
 The Brain adapts advice based on:
+
 - **Player Mode**: Daily vibe check, injury prevention, motivational content
 - **Team Coach Mode**: Practice planning, roster health, tournament preparation
 - **Pitching Coach Mode**: Specialized pitching knowledge, homework assignments
 
 ### 4. **Continuous Learning**
+
 The knowledge base is designed to grow:
+
 - New drills added through TrainBrain interface
 - Expert insights incorporated as discovered
 - Research findings integrated
@@ -244,12 +262,14 @@ The knowledge base is designed to grow:
 ## Core Analysis Files
 
 ### `analyze_mechanics.ts`
+
 - Maps biomechanical issues to corrective drills
 - 80+ issue-to-tag mappings
 - Relevance scoring algorithm
 - Supports all 4 core skills (pitching, hitting, catching, fielding)
 
 ### `analysis_engine.ts`
+
 - Central router for video analysis
 - Skill-specific analysis engines
 - Mental module integration
@@ -260,16 +280,19 @@ The knowledge base is designed to grow:
 ## Three User Modes
 
 ### Player Mode ("My Journey")
+
 - **Daily Vibe Check-in**: Soreness tracker with injury prevention logic
 - **Mamba Feed**: Daily motivational quote from mental training knowledge
 - **Coach Me**: One-click video upload for instant feedback
 
 ### Team Mode ("Coach" View)
+
 - **Practice Architect**: Auto-generate practice plans using practice planning knowledge
 - **Roster Health**: Dashboard showing injury alerts from player check-ins
 - **GameChanger Integration**: Import stats for complete player analysis
 
 ### Pitching Coach Mode ("Specialist" View)
+
 - **Stable Management**: Assign homework drills from pitching knowledge base
 - **Split-Screen Analysis**: Compare student video with pro model (coming soon)
 - **Baseline Review**: Approve player onboarding videos
@@ -281,12 +304,14 @@ The knowledge base is designed to grow:
 The Brain prioritizes safety for ages 8-16:
 
 ### Mandatory Injury Prevention
+
 - If player reports arm/shoulder soreness ≥ 7/10, **BLOCK pitching drills**
 - Surface recovery/stretching content instead
 - Alert coaches of injury concerns
 - Recommend age-appropriate strength training only
 
 ### Age-Appropriate Content
+
 - 8-10: Bodyweight exercises, movement quality, fun
 - 11-13: Light weights with perfect technique
 - 14-16: Progressive strength training with supervision
@@ -296,6 +321,7 @@ The Brain prioritizes safety for ages 8-16:
 ## Expert Sources Referenced
 
 ### Pitching Experts
+
 - Amanda Scarborough (Texas A&M, Olympic player, ESPN analyst)
 - Monica Abbott (Olympic medalist, 77 mph record)
 - Cat Osterman (Olympic medalist, Texas legend)
@@ -303,14 +329,17 @@ The Brain prioritizes safety for ages 8-16:
 - Toni Paisley (Paisley's Pitching app)
 
 ### Hitting Experts
+
 - Kelly Kretschman (Olympic gold, Alabama)
 - Rachel Garcia (UCLA, USA Softball)
 
 ### Biomechanics
+
 - Dr. James Andrews (ASMI founder)
 - Kelly Inouye-Perez (UCLA Head Coach)
 
 ### Mental Training
+
 - Kobe Bryant (Mamba Mentality)
 - Michael Jordan (Championship mindset)
 - Muhammad Ali (Resilience and confidence)
@@ -321,6 +350,7 @@ The Brain prioritizes safety for ages 8-16:
 ## Research Sources
 
 All knowledge compiled from:
+
 - **Coaching Resources**: NFCA, Elite Fastpitch TV, CoachTube, Paisley's Pitching
 - **Biomechanics Research**: American Sports Medicine Institute, peer-reviewed journals (2025-2026)
 - **Rules Organizations**: NFHS, PGF, USSSA, GSA, Titan Tournaments
@@ -335,6 +365,7 @@ All knowledge compiled from:
 ## Future Enhancements
 
 ### Planned Additions
+
 1. **Pro Model Video Library**: Split-screen comparison with elite athletes
 2. **YouTube Content Integration**: Automated scraping of training videos
 3. **Advanced Biomechanics**: Real-time MediaPipe analysis with live feedback
@@ -345,7 +376,9 @@ All knowledge compiled from:
 8. **College Recruiting**: Recruiting timeline and profile building
 
 ### Continuous Learning
+
 The Brain is designed to grow with:
+
 - Coach feedback on drill effectiveness
 - Player progression data analysis
 - New research and expert insights
@@ -356,6 +389,7 @@ The Brain is designed to grow with:
 ## Usage Examples
 
 ### Example 1: Pitching Analysis
+
 ```typescript
 // Player uploads pitching video
 // Brain extracts: arm slot = 165°, hip-shoulder separation = 25°, drag foot lift = 15%
@@ -374,6 +408,7 @@ The Brain is designed to grow with:
 ```
 
 ### Example 2: Team Practice Planning
+
 ```typescript
 // Coach selects: 2-hour defensive focus, 12U team
 
@@ -388,6 +423,7 @@ The Brain is designed to grow with:
 ```
 
 ### Example 3: Mental Preparation
+
 ```typescript
 // Player check-in: Before championship game, feeling nervous
 
@@ -406,6 +442,7 @@ The Brain is designed to grow with:
 The Brain uses biometric data to provide context-aware coaching:
 
 ### Input Data
+
 - MediaPipe pose detection (arm angles, body positions, timing)
 - Video frame analysis (mechanics breakdown)
 - Player profile (age, position, skill level, injury history)
@@ -413,6 +450,7 @@ The Brain uses biometric data to provide context-aware coaching:
 - GameChanger stats (AVG, OPS, ERA, WHIP, K%)
 
 ### Processing
+
 1. Extract biomechanical metrics from video
 2. Compare to age-appropriate benchmarks from knowledge base
 3. Identify deviations and mechanical issues
@@ -421,6 +459,7 @@ The Brain uses biometric data to provide context-aware coaching:
 6. Generate personalized feedback
 
 ### Output
+
 - Detailed biomechanical analysis
 - Specific corrective drill recommendations
 - Mental game strategies
@@ -433,21 +472,27 @@ The Brain uses biometric data to provide context-aware coaching:
 ## Contributing to the Brain
 
 ### Adding New Drills
+
 Use the TrainBrain interface at `/train-brain`:
+
 - Name, category, difficulty
 - Description and mechanics tags
 - Video URL and expert source
 - Issue addressed
 
 ### Expanding Mental Content
+
 Add to mental edge database:
+
 - Title and content type (quote, video, principle)
 - Category and usage context
 - Source attribution
 - Tags for contextual delivery
 
 ### Updating Knowledge Base
+
 When new research or techniques emerge:
+
 1. Update relevant knowledge base file
 2. Add expert source if new
 3. Update analyze_mechanics.ts mappings if needed
@@ -458,18 +503,21 @@ When new research or techniques emerge:
 ## Safety and Compliance
 
 ### User Safety
+
 - Age-appropriate content filtering
 - Injury prevention prioritized
 - Medical disclaimer on all advice
 - Encouragement to consult professionals
 
 ### Data Privacy
+
 - Player videos stored securely (Replit Object Storage)
 - COPPA compliance for users under 13
 - Parent/guardian consent required
 - No sharing of player data without permission
 
 ### Liability
+
 - Educational tool, not replacement for professional coaching
 - Encourages proper supervision
 - Injury prevention emphasized
@@ -480,6 +528,7 @@ When new research or techniques emerge:
 ## Technical Architecture
 
 ### File Structure
+
 ```
 server/brain/
 ├── README.md (this file)
@@ -493,6 +542,7 @@ server/brain/
 ```
 
 ### Integration Points
+
 - Database: `drills`, `mentalEdge` tables
 - Routes: `/api/brain/*`, `/api/assessments/*`
 - Frontend: PoseAnalyzer component, TrainBrain interface
@@ -503,6 +553,7 @@ server/brain/
 ## Version History
 
 **Version 1.0** (January 2026)
+
 - Initial comprehensive knowledge base
 - All positions covered (pitching, hitting, catching, infield, outfield)
 - Mental training and Mamba Mentality
@@ -523,4 +574,4 @@ This knowledge base compiles publicly available coaching information, published 
 
 ---
 
-*"Hard work outweighs talent—every time."* - Kobe Bryant, Mamba Mentality
+_"Hard work outweighs talent—every time."_ - Kobe Bryant, Mamba Mentality

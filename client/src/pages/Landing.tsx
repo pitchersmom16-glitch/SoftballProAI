@@ -1,23 +1,36 @@
-import { Link } from "wouter";
-import { Activity, TrendingUp, Video } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import logo from "@/assets/logo.jpg";
-import heroImage from "@/assets/hero.jpg";
+import { Link } from 'wouter';
+import { Activity, TrendingUp, Video } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import logo from '@/assets/logo.jpg';
+import heroImage from '@/assets/hero.jpg';
 
 export default function Landing() {
   return (
     <div className="relative overflow-hidden min-h-screen" style={{ backgroundColor: '#050505' }}>
       {/* Navbar */}
-      <nav className="fixed w-full z-50 border-b" style={{ backgroundColor: 'rgba(5, 5, 5, 0.8)', backdropFilter: 'blur(12px)', borderColor: 'rgba(255, 255, 255, 0.1)' }}>
+      <nav
+        className="fixed w-full z-50 border-b"
+        style={{
+          backgroundColor: 'rgba(5, 5, 5, 0.8)',
+          backdropFilter: 'blur(12px)',
+          borderColor: 'rgba(255, 255, 255, 0.1)',
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <img src={logo} alt="SoftballProAI" className="h-14 w-auto object-contain" />
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/auth" className="text-sm font-medium text-gray-400 hover:text-white transition-colors" data-testid="link-signin">Sign In</Link>
+            <Link
+              href="/auth"
+              className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
+              data-testid="link-signin"
+            >
+              Sign In
+            </Link>
             <Link href="/pricing">
-              <button 
-                className="px-5 py-2.5 rounded-full btn-primary-glow text-sm" 
+              <button
+                className="px-5 py-2.5 rounded-full btn-primary-glow text-sm"
                 data-testid="button-get-started"
               >
                 Get Started
@@ -54,8 +67,10 @@ export default function Landing() {
           <div className="max-w-3xl text-left space-y-8">
             {/* The AI Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
-              <span className="w-2 h-2 rounded-full bg-brand-blue animate-pulse"/>
-              <span className="text-sm font-medium text-gray-300 tracking-wide">AI-POWERED COACH</span>
+              <span className="w-2 h-2 rounded-full bg-brand-blue animate-pulse" />
+              <span className="text-sm font-medium text-gray-300 tracking-wide">
+                AI-POWERED COACH
+              </span>
             </div>
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-tight">
@@ -66,7 +81,8 @@ export default function Landing() {
             </h1>
 
             <p className="text-lg md:text-xl text-gray-400 max-w-2xl leading-relaxed">
-              Your personal pitching, hitting, and mental performance coach—available 24/7. Built for the 8U to 16U athlete.
+              Your personal pitching, hitting, and mental performance coach—available 24/7. Built
+              for the 8U to 16U athlete.
             </p>
 
             {/* Feature Bullets */}
@@ -93,7 +109,10 @@ export default function Landing() {
                 </Button>
               </Link>
               <a href="#features">
-                <Button variant="outline" className="h-14 px-8 text-lg border-white/20 text-white hover:bg-white/10 backdrop-blur-md">
+                <Button
+                  variant="outline"
+                  className="h-14 px-8 text-lg border-white/20 text-white hover:bg-white/10 backdrop-blur-md"
+                >
                   View Features
                 </Button>
               </a>
@@ -106,38 +125,43 @@ export default function Landing() {
       <section id="features" className="py-24" style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl font-bold font-display text-white mb-4">Everything you need to win</h2>
-            <p className="text-gray-400 text-lg">From windmill mechanics to roster management, SoftballProAI gives you the tools to develop elite fastpitch athletes.</p>
+            <h2 className="text-3xl font-bold font-display text-white mb-4">
+              Everything you need to win
+            </h2>
+            <p className="text-gray-400 text-lg">
+              From windmill mechanics to roster management, SoftballProAI gives you the tools to
+              develop elite fastpitch athletes.
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
                 icon: Video,
-                title: "AI Video Analysis",
-                desc: "Upload game footage and get instant biomechanical feedback on windmill pitching and hitting form."
+                title: 'AI Video Analysis',
+                desc: 'Upload game footage and get instant biomechanical feedback on windmill pitching and hitting form.',
               },
               {
                 icon: Activity,
-                title: "Progress Tracking",
-                desc: "Visualize improvement over time with automated metric tracking for drag foot, arm circle speed, and release point."
+                title: 'Progress Tracking',
+                desc: 'Visualize improvement over time with automated metric tracking for drag foot, arm circle speed, and release point.',
               },
               {
                 icon: TrendingUp,
-                title: "Smart Drills",
-                desc: "Receive personalized drill recommendations for rise ball, drop ball, and change-up mechanics."
-              }
+                title: 'Smart Drills',
+                desc: 'Receive personalized drill recommendations for rise ball, drop ball, and change-up mechanics.',
+              },
             ].map((feature, i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className="p-8 rounded-3xl transition-all duration-300 group hover:-translate-y-1"
-                style={{ 
+                style={{
                   backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)'
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
                 }}
                 data-testid={`card-feature-${i}`}
               >
-                <div 
+                <div
                   className="h-12 w-12 rounded-2xl flex items-center justify-center mb-6 transition-all"
                   style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)' }}
                 >
@@ -153,10 +177,19 @@ export default function Landing() {
 
       {/* CTA Section - Redirects to homepage */}
       <section className="py-24 relative">
-        <div className="absolute inset-0 blur-3xl opacity-30" style={{ background: 'linear-gradient(90deg, rgba(139, 92, 246, 0.2), rgba(255, 16, 240, 0.1))' }} />
+        <div
+          className="absolute inset-0 blur-3xl opacity-30"
+          style={{
+            background: 'linear-gradient(90deg, rgba(139, 92, 246, 0.2), rgba(255, 16, 240, 0.1))',
+          }}
+        />
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <h2 className="text-4xl font-bold font-display text-white mb-6">Ready to dominate the circle?</h2>
-          <p className="text-gray-400 text-lg mb-8">Join thousands of fastpitch coaches using AI to develop elite athletes.</p>
+          <h2 className="text-4xl font-bold font-display text-white mb-6">
+            Ready to dominate the circle?
+          </h2>
+          <p className="text-gray-400 text-lg mb-8">
+            Join thousands of fastpitch coaches using AI to develop elite athletes.
+          </p>
           <Link href="/pricing">
             <Button className="h-14 px-8 text-lg bg-gradient-to-r from-brand-pink to-brand-purple hover:opacity-90 transition-all shadow-[0_0_20px_rgba(236,72,153,0.3)]">
               Get Started Free

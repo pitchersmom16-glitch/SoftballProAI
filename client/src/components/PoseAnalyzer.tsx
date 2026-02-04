@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import { Pose, Results, POSE_CONNECTIONS, NormalizedLandmark } from "@mediapipe/pose";
-import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
-import { AlertCircle, ChevronLeft, ChevronRight, Gauge } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { Pose, Results, POSE_CONNECTIONS, NormalizedLandmark } from '@mediapipe/pose';
+import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
+import { AlertCircle, ChevronLeft, ChevronRight, Gauge } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface BiomechanicsMetrics {
   armSlotAngle: number | null;
@@ -41,7 +41,7 @@ function getLandmarkVisibility(landmark: NormalizedLandmark): number {
 function calculateAngle(
   p1: { x: number; y: number },
   p2: { x: number; y: number },
-  p3: { x: number; y: number }
+  p3: { x: number; y: number },
 ): number {
   const radians = Math.atan2(p3.y - p2.y, p3.x - p2.x) - Math.atan2(p1.y - p2.y, p1.x - p2.x);
   let angle = Math.abs((radians * 180) / Math.PI);
@@ -50,20 +50,25 @@ function calculateAngle(
 }
 
 function chooseDominantSide(landmarks: NormalizedLandmark[]): 'left' | 'right' {
-  const rightScore = 
+  const rightScore =
     getLandmarkVisibility(landmarks[LANDMARK_INDICES.RIGHT_SHOULDER]) +
     getLandmarkVisibility(landmarks[LANDMARK_INDICES.RIGHT_ELBOW]) +
     getLandmarkVisibility(landmarks[LANDMARK_INDICES.RIGHT_HIP]);
-    
-  const leftScore = 
+
+  const leftScore =
     getLandmarkVisibility(landmarks[LANDMARK_INDICES.LEFT_SHOULDER]) +
     getLandmarkVisibility(landmarks[LANDMARK_INDICES.LEFT_ELBOW]) +
     getLandmarkVisibility(landmarks[LANDMARK_INDICES.LEFT_HIP]);
-    
+
   return rightScore >= leftScore ? 'right' : 'left';
 }
 
-export default function PoseAnalyzer({ videoUrl, onMetricsUpdate, assessmentId, autoSave = false }: PoseAnalyzerProps) {
+export default function PoseAnalyzer({
+  videoUrl,
+  onMetricsUpdate,
+  assessmentId,
+  autoSave = false,
+}: PoseAnalyzerProps) {
   console.log('POSE MODEL INITIALIZING');
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -86,125 +91,136 @@ export default function PoseAnalyzer({ videoUrl, onMetricsUpdate, assessmentId, 
 
   const SPEED_OPTIONS = [0.25, 0.5, 1] as const;
 
-  const calculateMetrics = useCallback((landmarks: NormalizedLandmark[]): BiomechanicsMetrics | null => {
-    if (!landmarks || landmarks.length < 33) {
-      return null;
-    }
-
-    const side = chooseDominantSide(landmarks);
-    
-    const hip = side === 'right' 
-      ? landmarks[LANDMARK_INDICES.RIGHT_HIP] 
-      : landmarks[LANDMARK_INDICES.LEFT_HIP];
-    const shoulder = side === 'right'
-      ? landmarks[LANDMARK_INDICES.RIGHT_SHOULDER]
-      : landmarks[LANDMARK_INDICES.LEFT_SHOULDER];
-    const elbow = side === 'right'
-      ? landmarks[LANDMARK_INDICES.RIGHT_ELBOW]
-      : landmarks[LANDMARK_INDICES.LEFT_ELBOW];
-    const knee = side === 'right'
-      ? landmarks[LANDMARK_INDICES.RIGHT_KNEE]
-      : landmarks[LANDMARK_INDICES.LEFT_KNEE];
-    const ankle = side === 'right'
-      ? landmarks[LANDMARK_INDICES.RIGHT_ANKLE]
-      : landmarks[LANDMARK_INDICES.LEFT_ANKLE];
-
-    if (
-      getLandmarkVisibility(hip) < MIN_VISIBILITY ||
-      getLandmarkVisibility(shoulder) < MIN_VISIBILITY ||
-      getLandmarkVisibility(elbow) < MIN_VISIBILITY
-    ) {
-      return null;
-    }
-
-    const armSlotAngle = calculateAngle(hip, shoulder, elbow);
-
-    let kneeFlexion: number | null = null;
-    if (
-      getLandmarkVisibility(hip) >= MIN_VISIBILITY &&
-      getLandmarkVisibility(knee) >= MIN_VISIBILITY &&
-      getLandmarkVisibility(ankle) >= MIN_VISIBILITY
-    ) {
-      kneeFlexion = calculateAngle(hip, knee, ankle);
-    }
-
-    const rightShoulder = landmarks[LANDMARK_INDICES.RIGHT_SHOULDER];
-    const leftShoulder = landmarks[LANDMARK_INDICES.LEFT_SHOULDER];
-    const rightHip = landmarks[LANDMARK_INDICES.RIGHT_HIP];
-    const leftHip = landmarks[LANDMARK_INDICES.LEFT_HIP];
-    
-    let torqueSeparation: number | null = null;
-    if (
-      getLandmarkVisibility(rightShoulder) >= MIN_VISIBILITY &&
-      getLandmarkVisibility(leftShoulder) >= MIN_VISIBILITY &&
-      getLandmarkVisibility(rightHip) >= MIN_VISIBILITY &&
-      getLandmarkVisibility(leftHip) >= MIN_VISIBILITY
-    ) {
-      const shoulderWidth = Math.abs(rightShoulder.x - leftShoulder.x);
-      if (shoulderWidth > 0.01) {
-        const shoulderMidX = (rightShoulder.x + leftShoulder.x) / 2;
-        const hipMidX = (rightHip.x + leftHip.x) / 2;
-        const rawSeparation = Math.abs(shoulderMidX - hipMidX);
-        torqueSeparation = Math.round((rawSeparation / shoulderWidth) * 100);
+  const calculateMetrics = useCallback(
+    (landmarks: NormalizedLandmark[]): BiomechanicsMetrics | null => {
+      if (!landmarks || landmarks.length < 33) {
+        return null;
       }
-    }
 
-    return {
-      armSlotAngle,
-      kneeFlexion,
-      torqueSeparation,
-    };
-  }, []);
+      const side = chooseDominantSide(landmarks);
 
-  const onResults = useCallback((results: Results) => {
-    const canvas = canvasRef.current;
-    const video = videoRef.current;
-    if (!canvas || !video) return;
+      const hip =
+        side === 'right'
+          ? landmarks[LANDMARK_INDICES.RIGHT_HIP]
+          : landmarks[LANDMARK_INDICES.LEFT_HIP];
+      const shoulder =
+        side === 'right'
+          ? landmarks[LANDMARK_INDICES.RIGHT_SHOULDER]
+          : landmarks[LANDMARK_INDICES.LEFT_SHOULDER];
+      const elbow =
+        side === 'right'
+          ? landmarks[LANDMARK_INDICES.RIGHT_ELBOW]
+          : landmarks[LANDMARK_INDICES.LEFT_ELBOW];
+      const knee =
+        side === 'right'
+          ? landmarks[LANDMARK_INDICES.RIGHT_KNEE]
+          : landmarks[LANDMARK_INDICES.LEFT_KNEE];
+      const ankle =
+        side === 'right'
+          ? landmarks[LANDMARK_INDICES.RIGHT_ANKLE]
+          : landmarks[LANDMARK_INDICES.LEFT_ANKLE];
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+      if (
+        getLandmarkVisibility(hip) < MIN_VISIBILITY ||
+        getLandmarkVisibility(shoulder) < MIN_VISIBILITY ||
+        getLandmarkVisibility(elbow) < MIN_VISIBILITY
+      ) {
+        return null;
+      }
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+      const armSlotAngle = calculateAngle(hip, shoulder, elbow);
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let kneeFlexion: number | null = null;
+      if (
+        getLandmarkVisibility(hip) >= MIN_VISIBILITY &&
+        getLandmarkVisibility(knee) >= MIN_VISIBILITY &&
+        getLandmarkVisibility(ankle) >= MIN_VISIBILITY
+      ) {
+        kneeFlexion = calculateAngle(hip, knee, ankle);
+      }
 
-    if (results.poseLandmarks && results.poseLandmarks.length > 0) {
-      setTrackingLost(false);
-      
-      drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {
-        color: "#39FF14",
-        lineWidth: 3,
-      });
+      const rightShoulder = landmarks[LANDMARK_INDICES.RIGHT_SHOULDER];
+      const leftShoulder = landmarks[LANDMARK_INDICES.LEFT_SHOULDER];
+      const rightHip = landmarks[LANDMARK_INDICES.RIGHT_HIP];
+      const leftHip = landmarks[LANDMARK_INDICES.LEFT_HIP];
 
-      drawLandmarks(ctx, results.poseLandmarks, {
-        color: "#FF10F0",
-        fillColor: "#FF10F0",
-        lineWidth: 1,
-        radius: 4,
-      });
-
-      const now = Date.now();
-      if (now - lastMetricsUpdate.current > 500) {
-        const newMetrics = calculateMetrics(results.poseLandmarks);
-        if (newMetrics) {
-          setMetrics(newMetrics);
-          onMetricsUpdate?.(newMetrics);
-          
-          // Auto-save to database if enabled and assessment ID provided
-          if (autoSave && assessmentId && now - lastSaveTime.current > 5000) {
-            saveBiomechanicsToDatabase(assessmentId, newMetrics);
-            lastSaveTime.current = now;
-          }
+      let torqueSeparation: number | null = null;
+      if (
+        getLandmarkVisibility(rightShoulder) >= MIN_VISIBILITY &&
+        getLandmarkVisibility(leftShoulder) >= MIN_VISIBILITY &&
+        getLandmarkVisibility(rightHip) >= MIN_VISIBILITY &&
+        getLandmarkVisibility(leftHip) >= MIN_VISIBILITY
+      ) {
+        const shoulderWidth = Math.abs(rightShoulder.x - leftShoulder.x);
+        if (shoulderWidth > 0.01) {
+          const shoulderMidX = (rightShoulder.x + leftShoulder.x) / 2;
+          const hipMidX = (rightHip.x + leftHip.x) / 2;
+          const rawSeparation = Math.abs(shoulderMidX - hipMidX);
+          torqueSeparation = Math.round((rawSeparation / shoulderWidth) * 100);
         }
-        lastMetricsUpdate.current = now;
       }
-    } else {
-      setTrackingLost(true);
-      setMetrics({ armSlotAngle: null, kneeFlexion: null, torqueSeparation: null });
-      onMetricsUpdate?.({ armSlotAngle: null, kneeFlexion: null, torqueSeparation: null });
-    }
-  }, [calculateMetrics, onMetricsUpdate]);
+
+      return {
+        armSlotAngle,
+        kneeFlexion,
+        torqueSeparation,
+      };
+    },
+    [],
+  );
+
+  const onResults = useCallback(
+    (results: Results) => {
+      const canvas = canvasRef.current;
+      const video = videoRef.current;
+      if (!canvas || !video) return;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (results.poseLandmarks && results.poseLandmarks.length > 0) {
+        setTrackingLost(false);
+
+        drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {
+          color: '#39FF14',
+          lineWidth: 3,
+        });
+
+        drawLandmarks(ctx, results.poseLandmarks, {
+          color: '#FF10F0',
+          fillColor: '#FF10F0',
+          lineWidth: 1,
+          radius: 4,
+        });
+
+        const now = Date.now();
+        if (now - lastMetricsUpdate.current > 500) {
+          const newMetrics = calculateMetrics(results.poseLandmarks);
+          if (newMetrics) {
+            setMetrics(newMetrics);
+            onMetricsUpdate?.(newMetrics);
+
+            // Auto-save to database if enabled and assessment ID provided
+            if (autoSave && assessmentId && now - lastSaveTime.current > 5000) {
+              saveBiomechanicsToDatabase(assessmentId, newMetrics);
+              lastSaveTime.current = now;
+            }
+          }
+          lastMetricsUpdate.current = now;
+        }
+      } else {
+        setTrackingLost(true);
+        setMetrics({ armSlotAngle: null, kneeFlexion: null, torqueSeparation: null });
+        onMetricsUpdate?.({ armSlotAngle: null, kneeFlexion: null, torqueSeparation: null });
+      }
+    },
+    [calculateMetrics, onMetricsUpdate],
+  );
 
   useEffect(() => {
     const pose = new Pose({
@@ -226,15 +242,16 @@ export default function PoseAnalyzer({ videoUrl, onMetricsUpdate, assessmentId, 
 
     poseRef.current = pose;
 
-    pose.initialize()
+    pose
+      .initialize()
       .then(() => {
         setIsLoading(false);
         setLoadError(null);
       })
       .catch((err) => {
-        console.error("MediaPipe initialization failed:", err);
+        console.error('MediaPipe initialization failed:', err);
         setIsLoading(false);
-        setLoadError("Failed to load pose detection model");
+        setLoadError('Failed to load pose detection model');
       });
 
     return () => {
@@ -259,7 +276,7 @@ export default function PoseAnalyzer({ videoUrl, onMetricsUpdate, assessmentId, 
     try {
       await pose.send({ image: video });
     } catch (err) {
-      console.error("Pose detection error:", err);
+      console.error('Pose detection error:', err);
     }
 
     if (isProcessingRef.current) {
@@ -324,7 +341,7 @@ export default function PoseAnalyzer({ videoUrl, onMetricsUpdate, assessmentId, 
       try {
         await poseRef.current.send({ image: videoRef.current });
       } catch (err) {
-        console.error("Frame processing error:", err);
+        console.error('Frame processing error:', err);
       }
     }
   }, [startProcessing]);
@@ -339,21 +356,22 @@ export default function PoseAnalyzer({ videoUrl, onMetricsUpdate, assessmentId, 
   const stepFrame = useCallback(async (direction: 'forward' | 'backward') => {
     const video = videoRef.current;
     if (!video) return;
-    
+
     // Each frame at ~30fps is about 0.033s, we'll use 0.04s for safety
     const frameTime = 0.04;
-    const newTime = direction === 'forward' 
-      ? Math.min(video.currentTime + frameTime, video.duration)
-      : Math.max(video.currentTime - frameTime, 0);
-    
+    const newTime =
+      direction === 'forward'
+        ? Math.min(video.currentTime + frameTime, video.duration)
+        : Math.max(video.currentTime - frameTime, 0);
+
     video.currentTime = newTime;
-    
+
     // Process frame immediately for pose overlay sync
     if (poseRef.current) {
       try {
         await poseRef.current.send({ image: video });
       } catch (err) {
-        console.error("Frame processing error:", err);
+        console.error('Frame processing error:', err);
       }
     }
   }, []);
@@ -440,7 +458,10 @@ export default function PoseAnalyzer({ videoUrl, onMetricsUpdate, assessmentId, 
       )}
 
       {/* Playback Controls */}
-      <div className="mt-4 flex items-center justify-between gap-4 bg-slate-900/80 p-3 rounded-lg" data-testid="playback-controls">
+      <div
+        className="mt-4 flex items-center justify-between gap-4 bg-slate-900/80 p-3 rounded-lg"
+        data-testid="playback-controls"
+      >
         {/* Frame-by-Frame Controls */}
         <div className="flex items-center gap-2">
           <Button
@@ -463,9 +484,7 @@ export default function PoseAnalyzer({ videoUrl, onMetricsUpdate, assessmentId, 
             Frame
             <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
-          <span className="text-xs text-slate-500 ml-2 hidden sm:inline">
-            (← → keys)
-          </span>
+          <span className="text-xs text-slate-500 ml-2 hidden sm:inline">(← → keys)</span>
         </div>
 
         {/* Slow Motion Controls */}
@@ -477,12 +496,12 @@ export default function PoseAnalyzer({ videoUrl, onMetricsUpdate, assessmentId, 
               <Button
                 key={speed}
                 size="sm"
-                variant={playbackSpeed === speed ? "default" : "outline"}
+                variant={playbackSpeed === speed ? 'default' : 'outline'}
                 onClick={() => changeSpeed(speed)}
                 className={`h-7 px-2 text-xs ${
-                  playbackSpeed === speed 
-                    ? "bg-gradient-to-r from-purple-600 to-pink-600 border-0" 
-                    : "border-slate-700 hover:border-pink-500"
+                  playbackSpeed === speed
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 border-0'
+                    : 'border-slate-700 hover:border-pink-500'
                 }`}
                 data-testid={`button-speed-${speed}x`}
               >
@@ -497,19 +516,19 @@ export default function PoseAnalyzer({ videoUrl, onMetricsUpdate, assessmentId, 
         <div className="bg-slate-900 p-3 rounded-lg text-center">
           <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Arm Slot</p>
           <p className="text-2xl font-bold text-[#39FF14]" data-testid="metric-arm-slot">
-            {metrics.armSlotAngle !== null ? `${metrics.armSlotAngle}°` : "--"}
+            {metrics.armSlotAngle !== null ? `${metrics.armSlotAngle}°` : '--'}
           </p>
         </div>
         <div className="bg-slate-900 p-3 rounded-lg text-center">
           <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Knee Flexion</p>
           <p className="text-2xl font-bold text-[#39FF14]" data-testid="metric-knee-flexion">
-            {metrics.kneeFlexion !== null ? `${metrics.kneeFlexion}°` : "--"}
+            {metrics.kneeFlexion !== null ? `${metrics.kneeFlexion}°` : '--'}
           </p>
         </div>
         <div className="bg-slate-900 p-3 rounded-lg text-center">
           <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Torque Sep</p>
           <p className="text-2xl font-bold text-[#39FF14]" data-testid="metric-torque-sep">
-            {metrics.torqueSeparation !== null ? `${metrics.torqueSeparation}%` : "--"}
+            {metrics.torqueSeparation !== null ? `${metrics.torqueSeparation}%` : '--'}
           </p>
         </div>
       </div>

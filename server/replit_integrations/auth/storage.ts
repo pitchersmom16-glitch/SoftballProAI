@@ -1,6 +1,6 @@
-import { users, type User, type UpsertUser } from "@shared/models/auth";
-import { db } from "../../db";
-import { eq } from "drizzle-orm";
+import { users, type User, type UpsertUser } from '@shared/models/auth';
+import { db } from '../../db';
+import { eq } from 'drizzle-orm';
 
 // Interface for auth storage operations
 // (IMPORTANT) These user operations are mandatory for Replit Auth.
@@ -59,10 +59,7 @@ class AuthStorage implements IAuthStorage {
     }
 
     // Insert new user
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .returning();
+    const [user] = await db.insert(users).values(userData).returning();
     return user;
   }
 }

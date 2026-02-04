@@ -1,65 +1,70 @@
-import { useState, useEffect } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "wouter";
-import { apiRequest } from "@/lib/queryClient";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Heart, User, Users, Target, Shield, Sparkles } from "lucide-react";
+import { useState, useEffect } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
+import { apiRequest } from '@/lib/queryClient';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Heart, User, Users, Target, Shield, Sparkles } from 'lucide-react';
 
-type UserRole = "player" | "parent" | "team_coach" | "pitching_coach";
+type UserRole = 'player' | 'parent' | 'team_coach' | 'pitching_coach';
 
 const roles = [
   {
-    id: "player" as UserRole,
-    title: "Player",
-    subtitle: "Individual Athlete (Ages 8-16)",
-    description: "Your Virtual Pro Coach - personal growth, daily check-ins, and instant AI feedback.",
+    id: 'player' as UserRole,
+    title: 'Player',
+    subtitle: 'Individual Athlete (Ages 8-16)',
+    description:
+      'Your Virtual Pro Coach - personal growth, daily check-ins, and instant AI feedback.',
     icon: User,
-    color: "neon-green",
-    price: "$14.99/mo",
+    color: 'neon-green',
+    price: '$14.99/mo',
     features: [
-      "Daily Vibe check-in with soreness tracking",
-      "Championship Mindset daily motivation (Mamba Feed)",
+      'Daily Vibe check-in with soreness tracking',
+      'Championship Mindset daily motivation (Mamba Feed)',
       "'Coach Me' button - instant video analysis",
-      "Personalized goal tracking and drill library",
-      "Smart injury prevention (blocks drills if sore)"
+      'Personalized goal tracking and drill library',
+      'Smart injury prevention (blocks drills if sore)',
     ],
-    accentClass: "from-neon-green/20 to-neon-green/5 border-neon-green/30 hover:border-neon-green/60"
+    accentClass:
+      'from-neon-green/20 to-neon-green/5 border-neon-green/30 hover:border-neon-green/60',
   },
   {
-    id: "pitching_coach" as UserRole,
-    title: "Private Instructor",
-    subtitle: "Pitching | Catching | Hitting Coach",
-    description: "Remote specialist training for your private students. Manage your 'stable' of athletes.",
+    id: 'pitching_coach' as UserRole,
+    title: 'Private Instructor',
+    subtitle: 'Pitching | Catching | Hitting Coach',
+    description:
+      "Remote specialist training for your private students. Manage your 'stable' of athletes.",
     icon: Target,
-    color: "neon-pink",
-    price: "$49.99/mo",
+    color: 'neon-pink',
+    price: '$49.99/mo',
     features: [
-      "Manage up to 25 students in your roster",
-      "Assign homework drills with specific rep counts",
-      "Split-screen analysis vs Pro Model videos",
-      "Detailed video feedback and markup tools",
-      "Track individual student progress over time"
+      'Manage up to 25 students in your roster',
+      'Assign homework drills with specific rep counts',
+      'Split-screen analysis vs Pro Model videos',
+      'Detailed video feedback and markup tools',
+      'Track individual student progress over time',
     ],
-    accentClass: "from-neon-pink/20 to-neon-pink/5 border-neon-pink/30 hover:border-neon-pink/60"
+    accentClass: 'from-neon-pink/20 to-neon-pink/5 border-neon-pink/30 hover:border-neon-pink/60',
   },
   {
-    id: "team_coach" as UserRole,
-    title: "Team Coach",
-    subtitle: "Full Roster Management",
-    description: "Manage your 12-15 player team roster, auto-generate practice plans, track health.",
+    id: 'team_coach' as UserRole,
+    title: 'Team Coach',
+    subtitle: 'Full Roster Management',
+    description:
+      'Manage your 12-15 player team roster, auto-generate practice plans, track health.',
     icon: Users,
-    color: "neon-yellow",
-    price: "$99/mo",
+    color: 'neon-yellow',
+    price: '$99/mo',
     features: [
-      "Full team roster (12-15 players)",
-      "Practice Architect - auto-generate 2-hour plans",
-      "Roster Health dashboard (Red/Injured or Green/Ready)",
-      "Station-based practice splits (Infield/Outfield/Catcher)",
-      "Team-wide analytics and progress tracking"
+      'Full team roster (12-15 players)',
+      'Practice Architect - auto-generate 2-hour plans',
+      'Roster Health dashboard (Red/Injured or Green/Ready)',
+      'Station-based practice splits (Infield/Outfield/Catcher)',
+      'Team-wide analytics and progress tracking',
     ],
-    accentClass: "from-neon-yellow/20 to-neon-yellow/5 border-neon-yellow/30 hover:border-neon-yellow/60"
-  }
+    accentClass:
+      'from-neon-yellow/20 to-neon-yellow/5 border-neon-yellow/30 hover:border-neon-yellow/60',
+  },
 ];
 
 export default function RoleSelection() {
@@ -69,19 +74,19 @@ export default function RoleSelection() {
 
   // Check for pending referral codes in localStorage - redirect back to register if found
   useEffect(() => {
-    const pendingReferral = localStorage.getItem("pendingTeamReferral");
-    const pendingInvite = localStorage.getItem("pendingInviteToken");
-    
+    const pendingReferral = localStorage.getItem('pendingTeamReferral');
+    const pendingInvite = localStorage.getItem('pendingInviteToken');
+
     if (pendingReferral) {
       // Clear and redirect to register with the referral code
-      localStorage.removeItem("pendingTeamReferral");
+      localStorage.removeItem('pendingTeamReferral');
       setLocation(`/register?ref=${pendingReferral}`);
       return;
     }
-    
+
     if (pendingInvite) {
       // Clear and redirect to register with the invite token
-      localStorage.removeItem("pendingInviteToken");
+      localStorage.removeItem('pendingInviteToken');
       setLocation(`/register?invite=${pendingInvite}`);
       return;
     }
@@ -89,10 +94,10 @@ export default function RoleSelection() {
 
   const setRoleMutation = useMutation({
     mutationFn: async (role: UserRole) => {
-      return apiRequest("PUT", "/api/user/role", { role });
+      return apiRequest('PUT', '/api/user/role', { role });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
     },
   });
 
@@ -121,7 +126,7 @@ export default function RoleSelection() {
           {roles.map((role) => {
             const Icon = role.icon;
             const isSelected = selectedRole === role.id;
-            
+
             return (
               <Card
                 key={role.id}
@@ -130,7 +135,7 @@ export default function RoleSelection() {
                 className={`
                   relative cursor-pointer p-6 bg-gradient-to-b ${role.accentClass}
                   border-2 transition-all duration-300
-                  ${isSelected ? `ring-2 ring-${role.color} scale-105 shadow-lg shadow-${role.color}/20` : ""}
+                  ${isSelected ? `ring-2 ring-${role.color} scale-105 shadow-lg shadow-${role.color}/20` : ''}
                 `}
               >
                 {isSelected && (
@@ -138,14 +143,18 @@ export default function RoleSelection() {
                     <Shield className="h-4 w-4 text-black" />
                   </div>
                 )}
-                
+
                 <div className="space-y-4">
-                  <div className={`h-14 w-14 rounded-2xl bg-${role.color}/20 flex items-center justify-center`}>
+                  <div
+                    className={`h-14 w-14 rounded-2xl bg-${role.color}/20 flex items-center justify-center`}
+                  >
                     <Icon className={`h-7 w-7 text-${role.color}`} />
                   </div>
-                  
+
                   <div>
-                    <p className={`text-sm font-medium text-${role.color} uppercase tracking-wider`}>
+                    <p
+                      className={`text-sm font-medium text-${role.color} uppercase tracking-wider`}
+                    >
                       {role.subtitle}
                     </p>
                     <h3 className="text-xl font-bold text-white mt-1">{role.title}</h3>
@@ -175,7 +184,9 @@ export default function RoleSelection() {
             size="lg"
             className="bg-neon-green hover:bg-neon-green/90 text-black font-bold text-lg px-12 py-6"
           >
-            {setRoleMutation.isPending ? "Setting up your experience..." : "Continue to My Dashboard"}
+            {setRoleMutation.isPending
+              ? 'Setting up your experience...'
+              : 'Continue to My Dashboard'}
           </Button>
         </div>
 

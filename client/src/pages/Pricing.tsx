@@ -1,14 +1,14 @@
-import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import { Check, Zap, Target, Users, Star, Sparkles } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
-import { useAuth } from "@/hooks/use-auth";
+import { useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import { Check, Zap, Target, Users, Star, Sparkles } from 'lucide-react';
+import { apiRequest } from '@/lib/queryClient';
+import { useAuth } from '@/hooks/use-auth';
 
 interface PricingTier {
   id: string;
@@ -24,72 +24,76 @@ interface PricingTier {
 
 const PRICING_TIERS: PricingTier[] = [
   {
-    id: "player",
-    name: "Player",
+    id: 'player',
+    name: 'Player',
     price: 14.99,
-    description: "Your personal AI coach - for individual athletes",
+    description: 'Your personal AI coach - for individual athletes',
     features: [
-      "AI Video Analysis",
-      "Daily Vibe Check-In (Injury Prevention)",
-      "Championship Mindset Feed",
-      "Personalized Goal Tracking",
-      "Custom Drill Library",
-      "Progress Dashboard"
+      'AI Video Analysis',
+      'Daily Vibe Check-In (Injury Prevention)',
+      'Championship Mindset Feed',
+      'Personalized Goal Tracking',
+      'Custom Drill Library',
+      'Progress Dashboard',
     ],
     icon: Zap,
     popular: true,
-    color: "purple"
+    color: 'purple',
   },
   {
-    id: "pitching_coach",
-    name: "Private Instructor",
+    id: 'pitching_coach',
+    name: 'Private Instructor',
     price: 49.99,
-    description: "For Pitching, Catching, or Hitting Coaches - remote training for your students",
+    description: 'For Pitching, Catching, or Hitting Coaches - remote training for your students',
     features: [
-      "Everything in Player",
-      "Manage Up to 25 Students",
-      "Assign Homework Drills (Rep Counts)",
-      "Split-Screen Pro Model Comparison",
-      "Detailed Video Feedback Tools",
-      "Student Progress Tracking"
+      'Everything in Player',
+      'Manage Up to 25 Students',
+      'Assign Homework Drills (Rep Counts)',
+      'Split-Screen Pro Model Comparison',
+      'Detailed Video Feedback Tools',
+      'Student Progress Tracking',
     ],
     icon: Target,
-    color: "pink"
+    color: 'pink',
   },
   {
-    id: "team_coach",
-    name: "Team Coach",
-    price: 99.00,
-    description: "Complete team management and practice planning",
+    id: 'team_coach',
+    name: 'Team Coach',
+    price: 99.0,
+    description: 'Complete team management and practice planning',
     features: [
-      "Everything in Private Instructor",
-      "Manage 12-15 Player Roster",
-      "Practice Architect (Auto-Generate Plans)",
-      "Roster Health Dashboard",
-      "Station-Based Practice Organization",
-      "GameChanger Integration",
-      "Team-Wide Analytics"
+      'Everything in Private Instructor',
+      'Manage 12-15 Player Roster',
+      'Practice Architect (Auto-Generate Plans)',
+      'Roster Health Dashboard',
+      'Station-Based Practice Organization',
+      'GameChanger Integration',
+      'Team-Wide Analytics',
     ],
     icon: Users,
-    color: "cyan"
-  }
+    color: 'cyan',
+  },
 ];
 
 export default function Pricing() {
-  const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number; badge?: string } | null>(null);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discount: number;
+    badge?: string;
+  } | null>(null);
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
   const [, navigate] = useLocation();
 
   const { data: products } = useQuery<any[]>({
-    queryKey: ["/api/stripe/products"],
+    queryKey: ['/api/stripe/products'],
   });
 
   const validateCouponMutation = useMutation({
     mutationFn: async (code: string) => {
-      const res = await apiRequest("POST", "/api/stripe/validate-coupon", { code });
+      const res = await apiRequest('POST', '/api/stripe/validate-coupon', { code });
       return res.json();
     },
     onSuccess: (data) => {
@@ -97,34 +101,34 @@ export default function Pricing() {
         setAppliedCoupon({
           code: couponCode.toUpperCase(),
           discount: data.percentOff,
-          badge: data.badge
+          badge: data.badge,
         });
         toast({
-          title: "Coupon Applied!",
+          title: 'Coupon Applied!',
           description: `${data.percentOff}% discount applied to your subscription.`,
         });
       } else {
         toast({
-          title: "Invalid Coupon",
-          description: "This coupon code is not valid or has expired.",
-          variant: "destructive",
+          title: 'Invalid Coupon',
+          description: 'This coupon code is not valid or has expired.',
+          variant: 'destructive',
         });
       }
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Could not validate coupon. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Could not validate coupon. Please try again.',
+        variant: 'destructive',
       });
-    }
+    },
   });
 
   const checkoutMutation = useMutation({
     mutationFn: async ({ tierId, coupon }: { tierId: string; coupon?: string }) => {
-      const res = await apiRequest("POST", "/api/stripe/checkout", { 
+      const res = await apiRequest('POST', '/api/stripe/checkout', {
         tier: tierId,
-        couponCode: coupon 
+        couponCode: coupon,
       });
       return res.json();
     },
@@ -135,11 +139,11 @@ export default function Pricing() {
     },
     onError: () => {
       toast({
-        title: "Checkout Error",
-        description: "Could not start checkout. Please try again.",
-        variant: "destructive",
+        title: 'Checkout Error',
+        description: 'Could not start checkout. Please try again.',
+        variant: 'destructive',
       });
-    }
+    },
   });
 
   const handleApplyCoupon = () => {
@@ -149,13 +153,13 @@ export default function Pricing() {
 
   const handleSubscribe = (tierId: string) => {
     if (!user) {
-      navigate("/auth");
+      navigate('/auth');
       return;
     }
     setSelectedTier(tierId);
-    checkoutMutation.mutate({ 
-      tierId, 
-      coupon: appliedCoupon?.code 
+    checkoutMutation.mutate({
+      tierId,
+      coupon: appliedCoupon?.code,
     });
   };
 
@@ -172,18 +176,18 @@ export default function Pricing() {
         {/* Back to Home Link */}
         {!user && (
           <div className="mb-8">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate("/")}
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
               className="text-muted-foreground hover:text-white"
             >
               ← Back to Home
             </Button>
           </div>
         )}
-        
+
         <div className="text-center mb-12">
-          <h1 
+          <h1
             className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent mb-4"
             data-testid="text-pricing-title"
           >
@@ -194,9 +198,9 @@ export default function Pricing() {
           </p>
         </div>
 
-        {appliedCoupon?.badge === "founding_member" && (
+        {appliedCoupon?.badge === 'founding_member' && (
           <div className="mb-8 text-center">
-            <Badge 
+            <Badge
               className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-4 py-2 text-lg"
               data-testid="badge-founding-member"
             >
@@ -222,7 +226,7 @@ export default function Pricing() {
               className="border-purple-500/50"
               data-testid="button-apply-coupon"
             >
-              {validateCouponMutation.isPending ? "Checking..." : "Apply"}
+              {validateCouponMutation.isPending ? 'Checking...' : 'Apply'}
             </Button>
             {appliedCoupon && (
               <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
@@ -237,9 +241,7 @@ export default function Pricing() {
             <Card
               key={tier.id}
               className={`relative overflow-hidden transition-all hover:scale-105 ${
-                tier.popular 
-                  ? "border-pink-500 shadow-lg shadow-pink-500/20" 
-                  : "border-border/50"
+                tier.popular ? 'border-pink-500 shadow-lg shadow-pink-500/20' : 'border-border/50'
               }`}
               data-testid={`card-tier-${tier.id}`}
             >
@@ -251,21 +253,31 @@ export default function Pricing() {
                   </Badge>
                 </div>
               )}
-              
+
               <CardHeader className="text-center pb-2">
-                <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 ${
-                  tier.color === "purple" ? "bg-purple-500/20" :
-                  tier.color === "pink" ? "bg-pink-500/20" : "bg-cyan-500/20"
-                }`}>
-                  <tier.icon className={`w-8 h-8 ${
-                    tier.color === "purple" ? "text-purple-400" :
-                    tier.color === "pink" ? "text-pink-400" : "text-cyan-400"
-                  }`} />
+                <div
+                  className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 ${
+                    tier.color === 'purple'
+                      ? 'bg-purple-500/20'
+                      : tier.color === 'pink'
+                        ? 'bg-pink-500/20'
+                        : 'bg-cyan-500/20'
+                  }`}
+                >
+                  <tier.icon
+                    className={`w-8 h-8 ${
+                      tier.color === 'purple'
+                        ? 'text-purple-400'
+                        : tier.color === 'pink'
+                          ? 'text-pink-400'
+                          : 'text-cyan-400'
+                    }`}
+                  />
                 </div>
                 <CardTitle className="text-2xl">{tier.name}</CardTitle>
                 <CardDescription>{tier.description}</CardDescription>
               </CardHeader>
-              
+
               <CardContent className="text-center">
                 <div className="mb-6">
                   {appliedCoupon && (
@@ -285,10 +297,15 @@ export default function Pricing() {
                 <ul className="space-y-3 text-left mb-6">
                   {tier.features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                        tier.color === "purple" ? "text-purple-400" :
-                        tier.color === "pink" ? "text-pink-400" : "text-cyan-400"
-                      }`} />
+                      <Check
+                        className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+                          tier.color === 'purple'
+                            ? 'text-purple-400'
+                            : tier.color === 'pink'
+                              ? 'text-pink-400'
+                              : 'text-cyan-400'
+                        }`}
+                      />
                       <span className="text-sm text-muted-foreground">{feature}</span>
                     </li>
                   ))}
@@ -298,16 +315,18 @@ export default function Pricing() {
                   onClick={() => handleSubscribe(tier.id)}
                   disabled={checkoutMutation.isPending && selectedTier === tier.id}
                   className={`w-full ${
-                    tier.popular 
-                      ? "bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600" 
-                      : ""
+                    tier.popular
+                      ? 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600'
+                      : ''
                   }`}
-                  variant={tier.popular ? "default" : "outline"}
+                  variant={tier.popular ? 'default' : 'outline'}
                   data-testid={`button-subscribe-${tier.id}`}
                 >
-                  {checkoutMutation.isPending && selectedTier === tier.id 
-                    ? "Processing..." 
-                    : user ? "Subscribe Now" : "Get Started"}
+                  {checkoutMutation.isPending && selectedTier === tier.id
+                    ? 'Processing...'
+                    : user
+                      ? 'Subscribe Now'
+                      : 'Get Started'}
                 </Button>
               </CardContent>
             </Card>
@@ -318,9 +337,7 @@ export default function Pricing() {
           <p className="text-sm text-muted-foreground">
             All plans include a 7-day free trial. Cancel anytime.
           </p>
-          <p className="text-xs text-muted-foreground mt-2">
-            Secure payments powered by Stripe
-          </p>
+          <p className="text-xs text-muted-foreground mt-2">Secure payments powered by Stripe</p>
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
 ## Brain Integration Guide
+
 **How to Use the SoftballProAI Knowledge Base in Your Application**
 
 ---
@@ -6,27 +7,25 @@
 ## Quick Start
 
 ### 1. Import the Brain
+
 ```typescript
 // Import specific knowledge bases
-import { 
-  PITCHING_KNOWLEDGE, 
-  MAMBA_MENTALITY,
-  getMotivationalQuote 
-} from './server/brain';
+import { PITCHING_KNOWLEDGE, MAMBA_MENTALITY, getMotivationalQuote } from './server/brain';
 
 // Or import everything
 import * as Brain from './server/brain';
 ```
 
 ### 2. Analyze Player Video
+
 ```typescript
 import { analyzeVideo } from './server/brain';
 
 const result = await analyzeVideo({
-  videoUrl: "https://storage.../video.mp4",
-  skillType: "PITCHING",
+  videoUrl: 'https://storage.../video.mp4',
+  skillType: 'PITCHING',
   athleteId: 123,
-  athleteLevel: "Intermediate"
+  athleteLevel: 'Intermediate',
 });
 
 // Result includes:
@@ -38,31 +37,33 @@ const result = await analyzeVideo({
 ```
 
 ### 3. Get Personalized Drills
+
 ```typescript
 import { analyzeMechanics } from './server/brain';
 
 const drills = await analyzeMechanics({
-  skillType: "HITTING",
-  detectedIssues: ["casting", "no hip rotation"],
-  athleteLevel: "Intermediate",
-  limit: 5
+  skillType: 'HITTING',
+  detectedIssues: ['casting', 'no hip rotation'],
+  athleteLevel: 'Intermediate',
+  limit: 5,
 });
 
 // Returns drills ranked by relevance with match reasons
 ```
 
 ### 4. Deliver Mental Content
+
 ```typescript
 import { analyzeMental, getMotivationalQuote } from './server/brain';
 
 // Get context-specific mental content
 const mentalContent = await analyzeMental({
-  context: "after-strikeout",
-  limit: 3
+  context: 'after-strikeout',
+  limit: 3,
 });
 
 // Get random motivational quote
-const quote = await getMotivationalQuote("resilience");
+const quote = await getMotivationalQuote('resilience');
 console.log(quote.content); // "I've missed more than 9,000 shots..."
 console.log(quote.author); // "Michael Jordan"
 ```
@@ -74,6 +75,7 @@ console.log(quote.author); // "Michael Jordan"
 ### Use Case 1: Player Uploads Pitching Video
 
 **Flow:**
+
 1. Player uploads video → ObjectUploader → Replit Object Storage
 2. Create assessment record in database
 3. Trigger analysis:
@@ -86,9 +88,9 @@ import { PITCHING_KNOWLEDGE } from './server/brain';
 // Analyze video
 const analysis = await analyzeVideo({
   videoUrl: assessmentVideoUrl,
-  skillType: "PITCHING",
+  skillType: 'PITCHING',
   athleteId: player.id,
-  athleteLevel: player.skillLevel
+  athleteLevel: player.skillLevel,
 });
 
 // Generate AI feedback using OpenAI with knowledge context
@@ -109,8 +111,8 @@ Focus on ages 8-16. Be positive but actionable.
 `;
 
 const feedback = await openai.chat.completions.create({
-  model: "gpt-4",
-  messages: [{ role: "user", content: prompt }]
+  model: 'gpt-4',
+  messages: [{ role: 'user', content: prompt }],
 });
 
 // Save feedback and recommended drills
@@ -119,7 +121,7 @@ await db.insert(assessmentFeedback).values({
   overallFeedback: feedback.choices[0].message.content,
   strengths: analysis.strengths,
   areasToImprove: analysis.issuesDetected,
-  recommendedDrills: analysis.recommendedDrills.map(d => d.id)
+  recommendedDrills: analysis.recommendedDrills.map((d) => d.id),
 });
 ```
 
@@ -131,18 +133,19 @@ import { getMambaDailyContent } from './server/brain';
 // Route: GET /api/player/daily-motivation
 app.get('/api/player/daily-motivation', async (req, res) => {
   const content = await getMambaDailyContent();
-  
+
   res.json({
     principle: content.mambaPrinciple.quote,
     lesson: content.mambaPrinciple.lesson,
     dailyTheme: content.dailyTheme.theme,
     motivation: content.dailyTheme.content[0],
-    application: content.randomApplication
+    application: content.randomApplication,
   });
 });
 ```
 
 **Frontend Display:**
+
 ```tsx
 // In PlayerDashboard.tsx
 const { data: dailyMotivation } = useQuery({
@@ -167,45 +170,45 @@ import { AGE_APPROPRIATE_TRAINING } from './server/brain';
 // Route: POST /api/player/check-in
 app.post('/api/player/check-in', async (req, res) => {
   const { armSoreness, shoulderSoreness, athleteId } = req.body;
-  
+
   const athlete = await db.query.athletes.findFirst({
-    where: eq(athletes.id, athleteId)
+    where: eq(athletes.id, athleteId),
   });
-  
+
   // Check if soreness is high (7+ on 10 scale)
   const highSoreness = armSoreness >= 7 || shoulderSoreness >= 7;
-  
+
   if (highSoreness) {
     // BLOCK pitching drills
     const blockedActivities = ['PITCHING', 'THROWING'];
-    
+
     // Save check-in with blocks
     await db.insert(playerCheckins).values({
       athleteId,
       armSoreness,
       shoulderSoreness,
       blockedActivities,
-      notes: 'High arm/shoulder soreness detected - pitching restricted'
+      notes: 'High arm/shoulder soreness detected - pitching restricted',
     });
-    
+
     // Get age-appropriate recovery guidance
     const guidance = await getAgeAppropriateGuidance(athlete.age);
-    
+
     // Alert coach
     await db.insert(notifications).values({
       userId: athlete.coachId,
       type: 'injury_alert',
       title: `${athlete.name} - Arm Soreness Alert`,
       message: `High soreness reported. Pitching has been blocked.`,
-      priority: 'high'
+      priority: 'high',
     });
-    
+
     res.json({
       blocked: true,
       blockedActivities,
       message: 'Your arm needs rest. Pitching drills are blocked today.',
       recoveryGuidance: guidance.avoid,
-      allowedActivities: ['Hitting (lower body focus)', 'Base running', 'Mental training']
+      allowedActivities: ['Hitting (lower body focus)', 'Base running', 'Mental training'],
     });
   }
 });
@@ -219,31 +222,31 @@ import { generatePracticePlan } from './server/brain';
 // Route: POST /api/practice-plans/generate
 app.post('/api/practice-plans/generate', async (req, res) => {
   const { teamId, focus, duration } = req.body;
-  
+
   const team = await db.query.teams.findFirst({
     where: eq(teams.id, teamId),
-    with: { athletes: true }
+    with: { athletes: true },
   });
-  
+
   // Calculate average age
   const avgAge = team.athletes.reduce((sum, a) => sum + a.age, 0) / team.athletes.length;
-  
+
   // Generate practice plan
   const plan = await generatePracticePlan(Math.round(avgAge), focus);
-  
+
   // Save to database
   const practicePlan = await db.insert(practicePlans).values({
     teamId,
     title: `${focus || 'Standard'} Practice - ${new Date().toLocaleDateString()}`,
     duration,
     structure: plan,
-    createdBy: req.user.id
+    createdBy: req.user.id,
   });
-  
+
   res.json({
     plan,
     saved: true,
-    id: practicePlan.id
+    id: practicePlan.id,
   });
 });
 ```
@@ -256,20 +259,21 @@ import { getTournamentRules } from './server/brain';
 // Route: GET /api/tournament-rules/:org
 app.get('/api/tournament-rules/:org', async (req, res) => {
   const { org } = req.params;
-  
+
   try {
     const rules = await getTournamentRules(org);
     res.json(rules);
   } catch (error) {
-    res.status(404).json({ 
+    res.status(404).json({
       error: `Rules not found for organization: ${org}`,
-      availableOrgs: ['NFHS', 'PGF', 'USSSA', 'GSA', 'TITAN']
+      availableOrgs: ['NFHS', 'PGF', 'USSSA', 'GSA', 'TITAN'],
     });
   }
 });
 ```
 
 **Frontend Display:**
+
 ```tsx
 // In TournamentRulesPage.tsx
 const { data: rules } = useQuery({
@@ -306,30 +310,30 @@ import { getAgeAppropriateGuidance, CROSSFIT_FOR_SOFTBALL } from './server/brain
 // Route: GET /api/athlete/:id/strength-plan
 app.get('/api/athlete/:id/strength-plan', async (req, res) => {
   const athlete = await db.query.athletes.findFirst({
-    where: eq(athletes.id, parseInt(req.params.id))
+    where: eq(athletes.id, parseInt(req.params.id)),
   });
-  
+
   const guidance = await getAgeAppropriateGuidance(athlete.age);
   const exercises = CROSSFIT_FOR_SOFTBALL.keyExercises;
-  
+
   // Filter exercises by age appropriateness
   const ageAppropriateExercises = {
-    lowerBody: exercises.lowerBody.filter(ex => 
-      ex.ageAppropriate.includes(`${Math.floor(athlete.age / 2) * 2}U+`)
+    lowerBody: exercises.lowerBody.filter((ex) =>
+      ex.ageAppropriate.includes(`${Math.floor(athlete.age / 2) * 2}U+`),
     ),
-    upperBody: exercises.upperBody.filter(ex => 
-      ex.ageAppropriate.includes(`${Math.floor(athlete.age / 2) * 2}U+`)
+    upperBody: exercises.upperBody.filter((ex) =>
+      ex.ageAppropriate.includes(`${Math.floor(athlete.age / 2) * 2}U+`),
     ),
-    core: exercises.core.filter(ex => 
-      ex.ageAppropriate.includes(`${Math.floor(athlete.age / 2) * 2}U+`)
-    )
+    core: exercises.core.filter((ex) =>
+      ex.ageAppropriate.includes(`${Math.floor(athlete.age / 2) * 2}U+`),
+    ),
   };
-  
+
   res.json({
     guidance,
     exercises: ageAppropriateExercises,
     workoutStructure: CROSSFIT_FOR_SOFTBALL.workoutStructures,
-    injuryPrevention: guidance.avoid
+    injuryPrevention: guidance.avoid,
   });
 });
 ```
@@ -347,7 +351,7 @@ async function generateEnhancedFeedback(assessment, detectedIssues) {
   // Pull relevant knowledge
   const expertInsights = PITCHING_KNOWLEDGE.expertInsights;
   const biomechanics = BIOMECHANICS_FRAMEWORK.videoAnalysisPoints.pitching;
-  
+
   // Build context-rich prompt
   const prompt = `
 You are an expert fastpitch softball pitching coach with knowledge from:
@@ -385,17 +389,18 @@ Remember: This is for a youth athlete. Be encouraging, not discouraging.
 `;
 
   const response = await openai.chat.completions.create({
-    model: "gpt-4",
+    model: 'gpt-4',
     messages: [
       {
-        role: "system",
-        content: "You are a supportive, expert softball coach specializing in youth development (ages 8-16). You prioritize encouragement, safety, and long-term skill building."
+        role: 'system',
+        content:
+          'You are a supportive, expert softball coach specializing in youth development (ages 8-16). You prioritize encouragement, safety, and long-term skill building.',
       },
-      { role: "user", content: prompt }
+      { role: 'user', content: prompt },
     ],
-    temperature: 0.7
+    temperature: 0.7,
   });
-  
+
   return response.choices[0].message.content;
 }
 ```
@@ -417,10 +422,10 @@ const handleAnalysisComplete = async (extractedMetrics) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       metrics: extractedMetrics,
-      skillType: 'PITCHING'
-    })
+      skillType: 'PITCHING',
+    }),
   });
-  
+
   const analysis = await response.json();
   setFeedback(analysis.coachingNotes);
   setRecommendedDrills(analysis.recommendedDrills);
@@ -435,7 +440,7 @@ The `/train-brain` page allows coaches to add new drills to expand the knowledge
 // Route: POST /api/admin/drills
 app.post('/api/admin/drills', async (req, res) => {
   const { name, category, description, mechanicTags, issueAddressed, videoUrl } = req.body;
-  
+
   const drill = await db.insert(drills).values({
     name,
     category,
@@ -447,9 +452,9 @@ app.post('/api/admin/drills', async (req, res) => {
     difficulty: req.body.difficulty || 'Intermediate',
     expertSource: req.body.expertSource,
     equipment: req.body.equipment || [],
-    ageRange: req.body.ageRange || '10U-18U'
+    ageRange: req.body.ageRange || '10U-18U',
   });
-  
+
   res.json({ success: true, drillId: drill.id });
 });
 ```
@@ -459,6 +464,7 @@ app.post('/api/admin/drills', async (req, res) => {
 ## Best Practices
 
 ### 1. Cache Knowledge Base Queries
+
 Knowledge bases are static and can be cached:
 
 ```typescript
@@ -466,13 +472,13 @@ import { LRUCache } from 'lru-cache';
 
 const knowledgeCache = new LRUCache({
   max: 50,
-  ttl: 1000 * 60 * 60 // 1 hour
+  ttl: 1000 * 60 * 60, // 1 hour
 });
 
 export async function getCachedKnowledge(topic: string) {
   const cached = knowledgeCache.get(topic);
   if (cached) return cached;
-  
+
   const knowledge = await getKnowledge(topic);
   knowledgeCache.set(topic, knowledge);
   return knowledge;
@@ -480,6 +486,7 @@ export async function getCachedKnowledge(topic: string) {
 ```
 
 ### 2. Progressive Enhancement
+
 Start with basic analysis, add advanced features incrementally:
 
 ```typescript
@@ -514,29 +521,29 @@ interface PlayerContext {
 async function getPersonalizedRecommendations(context: PlayerContext) {
   // Layer 1: Age-appropriate content
   const ageGuidance = await getAgeAppropriateGuidance(context.age);
-  
+
   // Layer 2: Position-specific knowledge
   const positionKnowledge = await getKnowledge(context.position.toLowerCase());
-  
+
   // Layer 3: Injury-aware recommendations
   if (context.recentSoreness?.armSoreness >= 7) {
     return {
       ...ageGuidance,
       blockedActivities: ['PITCHING', 'THROWING'],
-      alternatives: ['Hitting (lower body focus)', 'Mental training', 'Base running']
+      alternatives: ['Hitting (lower body focus)', 'Mental training', 'Base running'],
     };
   }
-  
+
   // Layer 4: Goal-aligned content
   const goalDrills = await analyzeMechanics({
     skillType: context.position === 'Pitcher' ? 'PITCHING' : 'FIELDING',
-    detectedIssues: context.goals
+    detectedIssues: context.goals,
   });
-  
+
   return {
     guidance: ageGuidance,
     knowledge: positionKnowledge,
-    drills: goalDrills.recommendations
+    drills: goalDrills.recommendations,
   };
 }
 ```
@@ -552,10 +559,10 @@ async function getSafeMotivationalContent() {
     console.error('Failed to get motivational quote:', error);
     // Fallback to default Mamba quote
     return {
-      quote: "Hard work outweighs talent—every time.",
-      author: "Kobe Bryant",
-      category: "Work Ethic",
-      context: "daily motivation"
+      quote: 'Hard work outweighs talent—every time.',
+      author: 'Kobe Bryant',
+      category: 'Work Ethic',
+      context: 'daily motivation',
     };
   }
 }
@@ -593,14 +600,14 @@ describe('Brain Integration', () => {
     expect(quote).toHaveProperty('author');
     expect(quote.category).toBe('Resilience');
   });
-  
+
   it('should analyze pitching mechanics', async () => {
     const result = await analyzeMechanics({
       skillType: 'PITCHING',
       detectedIssues: ['hunched forward', 'weak leg drive'],
-      athleteLevel: 'Intermediate'
+      athleteLevel: 'Intermediate',
     });
-    
+
     expect(result.recommendations).toHaveLength(3);
     expect(result.analyzedIssues).toContain('hunched forward');
   });
@@ -612,6 +619,7 @@ describe('Brain Integration', () => {
 ## Future Enhancements
 
 ### 1. Real-time Biomechanics
+
 Connect MediaPipe directly to analysis engine:
 
 ```typescript
@@ -621,6 +629,7 @@ const analysis = await analyzeVideo({ videoUrl, skillType, ...metrics });
 ```
 
 ### 2. Pro Model Comparisons
+
 Split-screen analysis with elite athletes:
 
 ```typescript
@@ -628,18 +637,19 @@ Split-screen analysis with elite athletes:
 const comparison = await compareToProModel({
   playerVideo: assessment.videoUrl,
   proModel: 'monica-abbott-rise-ball',
-  metrics: ['arm-slot', 'hip-shoulder-separation', 'release-point']
+  metrics: ['arm-slot', 'hip-shoulder-separation', 'release-point'],
 });
 ```
 
 ### 3. Voice-Activated Coaching
+
 Audio feedback during practice:
 
 ```typescript
 // Coming soon: Audio coaching
 const audioFeedback = await generateAudioCoaching({
   analysis: result,
-  voice: 'encouraging-female-coach'
+  voice: 'encouraging-female-coach',
 });
 ```
 
@@ -648,6 +658,7 @@ const audioFeedback = await generateAudioCoaching({
 ## Support & Questions
 
 For questions about integrating the Brain knowledge base:
+
 1. Check the README.md in `server/brain/`
 2. Review knowledge base TypeScript files for available exports
 3. Test with seed data using the seed scripts
@@ -657,4 +668,4 @@ For questions about integrating the Brain knowledge base:
 
 ---
 
-*"You have to work hard in the dark to shine in the light."* - Kobe Bryant
+_"You have to work hard in the dark to shine in the light."_ - Kobe Bryant

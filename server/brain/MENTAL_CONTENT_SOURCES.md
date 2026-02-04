@@ -9,6 +9,7 @@ Your Championship Mindset Brain includes content from **15+ legendary athletes a
 ## 🎯 Elite Athletes Featured
 
 ### Michael Jordan (8+ quotes)
+
 - **Category**: Failure, resilience, work ethic, teamwork
 - **Famous quotes**:
   - "I've missed 9,000 shots...that's why I succeed"
@@ -17,6 +18,7 @@ Your Championship Mindset Brain includes content from **15+ legendary athletes a
   - "Obstacles don't have to stop you"
 
 ### Muhammad Ali (5+ quotes)
+
 - **Category**: Training, perseverance, resilience
 - **Famous quotes**:
   - "I hated every minute of training, but I said don't quit"
@@ -24,6 +26,7 @@ Your Championship Mindset Brain includes content from **15+ legendary athletes a
   - "Champions are made from something deep inside"
 
 ### Kobe Bryant (5+ quotes)
+
 - **Category**: Work ethic, obsession, excellence
 - **Now branded as**: "Championship Mindset" philosophy (no trademark issues!)
 - **Famous quotes**:
@@ -32,17 +35,20 @@ Your Championship Mindset Brain includes content from **15+ legendary athletes a
   - "Obsess over your craft"
 
 ### Derek Jeter (2+ quotes)
+
 - **Category**: Work ethic, no excuses
 - **Famous quotes**:
   - "No excuse for anyone to work harder than you"
 
 ### Vince Lombardi (3+ quotes)
+
 - **Category**: Resilience, teamwork
 - **Famous quotes**:
   - "It's not whether you get knocked down, it's whether you get up"
   - "Individual commitment to group effort makes a team work"
 
 ### Other Elite Athletes:
+
 - **Billie Jean King**: "Pressure is a privilege"
 - **Wayne Gretzky**: "You miss 100% of shots you don't take"
 - **Phil Jackson**: "Strength of team is each member"
@@ -55,12 +61,14 @@ Your Championship Mindset Brain includes content from **15+ legendary athletes a
 ## 📚 Expert Sources
 
 ### Sports Psychology Research
+
 - Peer-reviewed studies on youth athlete development
 - Confidence building techniques (evidence-based)
 - Mental imagery and self-talk research
 - Age-specific developmental considerations (8-10, 11-13, 14-16)
 
 ### Softball-Specific Experts
+
 - Amanda Scarborough (Olympic player, ESPN analyst)
 - Monica Abbott (77 mph record holder)
 - Cat Osterman (Olympic medalist)
@@ -71,21 +79,27 @@ Your Championship Mindset Brain includes content from **15+ legendary athletes a
 ## 📊 Content Breakdown by Category
 
 ### Hard Work & Dedication (15+ items)
+
 - Michael Jordan, Kobe Bryant, Derek Jeter, Muhammad Ali, Pelé
 
 ### Resilience & Overcoming Failure (12+ items)
+
 - Michael Jordan (primary), Muhammad Ali, Vince Lombardi
 
 ### Teamwork & Leadership (8+ items)
+
 - Michael Jordan, Vince Lombardi, Phil Jackson
 
 ### Confidence & Mental Toughness (10+ items)
+
 - Muhammad Ali, Billie Jean King, Wayne Gretzky, Sports Psychology
 
 ### Work Ethic (10+ items)
+
 - Kobe Bryant, Derek Jeter, Sarah Bombell, Tommy Lasorda
 
 ### Championship Mindset Principles (7+ items)
+
 - Kobe Bryant content (rebranded, legally safe)
 
 ---
@@ -93,6 +107,7 @@ Your Championship Mindset Brain includes content from **15+ legendary athletes a
 ## 🎓 Research-Based Content
 
 ### Sports Psychology Studies
+
 - **Confidence Building**: Proactive confidence, self-talk techniques
 - **Mental Imagery**: Cognitive + motivational visualization
 - **Pre-Game Routines**: Breathing exercises, focus cues
@@ -100,6 +115,7 @@ Your Championship Mindset Brain includes content from **15+ legendary athletes a
 - **Age-Appropriate**: Tailored for 8-10, 11-13, 14-16 year olds
 
 ### Context-Specific Strategies
+
 - Before game (visualization, breathing)
 - After strikeout (bounce back, next opportunity)
 - Before at-bat (focus, routine)
@@ -111,6 +127,7 @@ Your Championship Mindset Brain includes content from **15+ legendary athletes a
 ## 📅 Daily Motivation (Monday-Sunday)
 
 ### Each day has unique theme:
+
 - **Monday**: "Start Strong" (champions made on Monday morning)
 - **Tuesday**: "Trust the Process" (1% better daily)
 - **Wednesday**: "Mid-Week Grind" (separate yourself)
@@ -126,12 +143,14 @@ Your Championship Mindset Brain includes content from **15+ legendary athletes a
 ## ✅ Legal Status: 100% Safe
 
 ### What Changed:
+
 - ❌ "Mamba Mentality" → ✅ "Championship Mindset"
 - Kobe's quotes still included (they're his words, freely quotable)
 - Philosophy principles rebranded (same wisdom, different name)
 - All other athlete quotes unchanged (always been diverse!)
 
 ### You Have:
+
 - **15+ legendary athletes** across multiple sports
 - **50+ motivational quotes** from diverse sources
 - **Sports psychology research** (peer-reviewed, scientific)
@@ -146,6 +165,7 @@ Your Championship Mindset Brain includes content from **15+ legendary athletes a
 **YES! You have a HUGE variety of sources beyond Kobe!**
 
 ### Content Distribution:
+
 - **Michael Jordan**: ~25% of quotes (biggest single source)
 - **Kobe Bryant**: ~15% (now "Championship Mindset" - legal!)
 - **Muhammad Ali**: ~15%
@@ -156,5 +176,5 @@ Your Championship Mindset Brain includes content from **15+ legendary athletes a
 
 ---
 
-*No trademark issues, tons of legendary athletes, research-backed psychology.*
-*Your players get the BEST mental training from the BEST sources!*
+_No trademark issues, tons of legendary athletes, research-backed psychology._
+_Your players get the BEST mental training from the BEST sources!_

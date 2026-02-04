@@ -1,23 +1,29 @@
 import { z } from 'zod';
-export { 
-  insertCoachSchema, 
-  insertTeamSchema, 
-  insertAthleteSchema, 
-  insertDrillSchema, 
+export {
+  insertCoachSchema,
+  insertTeamSchema,
+  insertAthleteSchema,
+  insertDrillSchema,
   insertMentalEdgeSchema,
-  insertAssessmentSchema, 
-  insertFeedbackSchema
+  insertAssessmentSchema,
+  insertFeedbackSchema,
 } from './schema';
 
-import { 
-  insertCoachSchema, 
-  insertTeamSchema, 
-  insertAthleteSchema, 
-  insertDrillSchema, 
+import {
+  insertCoachSchema,
+  insertTeamSchema,
+  insertAthleteSchema,
+  insertDrillSchema,
   insertMentalEdgeSchema,
-  insertAssessmentSchema, 
+  insertAssessmentSchema,
   insertFeedbackSchema,
-  coaches, teams, athletes, drills, mentalEdge, assessments, assessmentFeedback 
+  coaches,
+  teams,
+  athletes,
+  drills,
+  mentalEdge,
+  assessments,
+  assessmentFeedback,
 } from './schema';
 
 // ============================================
@@ -63,9 +69,11 @@ export const api = {
     list: {
       method: 'GET' as const,
       path: '/api/athletes',
-      input: z.object({
-        teamId: z.coerce.number().optional(),
-      }).optional(),
+      input: z
+        .object({
+          teamId: z.coerce.number().optional(),
+        })
+        .optional(),
       responses: {
         200: z.array(z.custom<typeof athletes.$inferSelect>()),
       },
@@ -119,9 +127,11 @@ export const api = {
     list: {
       method: 'GET' as const,
       path: '/api/assessments',
-      input: z.object({
-        athleteId: z.coerce.number().optional(),
-      }).optional(),
+      input: z
+        .object({
+          athleteId: z.coerce.number().optional(),
+        })
+        .optional(),
       responses: {
         200: z.array(z.custom<typeof assessments.$inferSelect>()),
       },
@@ -139,32 +149,40 @@ export const api = {
       method: 'GET' as const,
       path: '/api/assessments/:id',
       responses: {
-        200: z.custom<typeof assessments.$inferSelect & { feedback?: typeof assessmentFeedback.$inferSelect[] }>(),
+        200: z.custom<
+          typeof assessments.$inferSelect & {
+            feedback?: (typeof assessmentFeedback.$inferSelect)[];
+          }
+        >(),
         404: errorSchemas.notFound,
       },
     },
-    analyze: { // Special endpoint to trigger AI analysis
+    analyze: {
+      // Special endpoint to trigger AI analysis
       method: 'POST' as const,
       path: '/api/assessments/:id/analyze',
       responses: {
         202: z.object({ message: z.string(), status: z.string() }),
         404: errorSchemas.notFound,
       },
-    }
+    },
   },
   drills: {
     list: {
       method: 'GET' as const,
       path: '/api/drills',
-      input: z.object({
-        skillType: z.string().optional(),
-        difficulty: z.string().optional(),
-      }).optional(),
+      input: z
+        .object({
+          skillType: z.string().optional(),
+          difficulty: z.string().optional(),
+        })
+        .optional(),
       responses: {
         200: z.array(z.custom<typeof drills.$inferSelect>()),
       },
     },
-    create: { // Admin or Coach only
+    create: {
+      // Admin or Coach only
       method: 'POST' as const,
       path: '/api/drills',
       input: insertDrillSchema,
@@ -214,7 +232,7 @@ export const api = {
       path: '/api/brain/train/drill',
       input: insertDrillSchema.extend({
         equipment: z.array(z.string()).optional().default([]),
-        ageRange: z.string().optional().default("All Ages"),
+        ageRange: z.string().optional().default('All Ages'),
       }),
       responses: {
         201: z.object({
@@ -224,7 +242,7 @@ export const api = {
         400: errorSchemas.validation,
       },
     },
-  }
+  },
 };
 
 // ============================================

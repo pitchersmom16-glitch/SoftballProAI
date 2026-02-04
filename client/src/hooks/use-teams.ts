@@ -1,12 +1,12 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, type Team, type CreateTeamRequest } from "@shared/routes";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { api, type Team, type CreateTeamRequest } from '@shared/routes';
 
 export function useTeams() {
   return useQuery({
     queryKey: [api.teams.list.path],
     queryFn: async () => {
-      const res = await fetch(api.teams.list.path, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch teams");
+      const res = await fetch(api.teams.list.path, { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch teams');
       return api.teams.list.responses[200].parse(await res.json());
     },
   });
@@ -19,11 +19,11 @@ export function useCreateTeam() {
       const validated = api.teams.create.input.parse(data);
       const res = await fetch(api.teams.create.path, {
         method: api.teams.create.method,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(validated),
-        credentials: "include",
+        credentials: 'include',
       });
-      if (!res.ok) throw new Error("Failed to create team");
+      if (!res.ok) throw new Error('Failed to create team');
       return api.teams.create.responses[201].parse(await res.json());
     },
     onSuccess: () => {
@@ -37,10 +37,10 @@ export function useDeleteTeam() {
   return useMutation({
     mutationFn: async (id: number) => {
       const res = await fetch(`/api/teams/${id}`, {
-        method: "DELETE",
-        credentials: "include",
+        method: 'DELETE',
+        credentials: 'include',
       });
-      if (!res.ok) throw new Error("Failed to delete team");
+      if (!res.ok) throw new Error('Failed to delete team');
       return res.json();
     },
     onSuccess: () => {

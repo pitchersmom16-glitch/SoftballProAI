@@ -3,9 +3,9 @@
 
 :root {
   /* Brand Gradients */
-  --gradient-brand: linear-gradient(135deg, #FF00FF 0%, #00FFFF 50%, #FFFF33 100%);
-  --gradient-circuit: linear-gradient(90deg, #00FFFF 0%, #9900FF 100%);
-  --gradient-motion: linear-gradient(45deg, #FF6600 0%, #FF00FF 100%);
+  --gradient-brand: linear-gradient(135deg, #ff00ff 0%, #00ffff 50%, #ffff33 100%);
+  --gradient-circuit: linear-gradient(90deg, #00ffff 0%, #9900ff 100%);
+  --gradient-motion: linear-gradient(45deg, #ff6600 0%, #ff00ff 100%);
 
   /* Typography Scale */
   --heading-xl: 96px;

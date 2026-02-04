@@ -1,17 +1,17 @@
-import { useState, useRef } from "react";
-import { Link } from "wouter";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Users, 
-  Calendar, 
-  ClipboardList, 
+import { useState, useRef } from 'react';
+import { Link } from 'wouter';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
+import {
+  Users,
+  Calendar,
+  ClipboardList,
   Plus,
   AlertTriangle,
   CheckCircle2,
@@ -23,13 +23,13 @@ import {
   Trash2,
   Upload,
   BarChart3,
-  FileSpreadsheet
-} from "lucide-react";
-import type { Team, Athlete, PracticePlan, TeamStats } from "@shared/schema";
+  FileSpreadsheet,
+} from 'lucide-react';
+import type { Team, Athlete, PracticePlan, TeamStats } from '@shared/schema';
 
 interface RosterHealthData {
   athlete: Athlete;
-  healthStatus: "healthy" | "caution" | "rest";
+  healthStatus: 'healthy' | 'caution' | 'rest';
   lastCheckIn?: {
     mood: string;
     sorenessLevel: number;
@@ -38,17 +38,17 @@ interface RosterHealthData {
 }
 
 const PRACTICE_FOCUS_OPTIONS = [
-  { value: "defensive", label: "Defensive Focus", icon: Target },
-  { value: "offensive", label: "Offensive Focus", icon: Dumbbell },
-  { value: "pitching", label: "Pitching Focus", icon: Activity },
-  { value: "full", label: "Full Practice", icon: ClipboardList },
+  { value: 'defensive', label: 'Defensive Focus', icon: Target },
+  { value: 'offensive', label: 'Offensive Focus', icon: Dumbbell },
+  { value: 'pitching', label: 'Pitching Focus', icon: Activity },
+  { value: 'full', label: 'Full Practice', icon: ClipboardList },
 ];
 
 const DURATION_OPTIONS = [
-  { value: 60, label: "1 Hour" },
-  { value: 90, label: "1.5 Hours" },
-  { value: 120, label: "2 Hours" },
-  { value: 150, label: "2.5 Hours" },
+  { value: 60, label: '1 Hour' },
+  { value: 90, label: '1.5 Hours' },
+  { value: 120, label: '2 Hours' },
+  { value: 150, label: '2.5 Hours' },
 ];
 
 export default function TeamCoachDashboard() {
@@ -58,57 +58,57 @@ export default function TeamCoachDashboard() {
   const [showStatsImport, setShowStatsImport] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [practiceData, setPracticeData] = useState({
-    name: "",
+    name: '',
     duration: 90,
-    focus: "full",
-    scheduledDate: "",
-    notes: "",
+    focus: 'full',
+    scheduledDate: '',
+    notes: '',
   });
 
   const { data: teams } = useQuery<Team[]>({
-    queryKey: ["/api/teams"],
+    queryKey: ['/api/teams'],
   });
 
   const { data: athletes } = useQuery<Athlete[]>({
-    queryKey: ["/api/athletes"],
+    queryKey: ['/api/athletes'],
   });
 
   const { data: practicePlans } = useQuery<PracticePlan[]>({
-    queryKey: ["/api/practice-plans"],
+    queryKey: ['/api/practice-plans'],
   });
 
   const { data: rosterHealth } = useQuery<RosterHealthData[]>({
-    queryKey: ["/api/roster-health"],
+    queryKey: ['/api/roster-health'],
   });
 
   const { data: teamStats } = useQuery<TeamStats[]>({
-    queryKey: ["/api/coach/team-stats"],
+    queryKey: ['/api/coach/team-stats'],
   });
 
   const createPracticeMutation = useMutation({
     mutationFn: async (data: typeof practiceData) => {
-      return apiRequest("POST", "/api/practice-plans", data);
+      return apiRequest('POST', '/api/practice-plans', data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/practice-plans"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/practice-plans'] });
       setShowPracticeBuilder(false);
       setPracticeData({
-        name: "",
+        name: '',
         duration: 90,
-        focus: "full",
-        scheduledDate: "",
-        notes: "",
+        focus: 'full',
+        scheduledDate: '',
+        notes: '',
       });
       toast({
-        title: "Practice Plan Created!",
-        description: "Your practice plan has been saved.",
+        title: 'Practice Plan Created!',
+        description: 'Your practice plan has been saved.',
       });
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to create practice plan.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to create practice plan.',
+        variant: 'destructive',
       });
     },
   });
@@ -116,25 +116,25 @@ export default function TeamCoachDashboard() {
   const importStatsMutation = useMutation({
     mutationFn: async (csvData: string) => {
       const teamId = teams?.[0]?.id;
-      return apiRequest("POST", "/api/team-stats/import", {
+      return apiRequest('POST', '/api/team-stats/import', {
         teamId,
         csvData,
-        season: `${new Date().getFullYear()} Season`
+        season: `${new Date().getFullYear()} Season`,
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/coach/team-stats"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/coach/team-stats'] });
       setShowStatsImport(false);
       toast({
-        title: "Team Stats Imported!",
-        description: "Your team statistics have been calculated.",
+        title: 'Team Stats Imported!',
+        description: 'Your team statistics have been calculated.',
       });
     },
     onError: () => {
       toast({
-        title: "Import Failed",
-        description: "Could not parse the CSV file. Please check the format.",
-        variant: "destructive",
+        title: 'Import Failed',
+        description: 'Could not parse the CSV file. Please check the format.',
+        variant: 'destructive',
       });
     },
   });
@@ -152,16 +152,16 @@ export default function TeamCoachDashboard() {
   };
 
   const healthData = rosterHealth || [];
-  const healthyCount = healthData.filter(r => r.healthStatus === "healthy").length;
-  const cautionCount = healthData.filter(r => r.healthStatus === "caution").length;
-  const restCount = healthData.filter(r => r.healthStatus === "rest").length;
+  const healthyCount = healthData.filter((r) => r.healthStatus === 'healthy').length;
+  const cautionCount = healthData.filter((r) => r.healthStatus === 'caution').length;
+  const restCount = healthData.filter((r) => r.healthStatus === 'rest').length;
 
   const handleCreatePractice = () => {
     if (!practiceData.name) {
       toast({
-        title: "Missing Name",
-        description: "Please give your practice a name.",
-        variant: "destructive",
+        title: 'Missing Name',
+        description: 'Please give your practice a name.',
+        variant: 'destructive',
       });
       return;
     }
@@ -173,9 +173,7 @@ export default function TeamCoachDashboard() {
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-neon-pink">
-              Team Coach HQ
-            </h1>
+            <h1 className="text-3xl font-bold text-neon-pink">Team Coach HQ</h1>
             <p className="text-muted-foreground mt-1">
               Manage your roster and architect winning practices
             </p>
@@ -188,19 +186,19 @@ export default function TeamCoachDashboard() {
               onChange={handleFileUpload}
               className="hidden"
             />
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="border-neon-green/50 text-neon-green hover-elevate"
               onClick={() => fileInputRef.current?.click()}
               disabled={importStatsMutation.isPending}
               data-testid="button-import-team-stats"
             >
               <Upload className="w-4 h-4 mr-2" />
-              {importStatsMutation.isPending ? "Importing..." : "Import Team Stats"}
+              {importStatsMutation.isPending ? 'Importing...' : 'Import Team Stats'}
             </Button>
             <Link href="/teams">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="border-neon-pink/50 text-neon-pink hover-elevate"
                 data-testid="button-view-teams"
               >
@@ -226,19 +224,23 @@ export default function TeamCoachDashboard() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="p-4 rounded-lg bg-background border border-border">
                 <p className="text-sm text-muted-foreground">Team ERA</p>
-                <p className="text-2xl font-bold text-neon-green">{teamStats[0].teamEra || "--"}</p>
+                <p className="text-2xl font-bold text-neon-green">{teamStats[0].teamEra || '--'}</p>
               </div>
               <div className="p-4 rounded-lg bg-background border border-border">
                 <p className="text-sm text-muted-foreground">Team AVG</p>
-                <p className="text-2xl font-bold text-neon-pink">{teamStats[0].teamAvg || "--"}</p>
+                <p className="text-2xl font-bold text-neon-pink">{teamStats[0].teamAvg || '--'}</p>
               </div>
               <div className="p-4 rounded-lg bg-background border border-border">
                 <p className="text-sm text-muted-foreground">Team WHIP</p>
-                <p className="text-2xl font-bold text-neon-yellow">{teamStats[0].teamWhip || "--"}</p>
+                <p className="text-2xl font-bold text-neon-yellow">
+                  {teamStats[0].teamWhip || '--'}
+                </p>
               </div>
               <div className="p-4 rounded-lg bg-background border border-border">
                 <p className="text-sm text-muted-foreground">Quality At-Bats</p>
-                <p className="text-2xl font-bold text-neon-blue">{teamStats[0].totalQualityAtBats || 0}</p>
+                <p className="text-2xl font-bold text-neon-blue">
+                  {teamStats[0].totalQualityAtBats || 0}
+                </p>
               </div>
             </div>
           </Card>
@@ -260,22 +262,30 @@ export default function TeamCoachDashboard() {
             <div className="grid grid-cols-2 gap-3">
               <div className="p-3 rounded-lg bg-background border border-border text-center">
                 <p className="text-xs text-muted-foreground">Avg Exit Velo</p>
-                <p className="text-xl font-bold text-neon-pink" data-testid="metric-exit-velocity">--</p>
+                <p className="text-xl font-bold text-neon-pink" data-testid="metric-exit-velocity">
+                  --
+                </p>
                 <p className="text-xs text-muted-foreground">mph</p>
               </div>
               <div className="p-3 rounded-lg bg-background border border-border text-center">
                 <p className="text-xs text-muted-foreground">Launch Angle</p>
-                <p className="text-xl font-bold text-neon-green" data-testid="metric-launch-angle">--</p>
+                <p className="text-xl font-bold text-neon-green" data-testid="metric-launch-angle">
+                  --
+                </p>
                 <p className="text-xs text-muted-foreground">degrees</p>
               </div>
               <div className="p-3 rounded-lg bg-background border border-border text-center">
                 <p className="text-xs text-muted-foreground">Bat Speed</p>
-                <p className="text-xl font-bold text-neon-yellow" data-testid="metric-bat-speed">--</p>
+                <p className="text-xl font-bold text-neon-yellow" data-testid="metric-bat-speed">
+                  --
+                </p>
                 <p className="text-xs text-muted-foreground">mph</p>
               </div>
               <div className="p-3 rounded-lg bg-background border border-border text-center">
                 <p className="text-xs text-muted-foreground">Swing Path</p>
-                <p className="text-xl font-bold text-neon-blue" data-testid="metric-swing-path">--</p>
+                <p className="text-xl font-bold text-neon-blue" data-testid="metric-swing-path">
+                  --
+                </p>
                 <p className="text-xs text-muted-foreground">efficiency</p>
               </div>
             </div>
@@ -295,22 +305,30 @@ export default function TeamCoachDashboard() {
             <div className="grid grid-cols-2 gap-3">
               <div className="p-3 rounded-lg bg-background border border-border text-center">
                 <p className="text-xs text-muted-foreground">Avg Pop-time</p>
-                <p className="text-xl font-bold text-neon-yellow" data-testid="metric-pop-time">--</p>
+                <p className="text-xl font-bold text-neon-yellow" data-testid="metric-pop-time">
+                  --
+                </p>
                 <p className="text-xs text-muted-foreground">seconds</p>
               </div>
               <div className="p-3 rounded-lg bg-background border border-border text-center">
                 <p className="text-xs text-muted-foreground">Transfer Speed</p>
-                <p className="text-xl font-bold text-neon-pink" data-testid="metric-transfer-speed">--</p>
+                <p className="text-xl font-bold text-neon-pink" data-testid="metric-transfer-speed">
+                  --
+                </p>
                 <p className="text-xs text-muted-foreground">ms</p>
               </div>
               <div className="p-3 rounded-lg bg-background border border-border text-center">
                 <p className="text-xs text-muted-foreground">Block Rate</p>
-                <p className="text-xl font-bold text-neon-green" data-testid="metric-block-rate">--</p>
+                <p className="text-xl font-bold text-neon-green" data-testid="metric-block-rate">
+                  --
+                </p>
                 <p className="text-xs text-muted-foreground">%</p>
               </div>
               <div className="p-3 rounded-lg bg-background border border-border text-center">
                 <p className="text-xs text-muted-foreground">Framing Grade</p>
-                <p className="text-xl font-bold text-neon-blue" data-testid="metric-framing-grade">--</p>
+                <p className="text-xl font-bold text-neon-blue" data-testid="metric-framing-grade">
+                  --
+                </p>
                 <p className="text-xs text-muted-foreground">AI Rating</p>
               </div>
             </div>
@@ -326,10 +344,12 @@ export default function TeamCoachDashboard() {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold">Practice Architect</h2>
-                  <p className="text-sm text-muted-foreground">Auto-generate winning practice plans</p>
+                  <p className="text-sm text-muted-foreground">
+                    Auto-generate winning practice plans
+                  </p>
                 </div>
               </div>
-              <Button 
+              <Button
                 onClick={() => setShowPracticeBuilder(true)}
                 className="bg-neon-pink text-black hover:bg-neon-pink/90"
                 data-testid="button-new-practice"
@@ -342,7 +362,7 @@ export default function TeamCoachDashboard() {
             {showPracticeBuilder && (
               <div className="mb-6 p-6 rounded-lg border border-neon-pink/30 bg-background/50 space-y-4">
                 <h3 className="font-semibold text-neon-yellow">Build Your Practice</h3>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm text-muted-foreground">Practice Name</label>
@@ -359,7 +379,9 @@ export default function TeamCoachDashboard() {
                     <Input
                       type="date"
                       value={practiceData.scheduledDate}
-                      onChange={(e) => setPracticeData({ ...practiceData, scheduledDate: e.target.value })}
+                      onChange={(e) =>
+                        setPracticeData({ ...practiceData, scheduledDate: e.target.value })
+                      }
                       className="mt-1"
                       data-testid="input-practice-date"
                     />
@@ -375,8 +397,8 @@ export default function TeamCoachDashboard() {
                         onClick={() => setPracticeData({ ...practiceData, focus: option.value })}
                         className={`p-3 rounded-lg border text-center transition-all ${
                           practiceData.focus === option.value
-                            ? "border-neon-pink bg-neon-pink/20 text-neon-pink"
-                            : "border-border hover:border-neon-pink/50"
+                            ? 'border-neon-pink bg-neon-pink/20 text-neon-pink'
+                            : 'border-border hover:border-neon-pink/50'
                         }`}
                         data-testid={`button-focus-${option.value}`}
                       >
@@ -396,8 +418,8 @@ export default function TeamCoachDashboard() {
                         onClick={() => setPracticeData({ ...practiceData, duration: option.value })}
                         className={`p-3 rounded-lg border text-center transition-all ${
                           practiceData.duration === option.value
-                            ? "border-neon-pink bg-neon-pink/20 text-neon-pink"
-                            : "border-border hover:border-neon-pink/50"
+                            ? 'border-neon-pink bg-neon-pink/20 text-neon-pink'
+                            : 'border-border hover:border-neon-pink/50'
                         }`}
                         data-testid={`button-duration-${option.value}`}
                       >
@@ -433,7 +455,7 @@ export default function TeamCoachDashboard() {
                     className="bg-neon-pink text-black hover:bg-neon-pink/90"
                     data-testid="button-save-practice"
                   >
-                    {createPracticeMutation.isPending ? "Creating..." : "Create Practice Plan"}
+                    {createPracticeMutation.isPending ? 'Creating...' : 'Create Practice Plan'}
                   </Button>
                 </div>
               </div>
@@ -443,7 +465,7 @@ export default function TeamCoachDashboard() {
               <h3 className="font-semibold text-muted-foreground">Upcoming Practices</h3>
               {practicePlans && practicePlans.length > 0 ? (
                 practicePlans.slice(0, 5).map((plan) => (
-                  <div 
+                  <div
                     key={plan.id}
                     className="p-4 rounded-lg border border-border hover:border-neon-pink/30 transition-colors flex items-center justify-between"
                     data-testid={`practice-plan-${plan.id}`}
@@ -504,7 +526,7 @@ export default function TeamCoachDashboard() {
 
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {healthData.map((item) => (
-                <div 
+                <div
                   key={item.athlete.id}
                   className="p-3 rounded-lg border border-border hover:border-neon-yellow/30 transition-colors flex items-center justify-between"
                   data-testid={`roster-athlete-${item.athlete.id}`}
@@ -512,44 +534,51 @@ export default function TeamCoachDashboard() {
                   <div className="flex items-center gap-3">
                     <div className="relative">
                       {item.athlete.photoUrl ? (
-                        <img 
-                          src={item.athlete.photoUrl} 
+                        <img
+                          src={item.athlete.photoUrl}
                           alt={`${item.athlete.firstName} ${item.athlete.lastName}`}
                           className="w-8 h-8 rounded-full object-cover border border-white/20"
                           data-testid={`health-img-athlete-${item.athlete.id}`}
                         />
                       ) : (
-                        <div 
+                        <div
                           className="w-8 h-8 rounded-full bg-neon-yellow/20 flex items-center justify-center"
                           data-testid={`health-avatar-fallback-${item.athlete.id}`}
                         >
                           <span className="text-neon-yellow text-xs font-bold">
-                            {item.athlete.firstName?.charAt(0) || "?"}
+                            {item.athlete.firstName?.charAt(0) || '?'}
                           </span>
                         </div>
                       )}
-                      <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card ${
-                        item.healthStatus === "healthy" ? "bg-neon-green" :
-                        item.healthStatus === "caution" ? "bg-neon-yellow" : "bg-neon-pink"
-                      }`} />
+                      <div
+                        className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card ${
+                          item.healthStatus === 'healthy'
+                            ? 'bg-neon-green'
+                            : item.healthStatus === 'caution'
+                              ? 'bg-neon-yellow'
+                              : 'bg-neon-pink'
+                        }`}
+                      />
                     </div>
                     <div>
-                      <p className="font-medium text-sm">{item.athlete.firstName} {item.athlete.lastName}</p>
+                      <p className="font-medium text-sm">
+                        {item.athlete.firstName} {item.athlete.lastName}
+                      </p>
                       <p className="text-xs text-muted-foreground">
-                        {item.athlete.primaryPosition || "Player"}
+                        {item.athlete.primaryPosition || 'Player'}
                       </p>
                     </div>
                   </div>
-                  {item.healthStatus !== "healthy" && (
-                    <Badge 
-                      variant="outline" 
+                  {item.healthStatus !== 'healthy' && (
+                    <Badge
+                      variant="outline"
                       className={`text-xs ${
-                        item.healthStatus === "caution" 
-                          ? "border-neon-yellow/50 text-neon-yellow" 
-                          : "border-neon-pink/50 text-neon-pink"
+                        item.healthStatus === 'caution'
+                          ? 'border-neon-yellow/50 text-neon-yellow'
+                          : 'border-neon-pink/50 text-neon-pink'
                       }`}
                     >
-                      {item.healthStatus === "caution" ? "Arm Soreness" : "Rest Day"}
+                      {item.healthStatus === 'caution' ? 'Arm Soreness' : 'Rest Day'}
                     </Badge>
                   )}
                 </div>
@@ -573,11 +602,13 @@ export default function TeamCoachDashboard() {
               </div>
               <div>
                 <h2 className="text-xl font-bold">Full Roster</h2>
-                <p className="text-sm text-muted-foreground">{athletes?.length || 0} athletes across all teams</p>
+                <p className="text-sm text-muted-foreground">
+                  {athletes?.length || 0} athletes across all teams
+                </p>
               </div>
             </div>
             <Link href="/athletes">
-              <Button 
+              <Button
                 variant="outline"
                 className="border-neon-green/50 text-neon-green hover-elevate"
                 data-testid="button-add-athlete"
@@ -597,32 +628,34 @@ export default function TeamCoachDashboard() {
               >
                 <div className="flex items-center gap-3">
                   {athlete.photoUrl ? (
-                    <img 
-                      src={athlete.photoUrl} 
+                    <img
+                      src={athlete.photoUrl}
                       alt={`${athlete.firstName} ${athlete.lastName}`}
                       className="w-10 h-10 rounded-full object-cover border border-neon-green/30"
                       data-testid={`img-athlete-${athlete.id}`}
                     />
                   ) : (
-                    <div 
+                    <div
                       className="w-10 h-10 rounded-full bg-neon-green/20 flex items-center justify-center"
                       data-testid={`avatar-fallback-${athlete.id}`}
                     >
                       <span className="text-neon-green font-bold">
-                        {athlete.firstName?.charAt(0) || "?"}
+                        {athlete.firstName?.charAt(0) || '?'}
                       </span>
                     </div>
                   )}
                   <div>
-                    <p className="font-medium">{athlete.firstName} {athlete.lastName}</p>
+                    <p className="font-medium">
+                      {athlete.firstName} {athlete.lastName}
+                    </p>
                     <p className="text-xs text-muted-foreground">
-                      #{athlete.jerseyNumber || "--"} | {athlete.primaryPosition || "Player"}
+                      #{athlete.jerseyNumber || '--'} | {athlete.primaryPosition || 'Player'}
                     </p>
                   </div>
                 </div>
                 {athlete.dob && (
                   <p className="text-xs text-muted-foreground mt-2">
-                    {athlete.throws || "R"}H Throw / {athlete.bats || "R"}H Bat
+                    {athlete.throws || 'R'}H Throw / {athlete.bats || 'R'}H Bat
                   </p>
                 )}
               </div>
