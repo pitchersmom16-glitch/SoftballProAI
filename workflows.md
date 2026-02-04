@@ -7,8 +7,8 @@
 ---
 
 ## 🔁 Live Updates (canonical change log)
-- 2026-02-04 — Fix Prettier formatting issues (commit: `b852e9f`) — author: pitchersmom16-glitch
 
+- 2026-02-04 — Fix Prettier formatting issues (commit: `b852e9f`) — author: pitchersmom16-glitch
 
 - 2026-02-04 — Fix code formatting with Prettier (commit: `2ec048e`) — author: pitchersmom16-glitch
 

@@ -1,21 +1,59 @@
 /**
  * SOFTBALLPROAI BRAIN - MASTER INDEX
  * Central export point for all knowledge bases
- * 
+ *
  * Import comprehensive softball knowledge, mental training, strength conditioning,
  * tournament rules, and practice planning from a single location.
- * 
+ *
  * Usage:
  *   import { PITCHING_KNOWLEDGE, MAMBA_MENTALITY } from './brain';
  *   import * as SoftballBrain from './brain';
  */
 
 // Core analysis engines
-import { analyzeMechanics, analyzePitching, analyzeHitting, analyzeCatching, analyzeFielding, analyzeMental, getCorrectiveDrills, getDrillsByTag, getDrillsByExpert, getDailyMindset, getPreGameAudio } from './analyze_mechanics';
-export { analyzeMechanics, analyzePitching, analyzeHitting, analyzeCatching, analyzeFielding, analyzeMental, getCorrectiveDrills, getDrillsByTag, getDrillsByExpert, getDailyMindset, getPreGameAudio } from './analyze_mechanics';
+import {
+  analyzeMechanics,
+  analyzePitching,
+  analyzeHitting,
+  analyzeCatching,
+  analyzeFielding,
+  analyzeMental,
+  getCorrectiveDrills,
+  getDrillsByTag,
+  getDrillsByExpert,
+  getDailyMindset,
+  getPreGameAudio,
+} from './analyze_mechanics';
+export {
+  analyzeMechanics,
+  analyzePitching,
+  analyzeHitting,
+  analyzeCatching,
+  analyzeFielding,
+  analyzeMental,
+  getCorrectiveDrills,
+  getDrillsByTag,
+  getDrillsByExpert,
+  getDailyMindset,
+  getPreGameAudio,
+} from './analyze_mechanics';
 
-import { analyzeVideo, getMentalContent, analyzeWindmillMechanics, analyzeSwingMechanics, analyzePopTime, analyzeFieldingMechanics } from './analysis_engine';
-export { analyzeVideo, getMentalContent, analyzeWindmillMechanics, analyzeSwingMechanics, analyzePopTime, analyzeFieldingMechanics } from './analysis_engine';
+import {
+  analyzeVideo,
+  getMentalContent,
+  analyzeWindmillMechanics,
+  analyzeSwingMechanics,
+  analyzePopTime,
+  analyzeFieldingMechanics,
+} from './analysis_engine';
+export {
+  analyzeVideo,
+  getMentalContent,
+  analyzeWindmillMechanics,
+  analyzeSwingMechanics,
+  analyzePopTime,
+  analyzeFieldingMechanics,
+} from './analysis_engine';
 
 export type {
   MechanicsAnalysisRequest,
@@ -23,7 +61,7 @@ export type {
   MechanicsAnalysisResult,
   MentalContent,
   MentalAnalysisRequest,
-  MentalAnalysisResult
+  MentalAnalysisResult,
 } from './analyze_mechanics';
 
 export {
@@ -32,14 +70,14 @@ export {
   analyzeWindmillMechanics,
   analyzeSwingMechanics,
   analyzePopTime,
-  analyzeFieldingMechanics
+  analyzeFieldingMechanics,
 } from './analysis_engine';
 
 export type {
   VideoAnalysisRequest,
   AnalysisResult,
   DrillRecommendation as EngineDrillRecommendation,
-  MentalContentRequest
+  MentalContentRequest,
 } from './analysis_engine';
 
 // Comprehensive knowledge bases
@@ -50,7 +88,7 @@ export {
   INFIELD_KNOWLEDGE,
   OUTFIELD_KNOWLEDGE,
   BIOMECHANICS_FRAMEWORK,
-  EXPERT_SOURCES
+  EXPERT_SOURCES,
 } from './softball_knowledge_base';
 
 export {
@@ -58,7 +96,7 @@ export {
   MOTIVATIONAL_QUOTES,
   SPORTS_PSYCHOLOGY,
   DAILY_MINDSET_THEMES,
-  CONTEXTUAL_MENTAL_STRATEGIES
+  CONTEXTUAL_MENTAL_STRATEGIES,
 } from './mental_training_knowledge';
 
 export {
@@ -66,7 +104,7 @@ export {
   AGE_APPROPRIATE_TRAINING,
   SOFTBALL_TRAINING_PRIORITIES,
   INJURY_PREVENTION,
-  PERIODIZATION
+  PERIODIZATION,
 } from './strength_training_knowledge';
 
 export {
@@ -78,7 +116,7 @@ export {
   METROBALL_RULES,
   INTERNATIONAL_TIEBREAKER,
   RULE_COMPARISONS,
-  RULES_EDUCATION
+  RULES_EDUCATION,
 } from './tournament_rules_knowledge';
 
 export {
@@ -88,7 +126,7 @@ export {
   SPECIALIZED_PRACTICES,
   SEASONAL_PLANNING,
   EFFICIENCY_TIPS,
-  PRACTICE_TEMPLATES
+  PRACTICE_TEMPLATES,
 } from './practice_planning_knowledge';
 
 export {
@@ -97,55 +135,58 @@ export {
   CATCHING_BIOMECHANICS,
   FIELDING_BIOMECHANICS,
   MEDIAPIPE_ANALYSIS_POINTS,
-  BIOMECHANICS_COACHING_CONTEXT
+  BIOMECHANICS_COACHING_CONTEXT,
 } from './biomechanics_analysis';
 
 // Convenience access to full knowledge base
 export const SoftballKnowledge = {
-  pitching: () => import('./softball_knowledge_base').then(m => m.PITCHING_KNOWLEDGE),
-  hitting: () => import('./softball_knowledge_base').then(m => m.HITTING_KNOWLEDGE),
-  catching: () => import('./softball_knowledge_base').then(m => m.CATCHING_KNOWLEDGE),
-  infield: () => import('./softball_knowledge_base').then(m => m.INFIELD_KNOWLEDGE),
-  outfield: () => import('./softball_knowledge_base').then(m => m.OUTFIELD_KNOWLEDGE),
-  biomechanics: () => import('./softball_knowledge_base').then(m => m.BIOMECHANICS_FRAMEWORK),
-  experts: () => import('./softball_knowledge_base').then(m => m.EXPERT_SOURCES)
+  pitching: () => import('./softball_knowledge_base').then((m) => m.PITCHING_KNOWLEDGE),
+  hitting: () => import('./softball_knowledge_base').then((m) => m.HITTING_KNOWLEDGE),
+  catching: () => import('./softball_knowledge_base').then((m) => m.CATCHING_KNOWLEDGE),
+  infield: () => import('./softball_knowledge_base').then((m) => m.INFIELD_KNOWLEDGE),
+  outfield: () => import('./softball_knowledge_base').then((m) => m.OUTFIELD_KNOWLEDGE),
+  biomechanics: () => import('./softball_knowledge_base').then((m) => m.BIOMECHANICS_FRAMEWORK),
+  experts: () => import('./softball_knowledge_base').then((m) => m.EXPERT_SOURCES),
 };
 
 export const MentalTraining = {
-  championship: () => import('./mental_training_knowledge').then(m => m.CHAMPIONSHIP_MINDSET),
-  quotes: () => import('./mental_training_knowledge').then(m => m.MOTIVATIONAL_QUOTES),
-  psychology: () => import('./mental_training_knowledge').then(m => m.SPORTS_PSYCHOLOGY),
-  daily: () => import('./mental_training_knowledge').then(m => m.DAILY_MINDSET_THEMES),
-  contextual: () => import('./mental_training_knowledge').then(m => m.CONTEXTUAL_MENTAL_STRATEGIES)
+  championship: () => import('./mental_training_knowledge').then((m) => m.CHAMPIONSHIP_MINDSET),
+  quotes: () => import('./mental_training_knowledge').then((m) => m.MOTIVATIONAL_QUOTES),
+  psychology: () => import('./mental_training_knowledge').then((m) => m.SPORTS_PSYCHOLOGY),
+  daily: () => import('./mental_training_knowledge').then((m) => m.DAILY_MINDSET_THEMES),
+  contextual: () =>
+    import('./mental_training_knowledge').then((m) => m.CONTEXTUAL_MENTAL_STRATEGIES),
 };
 
 export const StrengthTraining = {
-  crossfit: () => import('./strength_training_knowledge').then(m => m.CROSSFIT_FOR_SOFTBALL),
-  ageAppropriate: () => import('./strength_training_knowledge').then(m => m.AGE_APPROPRIATE_TRAINING),
-  priorities: () => import('./strength_training_knowledge').then(m => m.SOFTBALL_TRAINING_PRIORITIES),
-  injury: () => import('./strength_training_knowledge').then(m => m.INJURY_PREVENTION),
-  periodization: () => import('./strength_training_knowledge').then(m => m.PERIODIZATION)
+  crossfit: () => import('./strength_training_knowledge').then((m) => m.CROSSFIT_FOR_SOFTBALL),
+  ageAppropriate: () =>
+    import('./strength_training_knowledge').then((m) => m.AGE_APPROPRIATE_TRAINING),
+  priorities: () =>
+    import('./strength_training_knowledge').then((m) => m.SOFTBALL_TRAINING_PRIORITIES),
+  injury: () => import('./strength_training_knowledge').then((m) => m.INJURY_PREVENTION),
+  periodization: () => import('./strength_training_knowledge').then((m) => m.PERIODIZATION),
 };
 
 export const TournamentRules = {
-  nfhs: () => import('./tournament_rules_knowledge').then(m => m.NFHS_RULES),
-  pgf: () => import('./tournament_rules_knowledge').then(m => m.PGF_RULES),
-  usssa: () => import('./tournament_rules_knowledge').then(m => m.USSSA_RULES),
-  gsa: () => import('./tournament_rules_knowledge').then(m => m.GSA_RULES),
-  titan: () => import('./tournament_rules_knowledge').then(m => m.TITAN_RULES),
-  itb: () => import('./tournament_rules_knowledge').then(m => m.INTERNATIONAL_TIEBREAKER),
-  comparisons: () => import('./tournament_rules_knowledge').then(m => m.RULE_COMPARISONS),
-  education: () => import('./tournament_rules_knowledge').then(m => m.RULES_EDUCATION)
+  nfhs: () => import('./tournament_rules_knowledge').then((m) => m.NFHS_RULES),
+  pgf: () => import('./tournament_rules_knowledge').then((m) => m.PGF_RULES),
+  usssa: () => import('./tournament_rules_knowledge').then((m) => m.USSSA_RULES),
+  gsa: () => import('./tournament_rules_knowledge').then((m) => m.GSA_RULES),
+  titan: () => import('./tournament_rules_knowledge').then((m) => m.TITAN_RULES),
+  itb: () => import('./tournament_rules_knowledge').then((m) => m.INTERNATIONAL_TIEBREAKER),
+  comparisons: () => import('./tournament_rules_knowledge').then((m) => m.RULE_COMPARISONS),
+  education: () => import('./tournament_rules_knowledge').then((m) => m.RULES_EDUCATION),
 };
 
 export const PracticePlanning = {
-  framework: () => import('./practice_planning_knowledge').then(m => m.PRACTICE_FRAMEWORK),
-  stations: () => import('./practice_planning_knowledge').then(m => m.STATION_PLANS),
-  ageSpecific: () => import('./practice_planning_knowledge').then(m => m.AGE_SPECIFIC_PLANS),
-  specialized: () => import('./practice_planning_knowledge').then(m => m.SPECIALIZED_PRACTICES),
-  seasonal: () => import('./practice_planning_knowledge').then(m => m.SEASONAL_PLANNING),
-  efficiency: () => import('./practice_planning_knowledge').then(m => m.EFFICIENCY_TIPS),
-  templates: () => import('./practice_planning_knowledge').then(m => m.PRACTICE_TEMPLATES)
+  framework: () => import('./practice_planning_knowledge').then((m) => m.PRACTICE_FRAMEWORK),
+  stations: () => import('./practice_planning_knowledge').then((m) => m.STATION_PLANS),
+  ageSpecific: () => import('./practice_planning_knowledge').then((m) => m.AGE_SPECIFIC_PLANS),
+  specialized: () => import('./practice_planning_knowledge').then((m) => m.SPECIALIZED_PRACTICES),
+  seasonal: () => import('./practice_planning_knowledge').then((m) => m.SEASONAL_PLANNING),
+  efficiency: () => import('./practice_planning_knowledge').then((m) => m.EFFICIENCY_TIPS),
+  templates: () => import('./practice_planning_knowledge').then((m) => m.PRACTICE_TEMPLATES),
 };
 
 /**
@@ -153,23 +194,23 @@ export const PracticePlanning = {
  */
 export async function getKnowledge(topic: string) {
   const topicMap: Record<string, any> = {
-    'pitching': SoftballKnowledge.pitching,
-    'hitting': SoftballKnowledge.hitting,
-    'catching': SoftballKnowledge.catching,
-    'infield': SoftballKnowledge.infield,
-    'outfield': SoftballKnowledge.outfield,
-    'biomechanics': SoftballKnowledge.biomechanics,
-    'experts': SoftballKnowledge.experts,
-    'championship': MentalTraining.championship,
-    'quotes': MentalTraining.quotes,
-    'psychology': MentalTraining.psychology,
+    pitching: SoftballKnowledge.pitching,
+    hitting: SoftballKnowledge.hitting,
+    catching: SoftballKnowledge.catching,
+    infield: SoftballKnowledge.infield,
+    outfield: SoftballKnowledge.outfield,
+    biomechanics: SoftballKnowledge.biomechanics,
+    experts: SoftballKnowledge.experts,
+    championship: MentalTraining.championship,
+    quotes: MentalTraining.quotes,
+    psychology: MentalTraining.psychology,
     'mental-daily': MentalTraining.daily,
     'mental-contextual': MentalTraining.contextual,
-    'crossfit': StrengthTraining.crossfit,
+    crossfit: StrengthTraining.crossfit,
     'strength-age': StrengthTraining.ageAppropriate,
     'strength-priorities': StrengthTraining.priorities,
     'injury-prevention': StrengthTraining.injury,
-    'periodization': StrengthTraining.periodization,
+    periodization: StrengthTraining.periodization,
     'rules-nfhs': TournamentRules.nfhs,
     'rules-pgf': TournamentRules.pgf,
     'rules-usssa': TournamentRules.usssa,
@@ -181,7 +222,7 @@ export async function getKnowledge(topic: string) {
     'practice-stations': PracticePlanning.stations,
     'practice-age': PracticePlanning.ageSpecific,
     'practice-specialized': PracticePlanning.specialized,
-    'practice-seasonal': PracticePlanning.seasonal
+    'practice-seasonal': PracticePlanning.seasonal,
   };
 
   const loader = topicMap[topic.toLowerCase()];
@@ -197,7 +238,7 @@ export async function getKnowledge(topic: string) {
  */
 export async function getMotivationalQuote(category?: string) {
   const quotes = await MentalTraining.quotes();
-  
+
   if (!category) {
     // Return random quote from all categories
     const allCategories = Object.keys(quotes);
@@ -222,14 +263,20 @@ export async function getChampionshipDailyContent() {
   const championship = await MentalTraining.championship();
   const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const today = days[new Date().getDay()];
-  
+
   const dailyThemes = await MentalTraining.daily();
+  const kpKeys = Object.keys(championship.keyPrinciples) as Array<
+    keyof typeof championship.keyPrinciples
+  >;
+  const kpKey = kpKeys[Math.floor(Math.random() * kpKeys.length)];
+
   return {
-    const kpKeys = Object.keys(championship.keyPrinciples) as Array<keyof typeof championship.keyPrinciples>;
-    const kpKey = kpKeys[Math.floor(Math.random() * kpKeys.length)];
     championshipPrinciple: championship.keyPrinciples[kpKey],
     dailyTheme: dailyThemes[today as keyof typeof dailyThemes],
-    randomApplication: championship.dailyApplications.morningMindset[Math.floor(Math.random() * championship.dailyApplications.morningMindset.length)]
+    randomApplication:
+      championship.dailyApplications.morningMindset[
+        Math.floor(Math.random() * championship.dailyApplications.morningMindset.length)
+      ],
   };
 }
 
@@ -241,7 +288,7 @@ export const getMambaDailyContent = getChampionshipDailyContent;
  */
 export async function getAgeAppropriateGuidance(age: number) {
   const strength = await StrengthTraining.ageAppropriate();
-  
+
   if (age >= 8 && age <= 10) {
     return strength.ages8to10;
   } else if (age >= 11 && age <= 13) {
@@ -249,7 +296,7 @@ export async function getAgeAppropriateGuidance(age: number) {
   } else if (age >= 14 && age <= 16) {
     return strength.ages14to16;
   }
-  
+
   throw new Error('Age must be between 8 and 16');
 }
 
@@ -258,7 +305,7 @@ export async function getAgeAppropriateGuidance(age: number) {
  */
 export async function getTournamentRules(organization: string) {
   const org = organization.toUpperCase();
-  
+
   switch (org) {
     case 'NFHS':
     case 'HIGH SCHOOL':
@@ -282,7 +329,7 @@ export async function getTournamentRules(organization: string) {
 export async function generatePracticePlan(age: number, focus?: string) {
   const ageSpecific = await PracticePlanning.ageSpecific();
   const specialized = await PracticePlanning.specialized();
-  
+
   let ageGroup: string;
   if (age >= 8 && age <= 10) {
     ageGroup = '8U-10U';
@@ -293,9 +340,9 @@ export async function generatePracticePlan(age: number, focus?: string) {
   } else {
     throw new Error('Age must be between 8 and 16');
   }
-  
+
   const basePlan = ageSpecific[ageGroup as keyof typeof ageSpecific];
-  
+
   if (focus) {
     const focusKey = focus.toLowerCase().replace(/\s+/g, '');
     if (focusKey.includes('defense')) {
@@ -306,7 +353,7 @@ export async function generatePracticePlan(age: number, focus?: string) {
       return { ...basePlan, specialized: specialized.pitchingCatchingClinic };
     }
   }
-  
+
   return basePlan;
 }
 
@@ -320,14 +367,14 @@ export default {
   analyzeFielding,
   analyzeMental,
   analyzeVideo,
-  
+
   // Knowledge bases
   SoftballKnowledge,
   MentalTraining,
   StrengthTraining,
   TournamentRules,
   PracticePlanning,
-  
+
   // Helper functions
   getKnowledge,
   getMotivationalQuote,
@@ -335,5 +382,5 @@ export default {
   getMambaDailyContent, // legacy alias
   getAgeAppropriateGuidance,
   getTournamentRules,
-  generatePracticePlan
+  generatePracticePlan,
 };

@@ -14,7 +14,9 @@
     "setup-githooks": "git config core.hooksPath .githooks",
     "prepare": "npm run setup-githooks",
     "sync-workflows": "node scripts/add-workflow-entry.cjs",
-    "check-live-update": "node scripts/check-live-update.cjs"
+    "check-live-update": "node scripts/check-live-update.cjs",
+    "lint": "eslint .",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@google-cloud/storage": "^7.18.0",
