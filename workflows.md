@@ -7,6 +7,8 @@
 ---
 
 ## 🔁 Live Updates (canonical change log)
+- 2026-02-04 — Merge formatting fixes from main (commit: `f37b36a`) — author: pitchersmom16-glitch
+
 
 - 2026-02-04 — Fix Prettier formatting issues (commit: `b852e9f`) — author: pitchersmom16-glitch
 
