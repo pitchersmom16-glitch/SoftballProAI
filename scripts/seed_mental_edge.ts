@@ -401,7 +401,7 @@ const MENTAL_EDGE_CONTENT: MentalEdgeSeed[] = [
     source: "Hitting Psychology",
     content: "See ball, hit ball. Nothing else matters right now. Same approach every time creates confidence. Know what you're looking for and where you want to hit it. Two deep breaths. You're ready.",
     tags: ["at-bat", "focus", "hitting", "preparation"],
-    usageContext: "pre-at-bat", "on-deck", "batting"
+    usageContext: ["pre-at-bat", "on-deck", "batting"]
   }
 ];
 
