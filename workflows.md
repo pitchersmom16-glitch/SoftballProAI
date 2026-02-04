@@ -7,7 +7,9 @@
 
 ## 🔁 Live Updates (canonical change log)
 Keep this section current. Whenever code, routes, or user flows are changed, add a short entry with: **date**, **one-line summary**, **commit hash**, and **author**. This is the single source of truth for other agents (e.g., Claude) and collaborators.
-- 2026-02-04 — Save work: changes from 2026-02-04 (commit: `33fd8b8`) — author: pitchersmom16-glitch
+- 2026-02-04 — Add lint and format scripts with ESLint flat config and fix syntax errors (commit: `8c4cf81`) — author: copilot-swe-agent[bot]
+
+ 2026-02-04 — Save work: changes from 2026-02-04 (commit: `33fd8b8`) — author: pitchersmom16-glitch
 
  2026-01-30 — fix: update pricing and role selection to correct 3-mode spec - Player $14.99, Private Instructor (Pitching/Catching/Hitting) $49.99, Team Coach $99 (commit: `4d81a37`) — author: pitchersmom16-glitch
 
