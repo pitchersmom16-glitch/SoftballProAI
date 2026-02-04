@@ -7,6 +7,9 @@ export {
   insertMentalEdgeSchema,
   insertAssessmentSchema,
   insertFeedbackSchema,
+  CreateCoachRequest,
+  CreateTeamRequest,
+  CreateAssessmentRequest,
 } from './schema';
 
 import {

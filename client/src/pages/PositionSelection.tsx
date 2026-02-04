@@ -79,7 +79,7 @@ export default function PositionSelection() {
 
     try {
       // Update athlete profile with positions
-      await apiRequest('PUT', `/api/athletes/${athlete.id}`, {
+      await apiRequest('PUT', `/api/athletes/${(athlete as any).id}`, {
         primaryPosition: selectedPrimary,
         secondaryPosition: selectedSecondary,
       });

@@ -65,8 +65,7 @@ export default function Assessments() {
         athleteId: parseInt(selectedAthleteId),
         skillType: selectedSkill,
         videoUrl: fileUrl,
-        status: 'pending',
-        date: new Date().toISOString(), // Use string format for timestamp
+        date: new Date(), // Use Date object for timestamp
       },
       {
         onSuccess: () => {

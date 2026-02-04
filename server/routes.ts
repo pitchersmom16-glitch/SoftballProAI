@@ -123,7 +123,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         await storage.updateAthlete(athlete.id, {
           firstName: profileData.athleteFirstName,
           lastName: profileData.athleteLastName,
-          dob: new Date(profileData.athleteDateOfBirth),
+          dob: profileData.athleteDateOfBirth, // Already in string format from form
           school: profileData.athleteSchool,
           parentEmail: profileData.parentEmail,
           parentPhone: profileData.parentPhone,
@@ -158,7 +158,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
           userId, // Link athlete to parent user
           firstName: profileData.athleteFirstName,
           lastName: profileData.athleteLastName,
-          dob: new Date(profileData.athleteDateOfBirth),
+          dob: profileData.athleteDateOfBirth, // Already in string format from form
           school: profileData.athleteSchool,
           parentEmail: profileData.parentEmail,
           parentPhone: profileData.parentPhone,
@@ -2942,9 +2942,7 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
         stripeSubscriptionId: subscriptionData.id,
         tier: 'player', // Assuming this is for players
         status: subscriptionData.status,
-        currentPeriodStart: new Date((subscriptionData as any).current_period_start * 1000),
         currentPeriodEnd: new Date((subscriptionData as any).current_period_end * 1000),
-        trialEnd: subscriptionData.trial_end ? new Date(subscriptionData.trial_end * 1000) : null,
       });
 
       res.json({

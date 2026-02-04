@@ -571,11 +571,11 @@ export default function SpecialistRoster() {
                         for (const video of selectedStudent.baselineVideos || []) {
                           if (video.videoUrl) {
                             await apiRequest('POST', '/api/analysis/process', {
-                              assessmentId: video.assessmentId || 0,
+                              assessmentId: (video as any).assessmentId || 0,
                               videoUrl: video.videoUrl,
-                              skillType: video.skillType || 'PITCHING',
+                              skillType: (video as any).skillType || 'PITCHING',
                               athleteId: selectedStudent.id,
-                              videoCategory: video.videoCategory || 'fastball',
+                              videoCategory: (video as any).videoCategory || 'fastball',
                             });
                           }
                         }

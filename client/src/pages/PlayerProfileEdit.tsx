@@ -601,7 +601,7 @@ export default function PlayerProfileEdit() {
                                     if (checked) {
                                       field.onChange([...current, day]);
                                     } else {
-                                      field.onChange(current.filter((d) => d !== day));
+                                      field.onChange(current.filter((d: string) => d !== day));
                                     }
                                   }}
                                   data-testid={`checkbox-day-${day.toLowerCase()}`}

@@ -73,7 +73,7 @@ app.use((req, res, next) => {
         await setupVite(httpServer, app);
         log('Vite dev middleware set up successfully', 'vite');
       } catch (viteErr) {
-        log(`Vite middleware setup failed: ${viteErr?.stack || viteErr}`);
+        log(`Vite middleware setup failed: ${(viteErr as any)?.stack || viteErr}`);
         throw viteErr;
       }
     }
@@ -107,7 +107,7 @@ app.use((req, res, next) => {
       },
     );
   } catch (err) {
-    log(`Fatal error during server startup: ${err?.stack || err}`);
+    log(`Fatal error during server startup: ${(err as any)?.stack || err}`);
     process.exit(1);
   }
 })();
