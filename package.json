@@ -15,7 +15,7 @@
     "prepare": "npm run setup-githooks",
     "sync-workflows": "node scripts/add-workflow-entry.cjs",
     "check-live-update": "node scripts/check-live-update.cjs",
-    "lint": "eslint .",
+    "lint": "eslint client/src server",
     "format": "prettier --write ."
   },
   "dependencies": {
@@ -128,8 +128,10 @@
     "esbuild": "^0.25.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.14.0",
     "husky": "^9.1.7",
     "jest": "^30.2.0",
     "postcss": "^8.4.47",
